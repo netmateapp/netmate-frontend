@@ -1,0 +1,38 @@
+<script lang="ts">
+    export let x: number, y: number;
+</script>
+
+<a href="https://netmate.app" class="brand" style="--x: {x}px; --y: {y}px;">
+    <img class="logo" src="/logo-temp.png" alt="ネットメイトロゴ" />
+    <span class="logotype">ネットメイト</span>
+    <span class="version">v0.0.1</span>
+</a>
+
+<style>
+    .brand {
+        position: fixed;
+        left: var(--x);
+        top: var(--y);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .logo {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 3.5rem;
+    }
+
+    @font-face {
+        font-family: YuseiMagic;
+        src: url("/YuseiMagic-Regular-Subset.woff2") format("woff2");
+    }
+
+    .logotype, .version {
+        color: var(--secondary-color);
+        font-family: YuseiMagic;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+</style>
