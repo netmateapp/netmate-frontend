@@ -1,0 +1,30 @@
+:root {
+    --dominant-color: #fff;
+    --dominant-color-hover: rgba(0, 0, 0, 0.05);
+
+    --secondary-color: #0f1419;
+    --secondary-color-hover: #272c30;
+
+    --accent-color: #167ac6;
+    --dark-gray: #767676;
+    --light-gray: #d5d5d5;
+
+    --warning-color: #da1818;
+    --warning-color-hover: #de2f2f;
+
+    --font-primary: Roboto, Arial, sans-serif;
+    
+    --soft-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
+}
+
+@font-face {
+    font-family: Roboto;
+    src: url("/Roboto-Regular.woff2") format("woff2");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: Roboto;
+    src: url("/Roboto-Bold.woff2") format("woff2");
+    font-weight: 700;
+}
