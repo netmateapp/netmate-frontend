@@ -1,0 +1,16 @@
+{
+  "common": {
+    "brand": {
+      "logo": "かわいい二次元美少女のメイドさんがアップで写っているネットメイトのロゴ",
+      "logotype": "ネットメイト"
+    },
+    "menu": {
+      "signin-button-label": "ログイン",
+      "language-button-tooltip": "言語",
+      "location-button-tooltip": "場所",
+      "handles-button-tooltip": "名義",
+      "announcements-button-tooltip": "お知らせ",
+      "kebab-button-tooltip": "もっと見る"
+    }
+  }
+}
