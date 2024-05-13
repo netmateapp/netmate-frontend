@@ -1,38 +1,42 @@
 <script lang="ts">
-    export let x: number, y: number;
+  import { createTranslator } from "../../../i18n.svelte";
+
+  export let x: number, y: number;
+
+  const _ = createTranslator("common", "brand");
 </script>
 
 <a href="https://netmate.app" class="brand" style="--x: {x}px; --y: {y}px;">
-    <img class="logo" src="/logo-temp.png" alt="ネットメイトロゴ" />
-    <span class="logotype">ネットメイト</span>
-    <span class="version">v0.0.1</span>
+  <img class="logo" src="/logo-temp.png" alt={_("logo")} />
+  <span class="logotype">{_("logotype")}</span>
+  <span class="version">v0.0.1</span>
 </a>
 
 <style>
-    .brand {
-        position: fixed;
-        left: var(--x);
-        top: var(--y);
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-    }
+  .brand {
+    position: fixed;
+    top: var(--y);
+    left: var(--x);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
 
-    .logo {
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 3.5rem;
-    }
+  .logo {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 3.5rem;
+  }
 
-    @font-face {
-        font-family: YuseiMagic;
-        src: url("/YuseiMagic-Regular-Subset.woff2") format("woff2");
-    }
+  @font-face {
+    font-family: YuseiMagic;
+    src: url("/YuseiMagic-Regular-Subset.woff2") format("woff2");
+  }
 
-    .logotype, .version {
-        color: var(--secondary-color);
-        font-family: YuseiMagic;
-        font-size: 1rem;
-        font-weight: 400;
-    }
+  .logotype, .version {
+    color: var(--secondary-color);
+    font-family: YuseiMagic;
+    font-size: 1rem;
+    font-weight: 400;
+  }
 </style>
