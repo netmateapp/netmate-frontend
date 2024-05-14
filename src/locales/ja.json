@@ -18,6 +18,15 @@
       "handles-button-tooltip": "名義",
       "announcements-button-tooltip": "お知らせ",
       "see-more-button-tooltip": "もっと見る",
+      "language-item-label": "言語",
+      "language-menu-header-text": "言語を選択",
+      "location-item-label": "場所",
+      "settings-item-label": "設定",
+      "signout-item-label": "ログアウト",
+      "announcements-button-label": "お知らせ",
+      "terms-link-label": "利用規約",
+      "privacy-link-label": "個人情報保護方針",
+      "contact-link-label": "お問い合わせ",
       "signin-button-label": "ログイン"
     }
   }
