@@ -1,19 +1,14 @@
 <script lang="ts">
-  export let text: string;
-  export let x: number, y: number;
-  export let targetElementHeight: number;
+  import { getTooltipData } from "./useTooltip.svelte.js";
   let tooltipElement: HTMLElement | null;
-
-  $: if (tooltipElement) {
-    tooltipElement.style.left = `${x - tooltipElement.offsetWidth / 2}px`; // X座標を中心に調整
-    tooltipElement.style.top = `${y + targetElementHeight}px`; // Y座標をそのまま使用
-    console.log("Tooltip.s: " + x + ", " + y + ", " + targetElementHeight)
-  }
 </script>
 
-<div bind:this={tooltipElement} class="tooltip">
-  <span class="text">{text}</span>
-</div>
+{#if getTooltipData().show}
+  <div bind:this={tooltipElement} class="tooltip"  style="left: {getTooltipData().x - (tooltipElement?.offsetWidth ?? 0) / 2}px; top: {getTooltipData().y + getTooltipData().targetElementHeight + 2}px;">
+    <span class="text">{getTooltipData().text}</span>
+  </div>
+{/if}
+
 
 <style>
   .tooltip {
@@ -26,14 +21,13 @@
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
-    pointer-events: none;
   }
 
   .text {
     color: var(--dominant-color);
     font-family: var(--primary-font);
     font-size: 0.75rem;
-    font-weight: 400;
     line-height: 1rem;
+    white-space: nowrap;
   }
 </style>

@@ -1,56 +1,86 @@
 <script lang="ts">
-    import type { SvelteComponent } from "svelte";
   import { createTranslator } from "../../../i18n.svelte";
   import Tooltip from "../tooltip/Tooltip.svelte";
+  import { tooltip } from "../tooltip/useTooltip.svelte";
 
   const _ = createTranslator("common", "menu");
+
+  const LANGUAGES: string[] = ["japanese", "korean", "traditional-chinese", "us-english"];
+
+  // 言語ボタン関連
+  let isLanguageButtonToggled = $state(false);
+  let languageButtonRef: Element | null = $state(null);
+  function toggleLanguageButton(event: MouseEvent | KeyboardEvent) {
+    if (isLanguageButtonToggled) {
+      isLanguageButtonToggled = false;
+    } else if (languageButtonRef?.contains(event.target as Element)) {
+      isLanguageButtonToggled = true;
+    }
+  }
+
+  // 場所ボタン関連
+  let isLocationButtonToggled = $state(false);
+  let locationButtonRef: Element | null = $state(null);
+  function toggleLocationButton(event: MouseEvent | KeyboardEvent) {
+    if (isLocationButtonToggled) {
+      isLocationButtonToggled = false;
+    } else if (locationButtonRef?.contains(event.target as Element)) {
+      isLocationButtonToggled = true;
+    }
+  }
 
   // 名義ボタン関連
   let isHandlesButtonToggled = $state(false);
   let handlesButtonRef: Element | null = $state(null);
-  function toggleHandlesButton(event: MouseEvent) {
-    if (isHandlesButtonToggled) isHandlesButtonToggled = false;
-    else if (handlesButtonRef?.contains(event.target as Element)) isHandlesButtonToggled = true;
+  function toggleHandlesButton(event: MouseEvent | KeyboardEvent) {
+    if (isHandlesButtonToggled) {
+      isHandlesButtonToggled = false;
+    } else if (handlesButtonRef?.contains(event.target as Element)) {
+      isHandlesButtonToggled = true;
+    }
   }
 
-  let showTooltip = $state(false);
-  let tooltipText = $state("");
-  let tooltipX = $state(0);
-  let tooltipY = $state(0);
-
-  function handleMouseEnter(text: string, event: MouseEvent) {
-    const rect = (event.target as Element).getBoundingClientRect();
-    tooltipText = text;
-    tooltipX = rect.left + window.scrollX + rect.width / 2;
-    tooltipY = rect.top + window.scrollY;
-    showTooltip = true;
+  // お知らせボタン関連
+  let isAnnouncementsButtonToggled = $state(false);
+  let hasUnreadAnnouncement = $state(true);
+  let announcementsButtonRef: Element | null = $state(null);
+  function toggleAnnouncementsButton(event: MouseEvent | KeyboardEvent) {
+    if (isAnnouncementsButtonToggled) {
+      isAnnouncementsButtonToggled = false;
+    } else if (announcementsButtonRef?.contains(event.target as Element)) {
+      isAnnouncementsButtonToggled = true;
+    }
   }
 
-  function handleMouseLeave() {
-    showTooltip = false;
+  // もっと見るボタン関連
+  let isSeeMoreButtonToggled = $state(false);
+  let seeMoreButtonRef: Element |null = $state(null);
+  function toggleSeeMoreButton(event: MouseEvent | KeyboardEvent) {
+    if (isSeeMoreButtonToggled) {
+      isSeeMoreButtonToggled = false;
+    } else if (seeMoreButtonRef?.contains(event.target as Element)) {
+      isSeeMoreButtonToggled = true;
+    }
   }
 
-  function handleFocusEvent(text: string, event: FocusEvent) {
-    const rect = (event.target as Element).getBoundingClientRect();
-    tooltipText = text;
-    tooltipX = rect.left + window.scrollX + rect.width / 2;
-    tooltipY = rect.top + window.scrollY;
-    showTooltip = true;
-  }
-
-  function handleBlurEvent() {
-    showTooltip = false;
-  }
-
-  let isAnnouncementsButtonToggled = false;
-  let hasUnreadAnnouncement = false;
-
+  // 各要素にon:xxxでハンドラを結び付けた場合、要素の領域外のクリックは拾わない
+  // ボタン外がクリックされた際にトグルが解除される必要があるため、要素にハンドラを結び付けない
   $effect(() => {
-    [toggleHandlesButton].forEach(handler => document.addEventListener("click", handler));
-  });
+    [
+      toggleLanguageButton,
+      toggleLocationButton,
+      toggleHandlesButton,
+      toggleAnnouncementsButton,
+      toggleSeeMoreButton
+    ].forEach(handler => {
+      document.addEventListener("click", handler);
+      document.addEventListener("keydown", handler);
+    })
+  })
 
+  // mocks
   function isLoggedIn(): boolean {
-    return false;
+    return true;
   }
 
   function userLanguageCode(): string {
@@ -64,37 +94,44 @@
 
 <div class="header">
   {#if isLoggedIn()}
-    <div class="stateful-button">
-      <svg class="stateful-button-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <!-- stateful-button-icon部分は無駄の可能性があるので後ほど削減 -->
+    <button
+      bind:this={languageButtonRef}
+      class="stateful-button"
+      class:button-toggled={isLanguageButtonToggled}
+      use:tooltip={_("language-button-tooltip")}>
+      <svg class="stateful-button-icon">
         <path d="M11.9002 21.0003L16.2579 10.0003H17.2809L21.6386 21.0003H20.5579L19.3675 17.9503H14.1713L12.9809 21.0003H11.9002ZM4.01939 18.1157L3.31169 17.408L8.20787 12.4926C7.63735 11.9093 7.06972 11.1913 6.50497 10.3388C5.94023 9.48622 5.52197 8.70672 5.25017 8.00031H6.33094C6.57452 8.56056 6.94312 9.20415 7.43672 9.93108C7.9303 10.658 8.42324 11.2759 8.91554 11.7849C9.78606 10.9016 10.5588 9.93204 11.2338 8.87626C11.9088 7.82049 12.3579 6.86184 12.5809 6.00031H2.38477V5.00031H8.50017V3.76953H9.50017V5.00031H15.6156V6.00031H13.6194C13.3207 7.04646 12.8117 8.1612 12.0925 9.34453C11.3732 10.5279 10.5502 11.5811 9.62324 12.5042L12.1579 15.108L11.7732 16.1388L8.91554 13.2061L4.01939 18.1157ZM14.5079 17.0465H19.0309L16.7694 11.2349L14.5079 17.0465Z"/>
       </svg>
       <span class="current-state">{userLanguageCode()}</span>
+    </button>
+
+    <div class="language-menu">
+      {#each LANGUAGES as language}
+        <div class="language-menu-item">
+          <span class="language-menu-label">{_(language)}</span>
+        </div>
+      {/each}
     </div>
 
-    <div class="stateful-button">
-      <svg class="stateful-button-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <div
+      bind:this={locationButtonRef}
+      class="stateful-button"
+      class:button-toggled={isLocationButtonToggled}
+      use:tooltip={_("location-button-tooltip")}>
+      <svg class="stateful-button-icon">
         <path d="M12.0034 21C10.7588 21 9.58872 20.7638 8.4931 20.2915C7.39748 19.8192 6.44444 19.1782 5.63397 18.3685C4.82352 17.5588 4.18192 16.6066 3.70915 15.512C3.23638 14.4174 3 13.2479 3 12.0034C3 10.7588 3.23616 9.58872 3.70848 8.4931C4.18081 7.39748 4.82183 6.44444 5.63153 5.63398C6.44123 4.82353 7.39337 4.18192 8.48795 3.70915C9.58255 3.23638 10.7521 3 11.9966 3C13.2412 3 14.4113 3.23616 15.5069 3.70847C16.6025 4.18081 17.5556 4.82182 18.366 5.63152C19.1765 6.44122 19.8181 7.39337 20.2908 8.48795C20.7636 9.58255 21 10.7521 21 11.9966C21 13.2412 20.7638 14.4113 20.2915 15.5069C19.8192 16.6025 19.1782 17.5556 18.3685 18.366C17.5588 19.1765 16.6066 19.8181 15.512 20.2909C14.4174 20.7636 13.2479 21 12.0034 21ZM11 19.95V18C10.45 18 9.97917 17.8042 9.5875 17.4125C9.19583 17.0208 9 16.55 9 16V15L4.2 10.2C4.15 10.5 4.10417 10.8 4.0625 11.1C4.02083 11.4 4 11.7 4 12C4 14.0167 4.6625 15.7833 5.9875 17.3C7.3125 18.8167 8.98333 19.7 11 19.95ZM17.9 17.4C18.2333 17.0333 18.5333 16.6375 18.8 16.2125C19.0667 15.7875 19.2875 15.3458 19.4625 14.8875C19.6375 14.4292 19.7708 13.9583 19.8625 13.475C19.9542 12.9917 20 12.5 20 12C20 10.357 19.549 8.85651 18.6471 7.49852C17.7452 6.14054 16.5295 5.16155 15 4.56155V5C15 5.55 14.8042 6.02083 14.4125 6.4125C14.0208 6.80417 13.55 7 13 7H11V9C11 9.28333 10.9042 9.52083 10.7125 9.7125C10.5208 9.90417 10.2833 10 10 10H8V12H14C14.2833 12 14.5208 12.0958 14.7125 12.2875C14.9042 12.4792 15 12.7167 15 13V16H16C16.4333 16 16.825 16.1292 17.175 16.3875C17.525 16.6458 17.7667 16.9833 17.9 17.4Z"/>
       </svg>
       <span class="current-state">{userLocationCode()}</span>
     </div>
-
-    <svg class="button">
-      <path d="M14.4619 21C14.1869 21 13.9515 20.9021 13.7557 20.7063C13.5598 20.5104 13.4619 20.275 13.4619 20C13.4619 19.725 13.5598 19.4896 13.7557 19.2938C13.9515 19.0979 14.1869 19 14.4619 19C14.7369 19 14.9724 19.0979 15.1682 19.2938C15.364 19.4896 15.4619 19.725 15.4619 20C15.4619 20.275 15.364 20.5104 15.1682 20.7063C14.9724 20.9021 14.7369 21 14.4619 21ZM20.0004 21C19.7254 21 19.49 20.9021 19.2941 20.7063C19.0983 20.5104 19.0004 20.275 19.0004 20C19.0004 19.725 19.0983 19.4896 19.2941 19.2938C19.49 19.0979 19.7254 19 20.0004 19C20.2754 19 20.5108 19.0979 20.7066 19.2938C20.9025 19.4896 21.0004 19.725 21.0004 20C21.0004 20.275 20.9025 20.5104 20.7066 20.7063C20.5108 20.9021 20.2754 21 20.0004 21ZM25.5389 21C25.2638 21 25.0284 20.9021 24.8326 20.7063C24.6368 20.5104 24.5388 20.275 24.5388 20C24.5388 19.725 24.6368 19.4896 24.8326 19.2938C25.0284 19.0979 25.2638 19 25.5389 19C25.8139 19 26.0493 19.0979 26.2451 19.2938C26.4409 19.4896 26.5389 19.725 26.5389 20C26.5389 20.275 26.4409 20.5104 26.2451 20.7063C26.0493 20.9021 25.8139 21 25.5389 21Z" fill="#0F1419"/>
-    </svg>
-
-    <button class="signin-button">
-      <span class="signin-button-label">{_("signin-button-label")}</span>
-    </button>
   {:else}
     <svg
       bind:this={handlesButtonRef}
       role="button"
       tabindex="0"
       class="button"
-      onmouseenter={event => handleMouseEnter(_("handles-button-tooltip"), event)}
-      onmouseleave={handleMouseLeave}
-      onfocus={event => handleFocusEvent(_("handles-button-tooltip"), event)}
-      onblur={handleBlurEvent}>
+      class:button-toggled={isHandlesButtonToggled}
+      use:tooltip={_("handles-button-tooltip")}>
       {#if isHandlesButtonToggled}
         <path d="M20 19.3848C19.175 19.3848 18.4688 19.091 17.8812 18.5035C17.2938 17.916 17 17.2098 17 16.3848C17 15.5598 17.2938 14.8535 17.8812 14.266C18.4688 13.6785 19.175 13.3848 20 13.3848C20.825 13.3848 21.5312 13.6785 22.1188 14.266C22.7063 14.8535 23 15.5598 23 16.3848C23 17.2098 22.7063 17.916 22.1188 18.5035C21.5312 19.091 20.825 19.3848 20 19.3848ZM13 26.6158V24.9695C13 24.5567 13.1202 24.1704 13.3605 23.8108C13.601 23.4513 13.9244 23.1721 14.3307 22.9733C15.2744 22.5208 16.2187 22.1813 17.1635 21.955C18.1083 21.7288 19.0538 21.6158 20 21.6158C20.9462 21.6158 21.8917 21.7288 22.8365 21.955C23.7813 22.1813 24.7256 22.5208 25.6693 22.9733C26.0756 23.1721 26.399 23.4513 26.6395 23.8108C26.8798 24.1704 27 24.5567 27 24.9695V26.6158H13Z"/>
       {:else}
@@ -102,22 +139,38 @@
       {/if}
     </svg>
 
-    <svg role="button" tabindex="0" class="button" onmouseenter={event => handleMouseEnter(_("announcements-button-tooltip"), event)} onmouseleave={handleMouseLeave}>
+    <svg
+      bind:this={announcementsButtonRef}
+      role="button"
+      tabindex="0"
+      class="button"
+      class:has-unread-announcement={hasUnreadAnnouncement}
+      class:button-toggled={isAnnouncementsButtonToggled}
+      use:tooltip={_("announcements-button-tooltip")}>
       {#if isAnnouncementsButtonToggled}
-        <path d="M19.5 24.5H20.5V19H19.5V24.5ZM20 17.577C20.1743 17.577 20.3205 17.518 20.4385 17.4C20.5565 17.282 20.6155 17.1358 20.6155 16.9615C20.6155 16.7872 20.5565 16.641 20.4385 16.523C20.3205 16.4052 20.1743 16.3462 20 16.3462C19.8257 16.3462 19.6795 16.4052 19.5615 16.523C19.4435 16.641 19.3845 16.7872 19.3845 16.9615C19.3845 17.1358 19.4435 17.282 19.5615 17.4C19.6795 17.518 19.8257 17.577 20 17.577ZM20.0033 29C18.7588 29 17.5887 28.7638 16.493 28.2915C15.3975 27.8192 14.4445 27.1782 13.634 26.3685C12.8235 25.5588 12.1819 24.6067 11.7092 23.512C11.2364 22.4175 11 21.2479 11 20.0033C11 18.7588 11.2362 17.5887 11.7085 16.493C12.1808 15.3975 12.8218 14.4445 13.6315 13.634C14.4412 12.8235 15.3933 12.1819 16.488 11.7092C17.5825 11.2364 18.7521 11 19.9967 11C21.2413 11 22.4113 11.2362 23.507 11.7085C24.6025 12.1808 25.5555 12.8218 26.366 13.6315C27.1765 14.4412 27.8181 15.3933 28.2908 16.488C28.7636 17.5825 29 18.7521 29 19.9967C29 21.2413 28.7638 22.4113 28.2915 23.507C27.8192 24.6025 27.1782 25.5555 26.3685 26.366C25.5588 27.1765 24.6067 27.8181 23.512 28.2908C22.4175 28.7636 21.2479 29 20.0033 29Z" fill="#0F1419"/>
+        <path d="M19.5 24.5H20.5V19H19.5V24.5ZM20 17.577C20.1743 17.577 20.3205 17.518 20.4385 17.4C20.5565 17.282 20.6155 17.1358 20.6155 16.9615C20.6155 16.7872 20.5565 16.641 20.4385 16.523C20.3205 16.4052 20.1743 16.3462 20 16.3462C19.8257 16.3462 19.6795 16.4052 19.5615 16.523C19.4435 16.641 19.3845 16.7872 19.3845 16.9615C19.3845 17.1358 19.4435 17.282 19.5615 17.4C19.6795 17.518 19.8257 17.577 20 17.577ZM20.0033 29C18.7588 29 17.5887 28.7638 16.493 28.2915C15.3975 27.8192 14.4445 27.1782 13.634 26.3685C12.8235 25.5588 12.1819 24.6067 11.7092 23.512C11.2364 22.4175 11 21.2479 11 20.0033C11 18.7588 11.2362 17.5887 11.7085 16.493C12.1808 15.3975 12.8218 14.4445 13.6315 13.634C14.4412 12.8235 15.3933 12.1819 16.488 11.7092C17.5825 11.2364 18.7521 11 19.9967 11C21.2413 11 22.4113 11.2362 23.507 11.7085C24.6025 12.1808 25.5555 12.8218 26.366 13.6315C27.1765 14.4412 27.8181 15.3933 28.2908 16.488C28.7636 17.5825 29 18.7521 29 19.9967C29 21.2413 28.7638 22.4113 28.2915 23.507C27.8192 24.6025 27.1782 25.5555 26.3685 26.366C25.5588 27.1765 24.6067 27.8181 23.512 28.2908C22.4175 28.7636 21.2479 29 20.0033 29Z"/>
       {:else}
-        <path d="M19.5 24.5H20.5V19H19.5V24.5ZM20 17.5769C20.1744 17.5769 20.3205 17.518 20.4385 17.4C20.5564 17.2821 20.6154 17.1359 20.6154 16.9615C20.6154 16.7872 20.5564 16.641 20.4385 16.5231C20.3205 16.4051 20.1744 16.3462 20 16.3462C19.8256 16.3462 19.6795 16.4051 19.5615 16.5231C19.4436 16.641 19.3846 16.7872 19.3846 16.9615C19.3846 17.1359 19.4436 17.2821 19.5615 17.4C19.6795 17.518 19.8256 17.5769 20 17.5769ZM20.0034 29C18.7588 29 17.5887 28.7638 16.4931 28.2915C15.3975 27.8192 14.4444 27.1782 13.634 26.3685C12.8235 25.5588 12.1819 24.6066 11.7091 23.512C11.2364 22.4174 11 21.2479 11 20.0034C11 18.7588 11.2362 17.5887 11.7085 16.4931C12.1808 15.3975 12.8218 14.4444 13.6315 13.634C14.4412 12.8235 15.3934 12.1819 16.488 11.7092C17.5826 11.2364 18.7521 11 19.9966 11C21.2412 11 22.4113 11.2362 23.5069 11.7085C24.6025 12.1808 25.5556 12.8218 26.366 13.6315C27.1765 14.4412 27.8181 15.3934 28.2908 16.488C28.7636 17.5826 29 18.7521 29 19.9966C29 21.2412 28.7638 22.4113 28.2915 23.5069C27.8192 24.6025 27.1782 25.5556 26.3685 26.366C25.5588 27.1765 24.6066 27.8181 23.512 28.2909C22.4174 28.7636 21.2479 29 20.0034 29ZM20 28C22.2333 28 24.125 27.225 25.675 25.675C27.225 24.125 28 22.2333 28 20C28 17.7667 27.225 15.875 25.675 14.325C24.125 12.775 22.2333 12 20 12C17.7667 12 15.875 12.775 14.325 14.325C12.775 15.875 12 17.7667 12 20C12 22.2333 12.775 24.125 14.325 25.675C15.875 27.225 17.7667 28 20 28Z" fill="#0F1419"/>
+        <path d="M19.5 24.5H20.5V19H19.5V24.5ZM20 17.5769C20.1744 17.5769 20.3205 17.518 20.4385 17.4C20.5564 17.2821 20.6154 17.1359 20.6154 16.9615C20.6154 16.7872 20.5564 16.641 20.4385 16.5231C20.3205 16.4051 20.1744 16.3462 20 16.3462C19.8256 16.3462 19.6795 16.4051 19.5615 16.5231C19.4436 16.641 19.3846 16.7872 19.3846 16.9615C19.3846 17.1359 19.4436 17.2821 19.5615 17.4C19.6795 17.518 19.8256 17.5769 20 17.5769ZM20.0034 29C18.7588 29 17.5887 28.7638 16.4931 28.2915C15.3975 27.8192 14.4444 27.1782 13.634 26.3685C12.8235 25.5588 12.1819 24.6066 11.7091 23.512C11.2364 22.4174 11 21.2479 11 20.0034C11 18.7588 11.2362 17.5887 11.7085 16.4931C12.1808 15.3975 12.8218 14.4444 13.6315 13.634C14.4412 12.8235 15.3934 12.1819 16.488 11.7092C17.5826 11.2364 18.7521 11 19.9966 11C21.2412 11 22.4113 11.2362 23.5069 11.7085C24.6025 12.1808 25.5556 12.8218 26.366 13.6315C27.1765 14.4412 27.8181 15.3934 28.2908 16.488C28.7636 17.5826 29 18.7521 29 19.9966C29 21.2412 28.7638 22.4113 28.2915 23.5069C27.8192 24.6025 27.1782 25.5556 26.3685 26.366C25.5588 27.1765 24.6066 27.8181 23.512 28.2909C22.4174 28.7636 21.2479 29 20.0034 29ZM20 28C22.2333 28 24.125 27.225 25.675 25.675C27.225 24.125 28 22.2333 28 20C28 17.7667 27.225 15.875 25.675 14.325C24.125 12.775 22.2333 12 20 12C17.7667 12 15.875 12.775 14.325 14.325C12.775 15.875 12 17.7667 12 20C12 22.2333 12.775 24.125 14.325 25.675C15.875 27.225 17.7667 28 20 28Z"/>
       {/if}
     </svg>
+  {/if}
     
-    <svg class="button">
-      <path d="M14.4619 21C14.1869 21 13.9515 20.9021 13.7557 20.7063C13.5598 20.5104 13.4619 20.275 13.4619 20C13.4619 19.725 13.5598 19.4896 13.7557 19.2938C13.9515 19.0979 14.1869 19 14.4619 19C14.7369 19 14.9724 19.0979 15.1682 19.2938C15.364 19.4896 15.4619 19.725 15.4619 20C15.4619 20.275 15.364 20.5104 15.1682 20.7063C14.9724 20.9021 14.7369 21 14.4619 21ZM20.0004 21C19.7254 21 19.49 20.9021 19.2941 20.7063C19.0983 20.5104 19.0004 20.275 19.0004 20C19.0004 19.725 19.0983 19.4896 19.2941 19.2938C19.49 19.0979 19.7254 19 20.0004 19C20.2754 19 20.5108 19.0979 20.7066 19.2938C20.9025 19.4896 21.0004 19.725 21.0004 20C21.0004 20.275 20.9025 20.5104 20.7066 20.7063C20.5108 20.9021 20.2754 21 20.0004 21ZM25.5389 21C25.2638 21 25.0284 20.9021 24.8326 20.7063C24.6368 20.5104 24.5388 20.275 24.5388 20C24.5388 19.725 24.6368 19.4896 24.8326 19.2938C25.0284 19.0979 25.2638 19 25.5389 19C25.8139 19 26.0493 19.0979 26.2451 19.2938C26.4409 19.4896 26.5389 19.725 26.5389 20C26.5389 20.275 26.4409 20.5104 26.2451 20.7063C26.0493 20.9021 25.8139 21 25.5389 21Z" fill="#0F1419"/>
-    </svg>
-  {/if}
+  <svg
+    bind:this={seeMoreButtonRef}
+    role="button"
+    tabindex="0"
+    class="button"
+    class:button-toggled={isSeeMoreButtonToggled}
+    use:tooltip={_("see-more-button-tooltip")}>
+    <path d="M14.4619 21C14.1869 21 13.9515 20.9021 13.7557 20.7063C13.5598 20.5104 13.4619 20.275 13.4619 20C13.4619 19.725 13.5598 19.4896 13.7557 19.2938C13.9515 19.0979 14.1869 19 14.4619 19C14.7369 19 14.9724 19.0979 15.1682 19.2938C15.364 19.4896 15.4619 19.725 15.4619 20C15.4619 20.275 15.364 20.5104 15.1682 20.7063C14.9724 20.9021 14.7369 21 14.4619 21ZM20.0004 21C19.7254 21 19.49 20.9021 19.2941 20.7063C19.0983 20.5104 19.0004 20.275 19.0004 20C19.0004 19.725 19.0983 19.4896 19.2941 19.2938C19.49 19.0979 19.7254 19 20.0004 19C20.2754 19 20.5108 19.0979 20.7066 19.2938C20.9025 19.4896 21.0004 19.725 21.0004 20C21.0004 20.275 20.9025 20.5104 20.7066 20.7063C20.5108 20.9021 20.2754 21 20.0004 21ZM25.5389 21C25.2638 21 25.0284 20.9021 24.8326 20.7063C24.6368 20.5104 24.5388 20.275 24.5388 20C24.5388 19.725 24.6368 19.4896 24.8326 19.2938C25.0284 19.0979 25.2638 19 25.5389 19C25.8139 19 26.0493 19.0979 26.2451 19.2938C26.4409 19.4896 26.5389 19.725 26.5389 20C26.5389 20.275 26.4409 20.5104 26.2451 20.7063C26.0493 20.9021 25.8139 21 25.5389 21Z"/>
+  </svg>
 
-  {#if showTooltip}
-    <Tooltip text={tooltipText} x={tooltipX} y={tooltipY} targetElementHeight={handlesButtonRef?.getBoundingClientRect().height ?? 0} />
+  {#if isLoggedIn()}
+    <a href="../../signin" class="signin-button">
+      <span class="signin-button-label">{_("signin-button-label")}</span>
+    </a>
   {/if}
+  <Tooltip />
 </div>
 
 <style>
@@ -155,14 +208,46 @@
     color: var(--light-gray);
   }
 
+  .language-menu {
+    border-radius: 1rem;
+    background-color: var(--dominant-color);
+    box-shadow: var(--soft-shadow);
+    padding: 0.5rem 0rem;
+    display: grid;
+    width: fit-content;
+    overflow: hidden;
+  }
+
+  .language-menu-item {
+    display: flex;
+    height: 2.25rem;
+    padding: 0.5rem 1rem;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: stretch;
+    cursor: pointer;
+  }
+
+  .language-menu-item:hover {
+    background-color: var(--dominant-color-hover);
+  }
+
+  .language-menu-label {
+    color: var(--secondary-color);
+    font-family: var(--primary-font);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
   .button {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
     fill: var(--secondary-color);
+    background-color: var(--dominant-color);
   }
 
-  .button:hover {
+  .button:hover, .button-toggled {
     background-color: var(--dominant-color-hover);
   }
 
