@@ -30,10 +30,10 @@
 }
 
 /* a11y: タブ時のみフォーカスを表示する */
-.button:focus {
+:focus {
   outline: 2px solid var(--accent-color);
 }
 
-.using-mouse .button:focus {
+.using-mouse :focus {
   outline: none;
 }

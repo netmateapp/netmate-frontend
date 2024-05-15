@@ -4,30 +4,39 @@
       "logo": "かわいい二次元美少女のメイドさんがアップで写っているネットメイトのロゴ",
       "logotype": "ネットメイト"
     },
-    "menu": {
+    "navigation": {
       "language-button-tooltip": "言語",
-      "japanese": "日本語",
-      "korean": "韓国語",
-      "traditional-chinese": "中国語(繁体字)",
-      "us-english": "英語(US)",
       "location-button-tooltip": "場所",
-      "japan": "日本",
-      "korea": "韓国",
-      "taiwan": "台湾",
-      "united-states": "アメリカ合衆国",
       "handles-button-tooltip": "名義",
       "announcements-button-tooltip": "お知らせ",
       "see-more-button-tooltip": "もっと見る",
       "language-item-label": "言語",
-      "language-menu-header-text": "言語を選択",
       "location-item-label": "場所",
       "settings-item-label": "設定",
       "signout-item-label": "ログアウト",
-      "announcements-button-label": "お知らせ",
+      "announcements-item-label": "お知らせ",
       "terms-link-label": "利用規約",
       "privacy-link-label": "個人情報保護方針",
       "contact-link-label": "お問い合わせ",
+      "japanese": "日本語",
+      "korean": "韓国語",
+      "traditional-chinese": "中国語(繁体字)",
+      "us-english": "英語(US)",
+      "japan": "日本",
+      "korea": "韓国",
+      "taiwan": "台湾",
+      "united-states": "アメリカ合衆国",
       "signin-button-label": "ログイン"
+    },
+    "menu": {
+      "language-button-tooltip": "言語",
+      "handles-button-tooltip": "名義",
+      "edit-handle": "編集",
+      "delete-handle": "削除",
+      "anonymous": "匿名",
+      "shares-count": "{count}件の共有", 
+      "new-handle-input-placeholder": "名義を作成…",
+      "announcements-button-tooltip": "お知らせ"
     }
   }
 }

@@ -17,7 +17,7 @@ export function createPersistedStore(key: string, startValue: any) {
   return store;
 }
 
-export const userLanguage = createPersistedStore("userLanguage", "en");
+export const language = createPersistedStore("language", "ja");
 
 export function createSessionStore(key: string, startValue: any) {
   let value = startValue;

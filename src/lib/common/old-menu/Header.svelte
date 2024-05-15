@@ -43,7 +43,7 @@
   let isHandlesButtonToggled = $state(false);
   let handlesButtonRef: Element | null = $state(null);
   function toggleHandlesButton(event: MouseEvent | KeyboardEvent) {
-    if (isHandlesButtonToggled) {
+    if (isHandlesButtonToggled && !handlesMenuRef?.contains(event.target as Element)) {
       isHandlesButtonToggled = false;
     } else if (handlesButtonRef?.contains(event.target as Element)) {
       isHandlesButtonToggled = true;
@@ -66,11 +66,33 @@
     return [new Handle(0, "匿名", 341), new Handle(12434, "はらむらのどか", 543), new Handle(7373748, "のどっち", 2849)];
   }
 
+  let handlesMenuRef: Element | null = $state(null);
+
+  let isHandleOperationsButtonToggled: boolean = $state(false);
+  let operationTargetHandle: Handle | null = $state(null);
+  let handleOperationsMenuRef: Element | null = $state(null);
+  function handleHandleOperationsButton(event: MouseEvent | KeyboardEvent, handle: Handle) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    isHandleOperationsButtonToggled = true;
+    operationTargetHandle = handle;
+  }
+
+  function handleHandleOperationMenu(event: MouseEvent | KeyboardEvent) {
+    let element = event.target as Element;
+    if (isHandleOperationsButtonToggled && !handleOperationsMenuRef?.contains(element)) {
+      event.stopPropagation();
+      isHandleOperationsButtonToggled = false;
+      operationTargetHandle = null;
+    }
+  }
+
   // お知らせメニュー関連
   let isAnnouncementsButtonToggled = $state(false);
   let announcementsButtonRef: Element | null = $state(null);
   function toggleAnnouncementsButton(event: MouseEvent | KeyboardEvent) {
-    if (isAnnouncementsButtonToggled) {
+    if (isAnnouncementsButtonToggled && !announcementsMenuRef?.contains(event.target as Element)) {
       isAnnouncementsButtonToggled = false;
     } else if (announcementsButtonRef?.contains(event.target as Element)) {
       isAnnouncementsButtonToggled = true;
@@ -174,13 +196,18 @@
       toggleLanguageButton,
       toggleLocationButton,
       toggleHandlesButton,
+      handleHandleOperationMenu,
       toggleAnnouncementsButton,
       toggleSeeMoreButton,
       toggleLanguageItem,
       toggleLocationItem,
     ].forEach(handler => {
       document.addEventListener("click", handler);
-      document.addEventListener("keydown", handler);
+      document.addEventListener("keydown", (event: KeyboardEvent) => {
+        if (event.key === "Enter") {
+          handler(event);
+        }
+      });
     })
   })
 
@@ -200,7 +227,6 @@
 
 <div class="header">
   {#if isLoggedIn()}
-    <!-- stateful-button-icon部分は無駄の可能性があるので後ほど削減 -->
     <button
       bind:this={languageButtonRef}
       class="stateful-button"
@@ -273,13 +299,45 @@
     </svg>
   {/if}
 
+  {#if isHandlesButtonToggled}
+    <div bind:this={handlesMenuRef} class="handles-menu" style={calculateMenuPosition(handlesButtonRef, handlesMenuRef)}>
+      {#each handles() as handle, i}
+        <a href="https://netmate.app/handles/{handle.id}" class="handles-menu-item">
+          <div class="handle-information">
+            <span class="handle">{i ? handle.name : _("anonymous")}</span>
+            <span class="shares-count">{_("shares-count", {count: handle.sharesCount})}</span>
+          </div>
+          <svg class="handle-operations-button">
+            <path d="M11.4619 18C11.1869 18 10.9515 17.9021 10.7557 17.7063C10.5598 17.5104 10.4619 17.275 10.4619 17C10.4619 16.725 10.5598 16.4896 10.7557 16.2938C10.9515 16.0979 11.1869 16 11.4619 16C11.7369 16 11.9724 16.0979 12.1682 16.2938C12.364 16.4896 12.4619 16.725 12.4619 17C12.4619 17.275 12.364 17.5104 12.1682 17.7063C11.9724 17.9021 11.7369 18 11.4619 18ZM17.0004 18C16.7254 18 16.49 17.9021 16.2941 17.7063C16.0983 17.5104 16.0004 17.275 16.0004 17C16.0004 16.725 16.0983 16.4896 16.2941 16.2938C16.49 16.0979 16.7254 16 17.0004 16C17.2754 16 17.5108 16.0979 17.7066 16.2938C17.9025 16.4896 18.0004 16.725 18.0004 17C18.0004 17.275 17.9025 17.5104 17.7066 17.7063C17.5108 17.9021 17.2754 18 17.0004 18ZM22.5389 18C22.2638 18 22.0284 17.9021 21.8326 17.7063C21.6368 17.5104 21.5388 17.275 21.5388 17C21.5388 16.725 21.6368 16.4896 21.8326 16.2938C22.0284 16.0979 22.2638 16 22.5389 16C22.8139 16 23.0493 16.0979 23.2451 16.2938C23.4409 16.4896 23.5389 16.725 23.5389 17C23.5389 17.275 23.4409 17.5104 23.2451 17.7063C23.0493 17.9021 22.8139 18 22.5389 18Z"/>
+          </svg>
+        </a>
+      {/each}
+      <div class="new-handle-creator">
+        <svg class="handle-menu-icon">
+          <path d="M11.5 12.5H6V11.5H11.5V6H12.5V11.5H18V12.5H12.5V18H11.5V12.5Z"/>
+        </svg>
+        <input class="new-handle-input" placeholder={_("new-handle-input-placeholder")}>
+      </div>
+    </div>
+    {#if isHandleOperationsButtonToggled}
+      <div bind:this={handleOperationsMenuRef} class="handle-operations-menu">
+        <div class="handle-operations-menu-item">
+          <span class="handle-operations-menu-label">{_("edit-handle")}</span>
+        </div>
+        <div class="handle-operations-menu-item">
+          <span class="handle-operations-menu-label">{_("delete-handle")}</span>
+        </div>
+      </div>
+    {/if}
+  {/if}
+
   {#if isAnnouncementsButtonToggled}
     <div bind:this={announcementsMenuRef} class="announcements-menu" style={calculateMenuPosition(announcementsButtonRef, announcementsMenuRef)}>
       {#each announcements() as announcement}
-        <div class="announcements-menu-item">
+        <a href="https://netmate.app/announcements/{announcement.id}" class="announcements-menu-item">
           <span class="announcements-menu-timestamp">{announcement.id}</span>
           <span class="announcements-menu-title" class:unread-announcement={!announcement.read}>{announcement.title}</span>
-        </div>
+        </a>
       {/each}
     </div>
   {/if}
@@ -331,7 +389,7 @@
         </button>
       {:else}
         <button class="main-menu-item">
-          <svg>
+          <svg class="main-menu-icon">
             <path d="M11.5 16.5H12.5V11H11.5V16.5ZM12 9.57693C12.1744 9.57693 12.3205 9.51795 12.4385 9.4C12.5564 9.28205 12.6154 9.13589 12.6154 8.96152C12.6154 8.78718 12.5564 8.64102 12.4385 8.52307C12.3205 8.40512 12.1744 8.34615 12 8.34615C11.8256 8.34615 11.6795 8.40512 11.5615 8.52307C11.4436 8.64102 11.3846 8.78718 11.3846 8.96152C11.3846 9.13589 11.4436 9.28205 11.5615 9.4C11.6795 9.51795 11.8256 9.57693 12 9.57693ZM12.0034 21C10.7588 21 9.58872 20.7638 8.4931 20.2915C7.39748 19.8192 6.44444 19.1782 5.63397 18.3685C4.82352 17.5588 4.18192 16.6066 3.70915 15.512C3.23638 14.4174 3 13.2479 3 12.0034C3 10.7588 3.23616 9.58872 3.70848 8.4931C4.18081 7.39748 4.82183 6.44444 5.63153 5.63398C6.44123 4.82353 7.39337 4.18192 8.48795 3.70915C9.58255 3.23638 10.7521 3 11.9966 3C13.2412 3 14.4113 3.23616 15.5069 3.70847C16.6025 4.18081 17.5556 4.82182 18.366 5.63152C19.1765 6.44122 19.8181 7.39337 20.2908 8.48795C20.7636 9.58255 21 10.7521 21 11.9966C21 13.2412 20.7638 14.4113 20.2915 15.5069C19.8192 16.6025 19.1782 17.5556 18.3685 18.366C17.5588 19.1765 16.6066 19.8181 15.512 20.2909C14.4174 20.7636 13.2479 21 12.0034 21ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"/>
           </svg>
           <span class="main-menu-label">{_("announcements-item-label")}</span>
@@ -502,7 +560,6 @@
   .main-menu-icon {
     width: 1.5rem;
     height: 1.5rem;
-    flex-shrink: 0;
     fill: var(--secondary-color);
   }
 
@@ -551,6 +608,89 @@
     background-color: var(--dominant-color-hover);
   }
 
+  .handles-menu {
+    position: fixed;
+    border-radius: 1rem;
+    background-color: var(--dominant-color);
+    box-shadow: var(--soft-shadow);
+    display: flex;
+    width: 15rem;
+    padding: 0.5rem 0rem;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 1;
+  }
+
+  .handles-menu-item {
+    display: flex;
+    padding: 0.25rem 0.75rem;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+  }
+
+  .handles-menu-item:hover {
+    background-color: var(--dominant-color-hover);
+  }
+
+  .handle-information {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .handle {
+    color: var(--secondary-color);
+    font-family: var(--primary-font);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .shares-count {
+    color: var(--light-gray);
+    font-family: var(--primary-font);
+    font-size: 0.75rem;
+  }
+
+  .handle-operations-button {
+    width: 2.125rem;
+    height: 2.125rem;
+    fill: var(--dark-gray);
+    border-radius: 50%;
+  }
+
+  .new-handle-creator {
+    display: flex;
+    padding: 0rem 0.5rem;
+    align-items: center;
+    align-self: stretch;
+  }
+
+  .handle-menu-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    fill: var(--light-gray);
+  }
+
+  .new-handle-input {
+    color: var(--secondary-color);
+    font-family: var(--primary-font);
+    font-size: 0.875rem;
+  }
+
+  .new-handle-input::placeholder {
+    color: var(--light-gray);
+    font-family: var(--primary-font);
+    font-size: 0.875rem;
+  }
+
+  .handle-operations-button:hover {
+    background-color: var(--dominant-color-hover);
+  }
+
   .has-unread-announcement {
     fill: var(--accent-color);
   }
@@ -564,6 +704,7 @@
     padding: 0.5rem 0rem;
     flex-direction: column;
     align-items: flex-start;
+    z-index: 1;
   }
 
   .announcements-menu-item {
@@ -571,7 +712,6 @@
     padding: 0.25rem 0.75rem;
     flex-direction: column;
     align-items: flex-start;
-    cursor: pointer;
   }
 
   .announcements-menu-item:hover {
