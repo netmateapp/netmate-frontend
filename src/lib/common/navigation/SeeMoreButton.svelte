@@ -1,9 +1,8 @@
 <script lang="ts">
   import { tooltip } from "$lib/common/tooltip/useTooltip.svelte";
-  import { createTranslator } from "../../i18n.svelte";
   import MainMenu from "./MainMenu.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
-  import MoreHorizSvg from "./svg/MoreHorizSvg.svelte";
+  import { createTranslator } from "$lib/i18n.svelte";
 
   const _ = createTranslator("common", "navigation");
 
@@ -24,15 +23,15 @@
   registerInteractHandler(handleInteract);
 </script>
 
-<svg
+<button
   bind:this={seeMoreButtonRef}
   class="see-more-button"
   class:toggled={isToggled}
-  role="button"
-  tabindex="0"
   use:tooltip={_("see-more-button-tooltip")}>
-  <MoreHorizSvg />
-</svg>
+ <svg class="icon">
+  <use href="/src/lib/assets/common/more_horiz.svg#more_horiz"></use>
+ </svg>
+</button>
 
 {#if isToggled}
   <MainMenu bind:this={mainMenu} basePoint={seeMoreButtonRef.getBoundingClientRect()} />
@@ -45,9 +44,18 @@
     border-radius: 50%;
     background-color: var(--dominant-color);
     fill: var(--secondary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center
   }
 
   .see-more-button:hover, .toggled {
     background-color: var(--dominant-color-hover);
+  }
+
+  .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--secondary-color);
   }
 </style>

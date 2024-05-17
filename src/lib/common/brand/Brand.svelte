@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { createTranslator } from "../../../i18n.svelte";
+  import { createTranslator } from "../../i18n.svelte";
 
   export let x: number, y: number;
 
   const _ = createTranslator("common", "brand");
 </script>
 
-<a href="https://netmate.app" class="brand" style="--x: {x}px; --y: {y}px;">
-  <img class="logo" src="/logo-temp.png" alt={_("logo")} />
+<a href="https://netmate.app" class="brand" style="top: {y}px; left: {x}px;">
+  <img class="logo" src="/src/lib/assets/logo-temp.png" alt={_("logo")} />
   <span class="logotype">{_("logotype")}</span>
   <span class="version">v0.0.1</span>
 </a>
@@ -15,8 +15,6 @@
 <style>
   .brand {
     position: fixed;
-    top: var(--y);
-    left: var(--x);
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -30,7 +28,7 @@
 
   @font-face {
     font-family: YuseiMagic;
-    src: url("/YuseiMagic-Regular-Subset.woff2") format("woff2");
+    src: url("/src/lib/assets/YuseiMagic-Regular-Subset.woff2") format("woff2");
   }
 
   .logotype, .version {

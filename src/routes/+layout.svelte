@@ -2,7 +2,7 @@
   import { browser } from "$app/environment";
   
   import "../app.css";
-  import "../i18n.svelte";
+  import "../lib/i18n.svelte";
 
   // a11y: タブ時のみフォーカスが表示されるようにする
   if (browser) {

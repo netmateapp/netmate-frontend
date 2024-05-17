@@ -3,14 +3,19 @@
   import LocationButton from "./LocationButton.svelte";
   import SeeMoreButton from "./SeeMoreButton.svelte";
   import SigninButton from "./SigninButton.svelte";
+  import Tooltip from "$lib/common/tooltip/Tooltip.svelte";
+  import AnnouncementsButton from "./AnnouncementsButton.svelte";
+  import HandlesButton from "./HandlesButton.svelte";
 
   function isSignedIn() {
-    return false;
+    return true;
   }
 </script>
 
 <div class="navigation">
   {#if isSignedIn()}
+    <HandlesButton/>
+    <AnnouncementsButton />
     <SeeMoreButton />
   {:else}
     <LanguageButton />
@@ -18,6 +23,7 @@
     <SeeMoreButton />
     <SigninButton />
   {/if}
+  <Tooltip />
 </div>
 
 <style>

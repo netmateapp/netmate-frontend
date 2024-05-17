@@ -8,7 +8,17 @@
       "language-button-tooltip": "言語",
       "location-button-tooltip": "場所",
       "handles-button-tooltip": "名義",
+      "anonymous": "匿名",
+      "edit": "編集",
+      "edit-handle": "名義を編集",
+      "delete": "削除",
+      "delete-dialog-title": "本当に名義を削除しますか？",
+      "delete-dialog-message": "この操作は取り消せません。\nこの名義の全共有が削除されます。\n削除を完了するには、以下に delete this handle と入力してください。",
+      "cancel": "キャンセル",
+      "shares-count": "{count}件の共有", 
+      "new-handle-input-placeholder": "名義を作成…",
       "announcements-button-tooltip": "お知らせ",
+      "elapsed-time-since-announcement": "{ unit, select, minutes {{t}分前} hours {{t}時間前} days {{t}日前} other {{t}週前} }",
       "see-more-button-tooltip": "もっと見る",
       "language-item-label": "言語",
       "location-item-label": "場所",
@@ -28,15 +38,8 @@
       "united-states": "アメリカ合衆国",
       "signin-button-label": "ログイン"
     },
-    "menu": {
-      "language-button-tooltip": "言語",
-      "handles-button-tooltip": "名義",
-      "edit-handle": "編集",
-      "delete-handle": "削除",
-      "anonymous": "匿名",
-      "shares-count": "{count}件の共有", 
-      "new-handle-input-placeholder": "名義を作成…",
-      "announcements-button-tooltip": "お知らせ"
+    "search-box": {
+      
     }
   }
 }

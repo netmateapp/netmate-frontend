@@ -3,7 +3,7 @@ import { _, init, locale, register } from "svelte-i18n";
 import { get } from "svelte/store";
 
 ["ja"].forEach(locale => {
-  register(locale, () => import(`./locales/${locale}.json`));
+  register(locale, () => import(`$lib/locales/${locale}.json`));
 });
 
 const defaultLocale = "ja";

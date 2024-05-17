@@ -1,14 +1,10 @@
 <script lang="ts">
   import { createTranslator } from "../../i18n.svelte";
   import { calculateMenuPosition } from "./nav.svelte";
-  import LanguageSvg from "./svg/LanguageSvg.svelte";
-  import ChevronRightSvg from "./svg/ChevronRightSvg.svelte";
-  import PublicSvg from "./svg/PublicSvg.svelte";
-  import SettingsSvg from "./svg/SettingsSvg.svelte";
-  import SignoutSvg from "./svg/SignoutSvg.svelte";
-  import InfoSvg from "./svg/InfoSvg.svelte";
   import LanguageMenu from "./LanguageMenu.svelte";
   import LocationMenu from "./LocationMenu.svelte";
+    import { registerInteractHandler } from "$lib/utils.svelte";
+    import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
 
   const _ = createTranslator("common", "navigation");
 
@@ -17,26 +13,36 @@
 
   export function contains(element: Element): boolean {
     return (mainMenuRef?.contains(element) ?? false)
-    || (languageMenu.dropdownMenuRef?.contains(element) ?? false)
-    || (locationMenu.dropdownMenuRef?.contains(element) ?? false);
+    || (languageMenu.menu?.contains(element) ?? false)
+    || (locationMenu.menu?.contains(element) ?? false)
+    || (announcementMenu.menu?.contains(element) ?? false);
   }
 
   function isSignedIn(): boolean {
     return false;
   }
 
-  class DropdownMenuData {
-    dropdownMenuRef: MaybeComponent = $state(null);
-    isDropdownMenuVisible: boolean = $state(false);
+  class ChildMenuData {
+    itemRef: MaybeElement = $state(null);
+    menu: MaybeComponent = $state(null);
+    isVisible: boolean = $state(false);
 
-    openDropdownMenu() {
-      this.isDropdownMenuVisible = true;
+    openMenu() {
+      this.isVisible = true;
       (mainMenuRef as HTMLElement).style.visibility = "hidden";
     }
   }
 
-  let languageMenu = new DropdownMenuData();
-  let locationMenu = new DropdownMenuData();
+  let languageMenu = new ChildMenuData();
+  let locationMenu = new ChildMenuData();
+  let announcementMenu = new ChildMenuData();
+
+  function handleInteractEvent(event: InteractEvent) {
+    [languageMenu, locationMenu, announcementMenu].forEach(menuData => {
+      if (menuData.itemRef?.contains(event.target as Element)) menuData.openMenu();
+    });
+  }
+  registerInteractHandler(handleInteractEvent);
 </script>
 
 <div
@@ -44,42 +50,42 @@
   class="menu"
   style={calculateMenuPosition(basePoint, mainMenuRef)}>
   {#if isSignedIn()}
-    <button class="item" onclick={() => languageMenu.openDropdownMenu()}>
-      <svg class="icon">
-        <LanguageSvg />
-      </svg>
+    <button class="item" bind:this={languageMenu.itemRef}>
+        <svg class="icon">
+          <use href="/src/lib/assets/common/translate.svg#translate"></use>
+        </svg>
       <span class="label">{_("language-item-label")}</span>
       <span class="spacer"></span>
       <svg class="icon">
-        <ChevronRightSvg />
+        <use href="/src/lib/assets/common/chevron_right.svg#chevron_right"></use>
       </svg>
     </button>
-    <button class="item" onclick={() => locationMenu.openDropdownMenu()}>
+    <button class="item" bind:this={locationMenu.itemRef}>
       <svg class="icon">
-        <PublicSvg />
+        <use href="/src/lib/assets/common/public.svg#public"></use>
       </svg>
       <span class="label">{_("location-item-label")}</span>
       <span class="spacer"></span>
       <svg class="icon">
-        <ChevronRightSvg />
+        <use href="/src/lib/assets/common/chevron_right.svg#chevron_right"></use>
       </svg>
     </button>
     <a href="https://netmate.app/settings" class="item">
       <svg class="icon">
-        <SettingsSvg />
+        <use href="/src/lib/assets/common/settings.svg#settings"></use>
       </svg>
       <span class="label">{_("settings-item-label")}</span>
     </a>
     <button class="item">
       <svg class="icon">
-        <SignoutSvg />
+        <use href="/src/lib/assets/common/logout.svg#logout"></use>
       </svg>
       <span class="label">{_("signout-item-label")}</span>
     </button>
   {:else}
-    <button class="item">
+    <button class="item" bind:this={announcementMenu.itemRef}>
       <svg class="icon">
-        <InfoSvg />
+        <use href="/src/lib/assets/common/info.svg#info"></use>
       </svg>
       <span class="label">{_("announcements-item-label")}</span>
     </button>
@@ -91,12 +97,16 @@
   </div>
 </div>
 
-{#if languageMenu.isDropdownMenuVisible}
-  <LanguageMenu bind:this={languageMenu.dropdownMenuRef} basePoint={basePoint} />
+{#if languageMenu.isVisible}
+  <LanguageMenu bind:this={languageMenu.menu} basePoint={basePoint} />
 {/if}
 
-{#if locationMenu.isDropdownMenuVisible}
-  <LocationMenu bind:this={locationMenu.dropdownMenuRef} basePoint={basePoint} />
+{#if locationMenu.isVisible}
+  <LocationMenu bind:this={locationMenu.menu} basePoint={basePoint} />
+{/if}
+
+{#if announcementMenu.isVisible}
+  <AnnouncementsMenu bind:this={announcementMenu.menu} basePoint={basePoint} />
 {/if}
 
 <style>

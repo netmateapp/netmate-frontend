@@ -30,6 +30,9 @@ importers:
       svelte-check:
         specifier: ^3.7.1
         version: 3.7.1(postcss-load-config@3.1.4(postcss@8.4.38))(postcss@8.4.38)(svelte@5.0.0-next.131)
+      svelte-preprocess-import-assets:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@5.0.0-next.131)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
@@ -1052,6 +1055,16 @@ packages:
     hasBin: true
     peerDependencies:
       svelte: ^3 || ^4
+
+  svelte-parse-markup@0.1.2:
+    resolution: {integrity: sha512-DycY7DJr7VqofiJ63ut1/NEG92HrWWL56VWITn/cJCu+LlZhMoBkBXT4opUitPEEwbq1nMQbv4vTKUfbOqIW1g==}
+    peerDependencies:
+      svelte: ^3.0.0 || ^4.0.0
+
+  svelte-preprocess-import-assets@1.1.0:
+    resolution: {integrity: sha512-pWjoceFcGAG6vUg50JZXfhr5V4amxI2aYbcsn6CJrytcA528NNgaHnvMR1EwJYBIpZEf302I8Pyw0YeEta1zbg==}
+    peerDependencies:
+      svelte: ^3.37.0 || ^4.0.0 || ^5.0.0-next.1
 
   svelte-preprocess@5.1.4:
     resolution: {integrity: sha512-IvnbQ6D6Ao3Gg6ftiM5tdbR6aAETwjhHV+UKGf5bHGYR69RQvF1ho0JKPcbUON4vy4R7zom13jPjgdOWCQ5hDA==}
@@ -2168,6 +2181,17 @@ snapshots:
       sade: 1.8.1
       svelte: 5.0.0-next.131
       tiny-glob: 0.2.9
+
+  svelte-parse-markup@0.1.2(svelte@5.0.0-next.131):
+    dependencies:
+      svelte: 5.0.0-next.131
+
+  svelte-preprocess-import-assets@1.1.0(svelte@5.0.0-next.131):
+    dependencies:
+      estree-walker: 3.0.3
+      magic-string: 0.30.10
+      svelte: 5.0.0-next.131
+      svelte-parse-markup: 0.1.2(svelte@5.0.0-next.131)
 
   svelte-preprocess@5.1.4(postcss-load-config@3.1.4(postcss@8.4.38))(postcss@8.4.38)(svelte@5.0.0-next.131)(typescript@5.4.5):
     dependencies:

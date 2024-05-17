@@ -2,12 +2,11 @@
     import { tooltip } from "$lib/common/tooltip/useTooltip.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
     import { createTranslator } from "../../i18n.svelte";
-  import LocationMenu from "./LocationMenu.svelte";
-    import PublicSvg from "./svg/PublicSvg.svelte";
+  import LanguageMenu from "./LanguageMenu.svelte";
 
-  const _ = createTranslator("common", "navigation");
+  const _ = createTranslator("common", "navigation")
 
-  function selectedLocation() {
+  function selectedLanguage() {
     return "JA";
   }
 
@@ -32,15 +31,15 @@
   bind:this={buttonRef}
   class="button"
   class:toggle={isToggled}
-  use:tooltip={_("location-button-tooltip")}>
+  use:tooltip={_("language-button-tooltip")}>
   <svg class="icon">
-    <PublicSvg />
+    <use href="/src/lib/assets/common/translate.svg#translate"></use>
   </svg>
-  <span class="selected-value">{selectedLocation()}</span>
+  <span class="selected-value">{selectedLanguage()}</span>
 </button>
 
 {#if isToggled}
-  <LocationMenu bind:this={menuRef} basePoint={buttonRef.getBoundingClientRect()} />
+  <LanguageMenu bind:this={menuRef} basePoint={buttonRef.getBoundingClientRect()} />
 {/if}
 
 <style>
@@ -61,6 +60,7 @@
   .icon {
     width: 1.5rem;
     height: 1.5rem;
+    fill: var(--secondary-color);
   }
 
   .selected-value {
