@@ -44,6 +44,7 @@
   function onEdit() {
     isEditingHandle = true;
     inputValue = handles()[currentIndex].name;
+    newHandle = "";
   }
 
   function isHandleEditing(index: number) {
@@ -122,6 +123,10 @@
   function currentCharactersCount() {
     return (isEditingHandle ? inputValue : newHandle).length;
   }
+
+  function shouldDisplayCharactersCount(): boolean {
+    return isEditingHandle || newHandle != "";
+  }
 </script>
 
 <div
@@ -184,14 +189,16 @@
           bind:value={newHandle}
         />
       </div>
-      <div class="bottomed-characters-counter">
-        <span
-          class="count"
-          class:limit-over={(isEditingHandle ? inputValue : newHandle).length >
-            HANDLE_LENGTH_LIMIT}>{currentCharactersCount()}</span
-        >
-        <span class="limit">/{HANDLE_LENGTH_LIMIT}</span>
-      </div>
+      {#if shouldDisplayCharactersCount()}
+        <div class="bottomed-characters-counter">
+          <span
+            class="count"
+            class:limit-over={(isEditingHandle ? inputValue : newHandle).length >
+              HANDLE_LENGTH_LIMIT}>{currentCharactersCount()}</span
+          >
+          <span class="limit">/{HANDLE_LENGTH_LIMIT}</span>
+        </div>
+      {/if}
     </div>
   {/if}
 </div>
