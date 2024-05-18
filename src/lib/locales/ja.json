@@ -39,7 +39,15 @@
       "signin-button-label": "ログイン"
     },
     "search-box": {
-      
+      "tag-specifier-tip": "キーワードの前に # をつけるとタグを指定できます",
+      "handle-specifier-tip": "キーワードの前に @ をつけると名義を指定できます",
+      "exact-match-operator-tip": "キーワードを \"\" で挟むと完全一致で検索できます",
+      "until-operator-tip": "until:年-月-日 を含めると、それ以前の検索結果を表示します",
+      "since-operator-tip": "since:年-月-日 を含めると、それ以降の検索結果を表示します",
+      "op-operator-tip": "条件を OR でつなぐことで、いずれかの一致を条件にできます",
+      "and-operator-tip": "条件を AND でつなぐことで、ORに優先して条件を合成できます",
+      "exclude-operator-tip": "キーワードの前に - をつけると除外を指定できます",
+      "nest-syntax-tip": "条件を () で挟むと入れ子にできます"
     }
   }
 }

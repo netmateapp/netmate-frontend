@@ -68,8 +68,8 @@
   autoFocusRenameInput();
 
   // 相互作用イベント関連
-  function isInteractOutsideOperateHandleMenu(element: Element): boolean {
-    return !operateHandleMenu?.contains(element);
+  function isInteractInsideOperateHandleMenu(element: Element): boolean {
+    return operateHandleMenu?.contains(element);
   }
 
   function isInteractInsideActiveItem(element: Element): boolean {
@@ -86,7 +86,7 @@
     const element = event.target as Element;
     if (
       isOperateHandleButtonToggled &&
-      isInteractOutsideOperateHandleMenu(element)
+      !isInteractInsideOperateHandleMenu(element)
     ) {
       event.stopPropagation();
       event.preventDefault();

@@ -1,82 +1,127 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
+  import { registerInteractHandler } from "$lib/utils.svelte";
+
   const _ = createTranslator("common", "search-box");
 
-  let isFocused = $state(false);
+  let searchBox: MaybeElement = $state(null);
+
+  let isActive = $state(false);
   let query = $state("");
 
   function shouldTipsTickerDisplay() {
-    return isFocused || query;
+    return isActive;
   }
 
   function suggestions(): string[] {
     return query ? ["a", "b", "c"] : [];
   }
+
+  function search(query: string) {
+    window.location.href = `https://netmate.app/search?q=${query}`;
+  }
+
+  const TIPS_TRANSLATION_KEYS = [
+    "tag-specifier-tip",
+    "handle-specifier-tip",
+    "exact-match-operator-tip",
+    "until-operator-tip",
+    "since-operator-tip",
+    "op-operator-tip",
+    "and-operator-tip",
+    "exclude-operator-tip",
+    "nest-syntax-tip",
+  ];
+
+  const tip =
+    TIPS_TRANSLATION_KEYS[
+      Math.floor(Math.random() * TIPS_TRANSLATION_KEYS.length)
+    ];
+
+  // 相互作用関連
+  function isInteractInsideSearchBox(element: Element): boolean {
+    return searchBox?.contains(element) ?? false;
+  }
+
+  function handleInteractEvent(event: InteractEvent) {
+    console.log(isActive);
+    const element = event.target as Element;
+    if (isActive) {
+      if (!isInteractInsideSearchBox(element)) isActive = false;
+    }
+  }
+  registerInteractHandler(handleInteractEvent);
 </script>
 
-<div class="search-box">
+<div
+  bind:this={searchBox}
+  class="search-box"
+  class:active={shouldTipsTickerDisplay()}
+>
   <div class="search-bar">
     <svg class="icon">
       <use href="/src/lib/assets/common/search.svg#search"></use>
     </svg>
     <input
-      class="search-input"
-      onfocus={() => (isFocused = true)}
-      onblur={() => (isFocused = false)}
+      class="query-input"
+      onfocus={() => (isActive = true)}
       bind:value={query}
     />
   </div>
-  {#if shouldTipsTickerDisplay()}
+  {#if isActive}
+    <div class="separator"></div>
     <div class="tips-ticker">
-      <div class="button-collision-left">
-        <svg class="icon">
-          <use href="/src/lib/assets/common/chevron_left.svg#chevron_left"
-          ></use>
-        </svg>
-      </div>
-      <span class="tip">tip</span>
-      <div class="button-collision-right">
-        <svg class="icon">
-          <use href="/src/lib/assets/common/chevron_right.svg#chevron_right"
-          ></use>
-        </svg>
+      <div class="centered-tip">
+        <span class="tip">{_(tip)}</span>
       </div>
     </div>
+    <div class="separator"></div>
+    <div class="suggestions">
+      {#each suggestions() as suggestion}
+        <button class="suggestion" onclick={() => search(suggestion)}>
+          <svg class="icon">
+            <use href="/src/lib/assets/common/search.svg#search"></use>
+          </svg>
+          <span class="suggested-query">{suggestion}</span>
+        </button>
+      {/each}
+    </div>
   {/if}
-  <div class="suggestions">
-    {#each suggestions() as suggestion}
-      <div class="suggestion">
-        <svg class="icon">
-          <use href="/src/lib/assets/common/search.svg#search"></use>
-        </svg>
-        <span class="suggested-query">{suggestion}</span>
-      </div>
-    {/each}
-  </div>
 </div>
 
 <style>
   .search-box {
     position: fixed;
-    top: 8px;
+    top: 0.5rem;
     left: 50%;
     transform: translate(-50%, 0%);
-    border-radius: 2rem;
+    border-radius: 100vmax;
     background-color: var(--dominant-color);
     box-shadow: 0px 2px 8px 1px rgba(0, 0, 0, 0.12);
     display: flex;
-width: 45%;
-flex-direction: column;
-align-items: flex-start;
+    width: 45%;
+    padding-right: 0.5rem;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
     z-index: 1;
+  }
+
+  .search-box:hover {
+    box-shadow: 0px 2px 8px 1px rgba(0, 0, 0, 0.2);
+  }
+
+  .active {
+    border-radius: 1rem;
+    box-shadow: 0px 2px 8px 1px rgba(0, 0, 0, 0.2);
   }
 
   .search-bar {
     display: flex;
-padding: 0.5rem 0.5rem 0.4375rem 0.5rem;
-align-items: center;
-gap: 0.5rem;
-align-self: stretch;
+    padding: 0.5rem 0.5rem 0.4375rem 0.5rem;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: stretch;
   }
 
   .icon {
@@ -85,11 +130,24 @@ align-self: stretch;
     fill: var(--light-gray);
   }
 
-  .search-input {
+  .query-input {
+    height: 1.25rem;
+    flex: 1 0 0;
     color: var(--secondary-color);
+    font-family: var(--primary-font);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+  }
+
+  .separator {
+    width: 95%;
+    height: 0.03125rem;
+    background-color: var(--lighter-gray);
   }
 
   .tips-ticker {
+    height: 1.875rem;
     display: flex;
     padding: 0.0625rem 0rem;
     justify-content: center;
@@ -98,31 +156,12 @@ align-self: stretch;
     align-self: stretch;
   }
 
-  .button-collision-left {
+  .centered-tip {
     display: flex;
-    padding-left: 0.5rem;
-    align-items: flex-start;
+    padding-top: 0.125rem;
+    justify-content: center;
+    align-items: center;
     gap: 0.5rem;
-    flex: 1 0 0;
-    align-self: stretch;
-  }
-
-  .button-collision-right {
-    display: flex;
-    padding-left: 0.5rem;
-    align-items: flex-start;
-    gap: 0.5rem;
-    flex: 1 0 0;
-    align-self: stretch;
-  }
-
-  .button-collision-left {
-    display: flex;
-    padding-right: 0.5rem;
-    justify-content: flex-end;
-    align-items: flex-start;
-    gap: 0.5rem;
-    flex: 1 0 0;
     align-self: stretch;
   }
 
@@ -131,6 +170,7 @@ align-self: stretch;
     font-family: var(--primary-font);
     font-size: 0.8125rem;
     line-height: 1.3125rem;
+    cursor: default;
   }
 
   .suggestions {
@@ -146,6 +186,11 @@ align-self: stretch;
     align-items: center;
     gap: 0.5rem;
     align-self: stretch;
+    cursor: pointer;
+  }
+
+  .suggestion:hover {
+    background-color: var(--dominant-color-hover);
   }
 
   .suggested-query {
