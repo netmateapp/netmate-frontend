@@ -17,6 +17,7 @@
       "cancel": "キャンセル",
       "shares-count": "{count}件の共有", 
       "new-handle-input-placeholder": "名義を作成…",
+      "creation-limit-reached": "作成上限に達しました",
       "announcements-button-tooltip": "お知らせ",
       "elapsed-time-since-announcement": "{ unit, select, minutes {{t}分前} hours {{t}時間前} days {{t}日前} other {{t}週前} }",
       "see-more-button-tooltip": "もっと見る",
@@ -52,6 +53,25 @@
     "location": {
       "go-to-space": "スペースへ",
       "go-to-detabase": "データベースへ"
+    },
+    "share-editor": {
+      "to-tag": "タグをつける…",
+      "to-share-something": "なにかを共有する…",
+      "title": "タイトル",
+      "image": "画像",
+      "audio": "音声",
+      "video": "動画",
+      "remove": "削除",
+      "edit-page": "ページを編集",
+      "add-youtube-video": "YouTube上の動画を追加",
+      "add-soundcloud-audio": "SoundCloud上の音声を追加",
+      "anonymous": "匿名",
+      "share": "共有する",
+      "complete-edit": "編集を完了する",
+      "discard-edit-dialog-title": "本当に編集内容を破棄しますか？",
+      "discard-edit-dialog-message": "この操作は取り消せません。",
+      "discard": "破棄",
+      "cancel": "キャンセル"
     }
   }
 }

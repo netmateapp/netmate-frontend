@@ -128,6 +128,10 @@
   function shouldDisplayCharactersCount(): boolean {
     return isEditingHandle || newHandle != "";
   }
+
+  function newHandleInputPlaceholder(): string {
+    return canCreateNewHandle() ? "new-handle-input-placeholder" : "creation-limit-reached";
+  }
 </script>
 
 <div
@@ -184,19 +188,12 @@
       <use href="/src/lib/assets/common/add.svg#add"></use>
     </svg>
     <div class="centered-input">
-      {#if canCreateNewHandle()}
-        <input
-          class="input"
-          placeholder={_("new-handle-input-placeholder")}
-          bind:value={newHandle}
-        />
-      {:else}
-        <span
-          class="dummy-input"
-          use:tooltip={_("cant-create-new-handle")}>
-          {_("new-handle-input-placeholder")}</span>
-      {/if}
-
+      <input
+      class="input"
+      placeholder={_(newHandleInputPlaceholder())}
+      bind:value={newHandle}
+      disabled={!canCreateNewHandle()}
+    />
     </div>
     {#if shouldDisplayCharactersCount()}
       <div class="bottomed-characters-counter">
@@ -320,15 +317,6 @@
     font-family: var(--primary-font);
     font-size: 0.875rem;
     line-height: 1.1875rem;
-  }
-
-  .dummy-input {
-    color: var(--light-gray);
-    font-family: var(--primary-font);
-    font-size: 0.875rem;
-    line-height: 1.1875rem;
-    cursor: default;
-    flex: 1 0 0;
   }
 
   .input::placeholder {
