@@ -48,6 +48,10 @@
       "and-operator-tip": "条件を AND でつなぐことで、ORに優先して条件を合成できます",
       "exclude-operator-tip": "キーワードの前に - をつけると除外を指定できます",
       "nest-syntax-tip": "条件を () で挟むと入れ子にできます"
+    },
+    "location": {
+      "go-to-space": "スペースへ",
+      "go-to-detabase": "データベースへ"
     }
   }
 }
