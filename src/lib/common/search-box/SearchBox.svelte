@@ -33,10 +33,11 @@
     "nest-syntax-tip",
   ];
 
-  const tip =
-    TIPS_TRANSLATION_KEYS[
+  function tip(): string {
+    return TIPS_TRANSLATION_KEYS[
       Math.floor(Math.random() * TIPS_TRANSLATION_KEYS.length)
     ];
+  }
 
   // 相互作用関連
   function isInteractInsideSearchBox(element: Element): boolean {
@@ -72,7 +73,7 @@
     <div class="separator"></div>
     <div class="tips-ticker">
       <div class="centered-tip">
-        <span class="tip">{_(tip)}</span>
+        <span class="tip">{_(tip())}</span>
       </div>
     </div>
     <div class="separator"></div>
