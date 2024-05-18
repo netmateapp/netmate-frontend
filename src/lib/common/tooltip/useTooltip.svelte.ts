@@ -17,14 +17,14 @@ export class TooltipData {
 let tooltipData = $state(new TooltipData("", 0, 0, 0, false));
 
 export function getTooltipData(): TooltipData {
-  return tooltipData
+  return tooltipData;
 }
 
 function showTooltip(text: string, x: number, y: number, targetElementHeight: number) {
   tooltipData = new TooltipData(text, x, y, targetElementHeight, true);
 }
 
-function hideTooltip() {
+export function hideTooltip() {
   tooltipData = new TooltipData("", 0, 0, 0, false);
 }
 

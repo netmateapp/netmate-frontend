@@ -45,7 +45,6 @@
   }
 
   function handleInteractEvent(event: InteractEvent) {
-    console.log(isActive);
     const element = event.target as Element;
     if (isActive) {
       if (!isInteractInsideSearchBox(element)) isActive = false;

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { registerInteractHandler } from "$lib/utils.svelte";
+    import { tooltip } from "../tooltip/useTooltip.svelte";
   import OperateHandleMenu from "./OperateHandleMenu.svelte";
   import { _, calculateMenuPosition } from "./nav.svelte";
 
@@ -169,6 +170,7 @@
           class:toggle={isIndexedButtonToggled(index) && !isEditingHandle}
           role="button"
           tabindex="0"
+          use:tooltip={_("see-more-button-tooltip")}
         >
           <svg class="icon">
             <use href="/src/lib/assets/common/more_horiz.svg#more_horiz"></use>
@@ -177,30 +179,35 @@
       {/if}
     </a>
   {/each}
-  {#if canCreateNewHandle()}
-    <div class="new-handle-input">
-      <svg class="input-icon" class:active={newHandle.length > 0}>
-        <use href="/src/lib/assets/common/add.svg#add"></use>
-      </svg>
-      <div class="centered-input">
+  <div class="new-handle-input">
+    <svg class="input-icon" class:active={newHandle.length > 0}>
+      <use href="/src/lib/assets/common/add.svg#add"></use>
+    </svg>
+    <div class="centered-input">
+      {#if canCreateNewHandle()}
         <input
           class="input"
           placeholder={_("new-handle-input-placeholder")}
           bind:value={newHandle}
         />
-      </div>
-      {#if shouldDisplayCharactersCount()}
-        <div class="bottomed-characters-counter">
-          <span
-            class="count"
-            class:limit-over={(isEditingHandle ? inputValue : newHandle).length >
-              HANDLE_LENGTH_LIMIT}>{currentCharactersCount()}</span
-          >
-          <span class="limit">/{HANDLE_LENGTH_LIMIT}</span>
-        </div>
+      {:else}
+        <span
+          class="dummy-input"
+          use:tooltip={_("cant-create-new-handle")}>
+          {_("new-handle-input-placeholder")}</span>
       {/if}
+
     </div>
-  {/if}
+    {#if shouldDisplayCharactersCount()}
+      <div class="bottomed-characters-counter">
+        <span
+          class="count"
+          class:limit-over={(isEditingHandle ? inputValue : newHandle).length >
+            HANDLE_LENGTH_LIMIT}>{currentCharactersCount()}</span>
+        <span class="limit">/{HANDLE_LENGTH_LIMIT}</span>
+      </div>
+    {/if}
+  </div>
 </div>
 
 {#if isOperateHandleButtonToggled && !isEditingHandle}
@@ -305,6 +312,7 @@
     padding: 0.1875rem 0rem;
     align-items: center;
     gap: 0.5rem;
+    flex: 1 0 0;
   }
 
   .input {
@@ -312,6 +320,15 @@
     font-family: var(--primary-font);
     font-size: 0.875rem;
     line-height: 1.1875rem;
+  }
+
+  .dummy-input {
+    color: var(--light-gray);
+    font-family: var(--primary-font);
+    font-size: 0.875rem;
+    line-height: 1.1875rem;
+    cursor: default;
+    flex: 1 0 0;
   }
 
   .input::placeholder {

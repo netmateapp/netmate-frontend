@@ -1,5 +1,6 @@
 <script>
   import { browser } from "$app/environment";
+    import Tooltip from "$lib/common/tooltip/Tooltip.svelte";
   
   import "../app.css";
   import "../lib/i18n.svelte";
@@ -17,5 +18,7 @@
     });
   }
 </script>
+
+<Tooltip />
 
 <slot />

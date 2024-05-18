@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { tooltip } from "$lib/common/tooltip/useTooltip.svelte";
+    import { hideTooltip, tooltip } from "$lib/common/tooltip/useTooltip.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
     import { createTranslator } from "../../i18n.svelte";
   import LanguageMenu from "./LanguageMenu.svelte";
@@ -20,7 +20,10 @@
     if (isToggled) {
       if (!menuRef.contains(element)) isToggled = false;
     } else {
-      if (buttonRef?.contains(element)) isToggled = true;
+      if (buttonRef?.contains(element)) {
+        hideTooltip();
+        isToggled = true;
+      }
     }
   }
 

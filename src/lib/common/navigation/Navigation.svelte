@@ -3,7 +3,6 @@
   import LocationButton from "./LocationButton.svelte";
   import SeeMoreButton from "./SeeMoreButton.svelte";
   import SigninButton from "./SigninButton.svelte";
-  import Tooltip from "$lib/common/tooltip/Tooltip.svelte";
   import AnnouncementsButton from "./AnnouncementsButton.svelte";
   import HandlesButton from "./HandlesButton.svelte";
 
@@ -23,7 +22,6 @@
     <SeeMoreButton />
     <SigninButton />
   {/if}
-  <Tooltip />
 </div>
 
 <style>
