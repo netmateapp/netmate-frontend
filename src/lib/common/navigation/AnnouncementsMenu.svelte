@@ -69,6 +69,10 @@
     align-items: flex-start;
   }
 
+  .item:hover {
+    background-color: var(--dominant-color-hover);
+  }
+
   .timestamp {
     color: var(--light-gray);
     font-family: var(--primary-font);
