@@ -31,9 +31,9 @@
   class="see-more-button"
   class:toggled={isToggled}
   use:tooltip={_("see-more-button-tooltip")}>
- <svg class="icon">
-  <use href="/src/lib/assets/common/more_horiz.svg#more_horiz"></use>
- </svg>
+  <svg class="icon">
+    <use href="/src/lib/assets/common/more_horiz.svg#more_horiz"></use>
+  </svg>
 </button>
 
 {#if isToggled}
@@ -49,7 +49,8 @@
     fill: var(--secondary-color);
     display: flex;
     justify-content: center;
-    align-items: center
+    align-items: center;
+    cursor: pointer;
   }
 
   .see-more-button:hover, .toggled {

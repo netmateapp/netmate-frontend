@@ -54,7 +54,8 @@
     fill: var(--secondary-color);
     display: flex;
     justify-content: center;
-    align-items: center
+    align-items: center;
+    cursor: pointer;
   }
 
   .button:hover, .toggle {

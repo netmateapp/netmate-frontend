@@ -54,6 +54,7 @@
     justify-content: center;
     align-items: center;
     gap: 0.25rem;
+    cursor: pointer;
   }
 
   .button:hover, .toggle {

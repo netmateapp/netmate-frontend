@@ -49,7 +49,8 @@
     background-color: var(--dominant-color);
     display: flex;
     justify-content: center;
-    align-items: center
+    align-items: center;
+    cursor: pointer;
   }
 
   .button:hover, .toggle {
