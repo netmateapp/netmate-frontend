@@ -184,9 +184,6 @@
     </a>
   {/each}
   <div class="new-handle-input">
-    <svg class="input-icon" class:active={newHandle.length > 0}>
-      <use href="/src/lib/assets/common/add.svg#add"></use>
-    </svg>
     <div class="centered-input">
       <input
       class="input"
@@ -284,27 +281,14 @@
 
   .new-handle-input {
     display: flex;
-    padding: 0.375rem 0.5rem;
+    padding: 0.375rem 0.75rem;
     align-items: flex-start;
     align-self: stretch;
   }
 
-  .input-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
-    align-self: stretch;
-    fill: var(--light-gray);
-    flex: 0 0 auto;
-  }
-
-  .active {
-    fill: var(--secondary-color);
-  }
-
   .centered-input {
     width: 100%;
+    max-width: 10.5rem;
     display: flex;
     padding: 0.1875rem 0rem;
     align-items: center;
@@ -342,6 +326,6 @@
   }
 
   .limit-over {
-    color: var(--warning-color-hover);
+    color: var(--warning-color);
   }
 </style>
