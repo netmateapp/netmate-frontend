@@ -233,75 +233,42 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
         .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0"),
     );
     // テキストと <br> を一緒に追加します
-    const div = document.createElement("div");
-    div.innerHTML = formattedLine + (index < lines.length - 1 ? "" : "");
-    fragment.appendChild(div);
+    /*const div = document.createElement("div");
+    div.innerHTML = formattedLine;// + (index < lines.length - 1 ? "" : "");
+    fragment.appendChild(div);*/
+    
+        // div要素を作成してテキストを設定
+        const div = document.createElement("div");
+        div.innerHTML = formattedLine;
+    
+        // 最後の行でない場合にのみ改行を追加
+        if (index < lines.length - 1) {
+          fragment.appendChild(div);
+        } else {
+          // 最後の行の場合、直接テキストを追加
+          fragment.appendChild(document.createTextNode(formattedLine));
+        }
   });
 
   // 選択範囲の最初の Range を取得します
   const range = selection.getRangeAt(0);
 
+      // 挿入された最後のノードを取得します
+      let lastNode = fragment.lastChild;
+      while (lastNode && lastNode.lastChild) {
+        lastNode = lastNode.lastChild;
+      }
+
   // フラグメントを現在の Range に挿入します
   range.insertNode(fragment);
 
-  // contenteditable 要素の最後にカーソルを移動します
-  const editable = document.getElementsByClassName("content")[0];
-  console.log(range);
-  range.setStart(editable, editable.childNodes.length);
-  range.collapse(true);
-
-  // 新しい Range を選択します
-  selection.removeAllRanges();
-  selection.addRange(range);
-
-  //let encodedPosition = encodePosition(contentDiv);
-  //console.log("encoded: " + encodedPosition);
-  //flattenDivsInDiv(contentDiv);
-  //decodeAndRestorePosition(contentDiv, encodedPosition);
-}
-
-function encodePosition(contentDiv: HTMLElement): number {
-  const selection = window.getSelection();
-  if (!selection) return 0;
-  const range = selection.getRangeAt(0);
-  const clonedRange = range.cloneRange();
-  clonedRange.selectNodeContents(contentDiv);
-  clonedRange.setEnd(range.endContainer, range.endOffset);
-  const cursorPosition = clonedRange.toString().length;
-  return cursorPosition;
-}
-
-function decodeAndRestorePosition(node: HTMLElement, targetPosition: number) {
-  let range = document.createRange();
-  range.selectNode(node);
-  range.setStart(node, 0);
-
-  let pos = 0;
-  const stack = [node];
-  while (stack.length > 0) {
-      const current = stack.pop();
-      if (!current) break;
-
-      if (current.nodeType === Node.TEXT_NODE) {
-          const len = current.textContent?.length ?? 0;
-          if (pos + len >= targetPosition) {
-              range.setEnd(current, targetPosition - pos);
-              return range;
-          }
-          pos += len;
-      } else if (current.childNodes && current.childNodes.length > 0) {
-          for (let i = current.childNodes.length - 1; i >= 0; i--) {
-            stack.push(current.childNodes[i] as HTMLElement);
-          }
-      }
-  }
-
-  // The target position is greater than the
-  // length of the contenteditable element.
-  range.setEnd(node, node.childNodes.length);
-
-  const selection = window.getSelection();
-  if (!selection) return;
-  selection.removeAllRanges();
-  selection.addRange(range);
+    // カーソルを最後のノードの後に移動します
+    if (lastNode) {
+      range.setStartAfter(lastNode);
+      range.collapse(true);
+  
+      // 新しい Range を選択します
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
 }
