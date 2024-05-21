@@ -16,14 +16,29 @@ export function printLines(contentDiv: HTMLElement) {
 export function onInput(contentDiv: HTMLElement) {
   const cursorPosition = saveCursorPosition(contentDiv);
 
+  format(contentDiv);
+
   //flattenDivsInDiv(contentDiv);
   markupUrls(contentDiv, cursorPosition);
 
   restoreCursorPosition(contentDiv, cursorPosition);
 }
 
+type Content = HTMLElement;
+
+// Contentがネストしない<div>の配列から成るようフォーマットする
+export function format(content: Content) {
+  for (var childNode of content.childNodes) {
+    if (!(childNode instanceof HTMLDivElement)) {
+      const div = document.createElement("div");
+      div.innerHTML = childNode.textContent ?? "";
+      content.replaceChild(div, childNode);
+    }
+  }
+}
+
 class SavedPosition {
-  constructor (public nodePath: number[], public offset: number) {}
+  constructor(public nodePath: number[], public offset: number) { }
 }
 
 function saveCursorPosition(content: HTMLElement): SavedPosition {
@@ -128,26 +143,26 @@ function markupUrls(content: HTMLElement, savedPosition: SavedPosition) {
         let lastIndex = 0;
         let match: RegExpExecArray | null;
         const fragment = document.createDocumentFragment();
-  
+
         while ((match = URL_PATTERN.exec(text)) !== null) {
           if (match.index > lastIndex) {
             fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
           }
-  
+
           const linkSpan = document.createElement("span");
           linkSpan.className = "link";
           linkSpan.textContent = match[0];
           fragment.appendChild(linkSpan);
-  
+
           lastIndex = match.index + match[0].length;
         }
-  
+
         if (lastIndex === 0) continue;
-  
+
         if (lastIndex < text.length) {
           fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
         }
-  
+
         if (fragment.childNodes.length > 0) {
           node.parentNode?.replaceChild(fragment, node);
           isMarkedUp = true;
@@ -232,43 +247,39 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
         .replace(/ /g, "\u00A0")
         .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0"),
     );
-    // テキストと <br> を一緒に追加します
-    /*const div = document.createElement("div");
-    div.innerHTML = formattedLine;// + (index < lines.length - 1 ? "" : "");
-    fragment.appendChild(div);*/
-    
-        // div要素を作成してテキストを設定
-        const div = document.createElement("div");
-        div.innerHTML = formattedLine;
-    
-        // 最後の行でない場合にのみ改行を追加
-        if (index < lines.length - 1) {
-          fragment.appendChild(div);
-        } else {
-          // 最後の行の場合、直接テキストを追加
-          fragment.appendChild(document.createTextNode(formattedLine));
-        }
+
+    // div要素を作成してテキストを設定
+    const div = document.createElement("div");
+    div.innerHTML = formattedLine;
+
+    // 最後の行でない場合にのみ改行を追加
+    if (index < lines.length - 1) {
+      fragment.appendChild(div);
+    } else {
+      // 最後の行の場合、直接テキストを追加
+      fragment.appendChild(document.createTextNode(formattedLine));
+    }
   });
 
   // 選択範囲の最初の Range を取得します
   const range = selection.getRangeAt(0);
 
-      // 挿入された最後のノードを取得します
-      let lastNode = fragment.lastChild;
-      while (lastNode && lastNode.lastChild) {
-        lastNode = lastNode.lastChild;
-      }
+  // 挿入された最後のノードを取得します
+  let lastNode = fragment.lastChild;
+  while (lastNode && lastNode.lastChild) {
+    lastNode = lastNode.lastChild;
+  }
 
   // フラグメントを現在の Range に挿入します
   range.insertNode(fragment);
 
-    // カーソルを最後のノードの後に移動します
-    if (lastNode) {
-      range.setStartAfter(lastNode);
-      range.collapse(true);
-  
-      // 新しい Range を選択します
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
+  // カーソルを最後のノードの後に移動します
+  if (lastNode) {
+    range.setStartAfter(lastNode);
+    range.collapse(true);
+
+    // 新しい Range を選択します
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
 }
