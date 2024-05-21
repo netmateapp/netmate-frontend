@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-  import { cleanup, toLines } from "./editor";
+  import { onInput, handlePaste, printLines } from "./editor";
 
   const _ = createTranslator("common", "navigation");
 
@@ -22,95 +22,27 @@
   function updatePlaceholder(element: HTMLElement | null) {
     if (element == null) return;
 
-    console.log(`innerText: "${element.innerText}"`);
-
     if (element.innerText == "" || element.innerText == "\n") {
       element.innerText = "";
       element.classList.add("is-empty");
-      console.log("trim");
     } else {
       element.classList.remove("is-empty");
     }
-  }
-
-  /*function handleKeyup(event: KeyboardEvent) {
-    if (contentDiv) {
-      const inner = contentDiv.innerText;
-      if (inner == "" || inner == "\n") setCursorToStart(contentDiv);
-    }
-  }*/
-
-  function setCursorToStart(element: HTMLElement) {
-    const range = document.createRange();
-    const sel = window.getSelection();
-    if (!sel) return;
-    range.setStart(element, 0);
-    range.setEnd(element, 0);
-    sel.removeAllRanges();
-    sel.addRange(range);
   }
 
   function check(element: HTMLElement | null) {
     if (element == null) return;
 
     updatePlaceholder(element);
-    toLines(element);
+    printLines(element);
+    onInput(element);
   }
 
-  function handlePaste(event: ClipboardEvent) {
-    // デフォルトの貼り付け動作を防ぎます
-    event.preventDefault();
-
-    // クリップボードからプレーンテキストデータを取得します
-    const text = event.clipboardData?.getData("text/plain");
-    if (!text) return;
-
-    // 現在の選択範囲を取得します
-    const selection = window.getSelection();
-    if (!selection?.rangeCount) return;
-
-    // 現在の選択範囲を削除します
-    selection.deleteFromDocument();
-
-    // 改行文字でテキストを分割して改行を保持します
-    const lines = text.split("\n");
-
-    // 新しいノードを保持するための DocumentFragment を作成します
-    const fragment = document.createDocumentFragment();
-
-    // 各行をループ処理してフラグメントに追加します
-    lines.forEach((line, index) => {
-      // 行頭の空白とタブを &nbsp; エンティティに置き換えます
-      const formattedLine = line.replace(/^\s+/, (match) =>
-        match
-          .replace(/ /g, "\u00A0")
-          .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0"),
-      );
-      // テキストと <br> を一緒に追加します
-      const div = document.createElement("div");
-      div.innerHTML = formattedLine + (index < lines.length - 1 ? "" : "");
-      fragment.appendChild(div);
-    });
-
-    console.log(fragment.childNodes);
-    console.log(fragment.lastChild);
-
-    // 選択範囲の最初の Range を取得します
-    const range = selection.getRangeAt(0);
-
-    // フラグメントを現在の Range に挿入します
-    range.insertNode(fragment);
-
-    // contenteditable 要素の最後にカーソルを移動します
-    const editable = document.getElementsByClassName("content")[0];
-    range.setStart(editable, editable.childNodes.length);
-    range.collapse(true);
-
-    // 新しい Range を選択します
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    if (contentDiv) updatePlaceholder(contentDiv);
+  function handlePasteWrapper(event: ClipboardEvent) {
+    if (contentDiv) {
+      handlePaste(event, contentDiv);
+      updatePlaceholder(contentDiv);
+    }
   }
 
   function insertImage() {
@@ -123,6 +55,8 @@
   let contentDiv: HTMLElement | null = $state(null);
 </script>
 
+<div class="overlay"></div>
+
 <div class="share-editor">
   <div class="tags is-empty" data-placeholder="タグをつける…"></div>
   <div class="separator"></div>
@@ -131,7 +65,7 @@
     class="content is-empty"
     contenteditable
     data-placeholder="なにかを共有する…"
-    onpaste={handlePaste}
+    onpaste={handlePasteWrapper}
     oninput={() => check(contentDiv)}
   ></div>
   <div class="separator"></div>
@@ -163,6 +97,16 @@
 </div>
 
 <style>
+  .overlay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 1;
+  }
+
   .share-editor {
     position: fixed;
     top: 50%;
@@ -170,7 +114,7 @@
     transform: translate(-50%, -50%);
     width: 90%;
     max-width: 63.125rem;
-    max-height: 80%;
+    max-height: 90%;
     padding: 0.75rem 0.75rem 0.5rem 0.75rem;
     border-radius: 1rem;
     background-color: var(--dominant-color);
@@ -185,7 +129,11 @@
   .content {
     width: 100%;
     white-space: pre-wrap;
-    background-color: pink;
+    overflow: auto;
+  }
+
+  :global(.tag, .handle, .share, .link) {
+    color: var(--accent-color);
   }
 
   .separator {
