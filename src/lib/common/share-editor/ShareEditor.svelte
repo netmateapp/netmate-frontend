@@ -30,12 +30,12 @@
     }
   }
 
-  function check(element: HTMLElement | null) {
-    if (element == null) return;
+  function check(event: InputEvent) {
+    if (contentDiv == null) return;
 
-    updatePlaceholder(element);
-    printLines(element);
-    onInput(element);
+    updatePlaceholder(contentDiv);
+    printLines(contentDiv);
+    onInput(event, contentDiv);
   }
 
   function handlePasteWrapper(event: ClipboardEvent) {
@@ -66,7 +66,7 @@
     contenteditable
     data-placeholder="なにかを共有する…"
     onpaste={handlePasteWrapper}
-    oninput={() => check(contentDiv)}
+    oninput={check}
   ></div>
   <div class="separator"></div>
   <div class="toolbar">

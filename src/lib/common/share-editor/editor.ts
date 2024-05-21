@@ -13,12 +13,13 @@ export function printLines(contentDiv: HTMLElement) {
   console.log(content);
 }
 
-export function onInput(contentDiv: HTMLElement) {
+export function onInput(event: InputEvent, contentDiv: HTMLElement) {
+
   const cursorPosition = saveCursorPosition(contentDiv);
 
-  format(contentDiv);
+  // IME判定を入れないと日本語が二重に入力される
+  if (!event.isComposing) format(contentDiv);
 
-  //flattenDivsInDiv(contentDiv);
   markupUrls(contentDiv, cursorPosition);
 
   restoreCursorPosition(contentDiv, cursorPosition);
@@ -209,9 +210,6 @@ function markupUrls(content: HTMLElement, savedPosition: SavedPosition) {
         offset = count;
       }
 
-      //console.log(`nodePath: ${nodePath} offset: ${offset}`);
-      //console.log(`nodePATH: ${savedPosition.nodePath} offSET: ${savedPosition.offset}`);
-
       savedPosition.nodePath = nodePath;
       savedPosition.offset = offset;
     }
@@ -236,30 +234,121 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
   // 改行文字でテキストを分割して改行を保持します
   const lines = text.split("\n");
 
+  const isMultipleLines = lines.length > 1;
+  let isPastingInEmptyLine: boolean = false;
+  let eventTarget = event.target;
+  if (eventTarget === contentDiv) {
+    isPastingInEmptyLine = true;
+  } else if (eventTarget) {
+    let target = eventTarget as Element;
+    if (target.nodeType === Node.ELEMENT_NODE && target.tagName === "br") {
+      isPastingInEmptyLine = true;
+    }
+  }
+
+  type InserPos = "left" | "middle" | "right" | "none";
+  let inPos: InserPos = "none";
+
+  // 非空行に対する複数行貼り付けに関する処理
+  if (isMultipleLines && !isPastingInEmptyLine) {
+    let currentCursorPosition = saveCursorPosition(contentDiv).offset;
+    let target = eventTarget as HTMLElement;
+    console.log(target.textContent);
+    console.log(`${currentCursorPosition} : ${target.textContent?.length}`);
+
+    // I xxx (左)
+    if (currentCursorPosition === 0) {
+      inPos = "left";
+    } else if (currentCursorPosition === (target.textContent?.length ?? 0)) { // xxx I (右)
+      inPos = "right";
+    } else { // xx I xx (間)
+      inPos = "middle";
+    }
+  }
+
   // 新しいノードを保持するための DocumentFragment を作成します
   const fragment = document.createDocumentFragment();
 
-  // 各行をループ処理してフラグメントに追加します
-  lines.forEach((line, index) => {
-    // 行頭の空白とタブを &nbsp; エンティティに置き換えます
-    const formattedLine = line.replace(/^\s+/, (match) =>
-      match
-        .replace(/ /g, "\u00A0")
-        .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0"),
-    );
+  let lastFragment: Node | null = null;
+  let lastFragmentLength = 0;
+  let targetInnerTextLength = 0;
 
-    // div要素を作成してテキストを設定
-    const div = document.createElement("div");
-    div.innerHTML = formattedLine;
+  if (isMultipleLines && !isPastingInEmptyLine) {
+    const target = eventTarget as HTMLElement;
+    if (inPos === "left") {
+      const formattedLines = lines.map(line => line.replace(/^\s+/, (match) =>
+        match
+          .replace(/ /g, "\u00A0")
+          .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0")
+        )
+      );
 
-    // 最後の行でない場合にのみ改行を追加
-    if (index < lines.length - 1) {
+      for (var i = 0; i < lines.length - 1; i++) {
+        // div要素を作成してテキストを設定
+        const div = document.createElement("div");
+        div.innerHTML = formattedLines[i];
+
+        fragment.appendChild(div);
+      }
+
+      const div = document.createElement("div");
+      div.innerHTML = formattedLines[formattedLines.length - 1] + target.innerHTML;
+
+      lastFragment = div;
+      lastFragmentLength = formattedLines[formattedLines.length - 1].length;
+      targetInnerTextLength = target.innerText.length;
+
       fragment.appendChild(div);
+    } else if (inPos === "right") {
+      const formattedLines = lines.map(line => line.replace(/^\s+/, (match) =>
+        match
+          .replace(/ /g, "\u00A0")
+          .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0")
+        )
+      );
+
+      const div = document.createElement("div");
+      div.innerHTML = target.innerHTML + formattedLines[0];
+
+      fragment.appendChild(div);
+
+      for (var i = 1; i < lines.length; i++) {
+        // div要素を作成してテキストを設定
+        const div = document.createElement("div");
+        div.innerHTML = formattedLines[i];
+
+        fragment.appendChild(div);
+      }
+
+      lastFragment = fragment.lastChild;
+      lastFragmentLength = formattedLines[lines.length - 1].length;
+      targetInnerTextLength = target.innerText.length;
     } else {
-      // 最後の行の場合、直接テキストを追加
-      fragment.appendChild(document.createTextNode(formattedLine));
+      
     }
-  });
+  } else {
+    // 各行をループ処理してフラグメントに追加します
+    lines.forEach((line, index) => {
+      // 行頭の空白とタブを &nbsp; エンティティに置き換えます
+      const formattedLine = line.replace(/^\s+/, (match) =>
+        match
+          .replace(/ /g, "\u00A0")
+          .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0"),
+      );
+
+      // div要素を作成してテキストを設定
+      const div = document.createElement("div");
+      div.innerHTML = formattedLine;
+
+      // 最後の行でない場合にのみ改行を追加
+      if (index < lines.length - 1) {
+        fragment.appendChild(div);
+      } else {
+        // 最後の行の場合、直接テキストを追加
+        fragment.appendChild(document.createTextNode(formattedLine));
+      }
+    });
+  }
 
   // 選択範囲の最初の Range を取得します
   const range = selection.getRangeAt(0);
@@ -271,8 +360,14 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
   }
 
   // フラグメントを現在の Range に挿入します
-  range.insertNode(fragment);
+  
+  if(isMultipleLines && !isPastingInEmptyLine && eventTarget instanceof Node) {
+    contentDiv.insertBefore(fragment, eventTarget);
+  } else {
+    range.insertNode(fragment);
+  }
 
+  /*
   // カーソルを最後のノードの後に移動します
   if (lastNode) {
     range.setStartAfter(lastNode);
@@ -281,5 +376,38 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
     // 新しい Range を選択します
     selection.removeAllRanges();
     selection.addRange(range);
+  }*/
+
+  if (isMultipleLines && !isPastingInEmptyLine && eventTarget instanceof Node && lastFragment) {
+    let rangee = document.createRange();
+
+    if (inPos === "left") {
+      const textNode = lastFragment.firstChild;
+      if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return;
+      rangee.setStart(textNode, lastFragmentLength);
+      rangee.setEnd(textNode, lastFragmentLength);
+    } else if (inPos === "right") {
+      const textNode = lastFragment.lastChild;
+      if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return;
+      rangee.setStartAfter(textNode);
+    } else {
+
+    }
+
+    console.log(rangee);
+
+    rangee.collapse(true);
+    // 新しい Range を選択します
+    selection.removeAllRanges();
+    selection.addRange(rangee);
+    contentDiv.removeChild(eventTarget);
+  } else if (lastNode) {
+    range.setStartAfter(lastNode);
+    range.collapse(true);
+    // 新しい Range を選択します
+    selection.removeAllRanges();
+    selection.addRange(range);
   }
+
+  //if(isMultipleLines && !isPastingInEmptyLine && eventTarget instanceof Node) contentDiv.removeChild(eventTarget);
 }
