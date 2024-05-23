@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
+    import { handleInput } from "./edit";
   import { onInput, handlePaste, printLines } from "./editor";
 
   const _ = createTranslator("common", "navigation");
@@ -30,19 +31,22 @@
     }
   }
 
-  function check(event: InputEvent) {
+  function handleIn(event: InputEvent) {
     if (contentDiv == null) return;
+
+    handleInput(event, contentDiv);
 
     updatePlaceholder(contentDiv);
     printLines(contentDiv);
-    onInput(event, contentDiv);
+    //onInput(event, contentDiv);
   }
 
   function handlePasteWrapper(event: ClipboardEvent) {
-    if (contentDiv) {
+    /*if (contentDiv) {
       handlePaste(event, contentDiv);
       updatePlaceholder(contentDiv);
-    }
+    }*/
+    if (!contentDiv) return;
   }
 
   function insertImage() {
@@ -53,6 +57,11 @@
   }
 
   let contentDiv: HTMLElement | null = $state(null);
+
+  /*$effect(() => {
+    document.execCommand("styleWithCSS", false, "false");
+    console.log("styleWithCSS is false");
+  });*/
 </script>
 
 <div class="overlay"></div>
@@ -63,11 +72,8 @@
   <div
     bind:this={contentDiv}
     class="content is-empty"
-    contenteditable
-    data-placeholder="なにかを共有する…"
-    onpaste={handlePasteWrapper}
-    oninput={check}
-  ></div>
+    contenteditable="plaintext-only"
+    data-placeholder="なにかを共有する…"></div>
   <div class="separator"></div>
   <div class="toolbar">
     <div class="left-aligned-tools">

@@ -275,23 +275,23 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
 
   if (isMultipleLines && !isPastingInEmptyLine) {
     const target = eventTarget as HTMLElement;
-    if (inPos === "left") {
-      const formattedLines = lines.map(line => line.replace(/^\s+/, (match) =>
-        match
-          .replace(/ /g, "\u00A0")
-          .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0")
-        )
-      );
-
+    const formattedLines = lines.map(line => line.replace(/^\s+/, (match) =>
+      match
+        .replace(/ /g, "\u00A0")
+        .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0")
+      )
+    );
+  
+    if (inPos === "left") { // I xxx
       for (var i = 0; i < lines.length - 1; i++) {
         // div要素を作成してテキストを設定
-        const div = document.createElement("div");
+        const div = document.createElement("p");
         div.innerHTML = formattedLines[i];
 
         fragment.appendChild(div);
       }
 
-      const div = document.createElement("div");
+      const div = document.createElement("p");
       div.innerHTML = formattedLines[formattedLines.length - 1] + target.innerHTML;
 
       lastFragment = div;
@@ -299,22 +299,15 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
       targetInnerTextLength = target.innerText.length;
 
       fragment.appendChild(div);
-    } else if (inPos === "right") {
-      const formattedLines = lines.map(line => line.replace(/^\s+/, (match) =>
-        match
-          .replace(/ /g, "\u00A0")
-          .replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0")
-        )
-      );
-
-      const div = document.createElement("div");
+    } else if (inPos === "right") { // xxx I
+      const div = document.createElement("p");
       div.innerHTML = target.innerHTML + formattedLines[0];
 
       fragment.appendChild(div);
 
       for (var i = 1; i < lines.length; i++) {
         // div要素を作成してテキストを設定
-        const div = document.createElement("div");
+        const div = document.createElement("p");
         div.innerHTML = formattedLines[i];
 
         fragment.appendChild(div);
@@ -322,9 +315,28 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
 
       lastFragment = fragment.lastChild;
       lastFragmentLength = formattedLines[lines.length - 1].length;
-      targetInnerTextLength = target.innerText.length;
-    } else {
-      
+    } else { // xx I xx
+      let currentCursorPosition = saveCursorPosition(contentDiv).offset;
+
+      let targetText = "";
+      if (eventTarget instanceof HTMLElement) targetText = eventTarget.textContent ?? "";
+
+      const div1 = document.createElement("p");
+      div1.innerHTML = targetText.slice(0, currentCursorPosition) + formattedLines[0];
+      fragment.appendChild(div1);
+
+      for (var i = 1; i < lines.length - 1; i++) {
+        const div = document.createElement("p");
+        div.innerHTML = formattedLines[i];
+        fragment.appendChild(div);
+      }
+
+      const div2 = document.createElement("p");
+      div2.innerHTML = formattedLines[lines.length - 1] + targetText.slice(currentCursorPosition);
+      fragment.appendChild(div2);
+
+      lastFragment = fragment.lastChild;
+      lastFragmentLength = formattedLines[lines.length - 1].length;
     }
   } else {
     // 各行をループ処理してフラグメントに追加します
@@ -337,7 +349,7 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
       );
 
       // div要素を作成してテキストを設定
-      const div = document.createElement("div");
+      const div = document.createElement("p");
       div.innerHTML = formattedLine;
 
       // 最後の行でない場合にのみ改行を追加
@@ -391,10 +403,11 @@ export function handlePaste(event: ClipboardEvent, contentDiv: HTMLElement) {
       if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return;
       rangee.setStartAfter(textNode);
     } else {
-
+      const textNode = lastFragment.firstChild;
+      if (!textNode || textNode.nodeType !== Node.TEXT_NODE) return;
+      rangee.setStart(textNode, lastFragmentLength);
+      rangee.setEnd(textNode, lastFragmentLength);
     }
-
-    console.log(rangee);
 
     rangee.collapse(true);
     // 新しい Range を選択します
