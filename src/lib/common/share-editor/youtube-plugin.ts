@@ -1,11 +1,12 @@
+import { $insertNodeToNearestRoot } from '@lexical/utils';
 import {
+  COMMAND_PRIORITY_EDITOR,
   DecoratorNode,
   createCommand,
   type DOMConversionMap,
   type DOMConversionOutput,
   type DOMExportOutput,
   type EditorConfig,
-  type ElementFormatType,
   type LexicalCommand,
   type LexicalEditor,
   type LexicalNode,
@@ -15,39 +16,6 @@ import {
 } from 'lexical';
 
 export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand("INSERT_YOUTUBE_COMMAND");
-
-type YouTubeComponentProps = Readonly<{
-  className: Readonly<{
-    base: string;
-    focus: string;
-  }>;
-  format: ElementFormatType | null;
-  nodeKey: NodeKey;
-  videoID: string;
-}>;
-
-function YouTubeComponent({
-  className,
-  format,
-  nodeKey,
-  videoID,
-}: YouTubeComponentProps) {
-  /*return React.createElement(
-    BlockWithAlignableContents,
-    { className, format, nodeKey },
-    React.createElement("iframe", {
-      width: "560",
-      height: "315",
-      src: `https://www.youtube-nocookie.com/embed/${videoID}`,
-      frameBorder: "0",
-      allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
-      allowFullScreen: true,
-      title: "YouTube video"
-    })
-  );*/
-
-  return document.createElement("");
-}
 
 export type SerializedYouTubeNode = Spread<
   {
@@ -83,7 +51,6 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
     this.__id = id;
   }
 
-  // このノードがHTMLとしてどのように表現されるか
   exportJSON(): SerializedYouTubeNode {
     return {
       ...super.exportJSON(),
@@ -96,11 +63,16 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
     return node;
   }
 
-  exportDOM(): DOMExportOutput {
+  createElement(): HTMLElement {
+    const container = document.createElement("div");
+    container.classList.add("video-container");
+
     const element = document.createElement('iframe');
     element.setAttribute('data-lexical-youtube', this.__id);
-    element.setAttribute('width', '560');
-    element.setAttribute('height', '315');
+    //element.setAttribute("width", "100%");
+    //element.setAttribute("height", "100%");
+    //element.setAttribute("max-height", "90vh");
+    //element.setAttribute("aspect-ratio", "16 / 9");
     element.setAttribute(
       'src',
       `https://www.youtube-nocookie.com/embed/${this.__id}`,
@@ -112,10 +84,16 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
     );
     element.setAttribute('allowfullscreen', 'true');
     element.setAttribute('title', 'YouTube video');
-    return {element};
+
+    container.appendChild(element);
+
+    return container;
   }
 
-  // HTMLElement -> YouTubeNode
+  exportDOM(): DOMExportOutput {
+    return {element: this.createElement()};
+  }
+
   static importDOM(): DOMConversionMap | null {
     return {
       iframe: (domNode: HTMLElement) => {
@@ -146,56 +124,17 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const element = document.createElement('iframe');
-    element.setAttribute('data-lexical-youtube', this.__id);
-    element.setAttribute('width', '560');
-    element.setAttribute('height', '315');
-    element.setAttribute(
-      'src',
-      `https://www.youtube-nocookie.com/embed/${this.__id}`,
-    );
-    element.setAttribute('frameborder', '0');
-    element.setAttribute(
-      'allow',
-      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
-    );
-    element.setAttribute('allowfullscreen', 'true');
-    element.setAttribute('title', 'YouTube video');
-    
-    return element;
+    return this.createElement();
   }
 
   decorate(_editor: LexicalEditor, config: EditorConfig): HTMLElement {
-    const embedBlockTheme = config.theme.embedBlock || {};
+    /*const embedBlockTheme = config.theme.embedBlock || {};
     const className = {
       base: embedBlockTheme.base || '',
       focus: embedBlockTheme.focus || '',
-    };
+    };*/
 
-    const element = document.createElement('iframe');
-    element.setAttribute('data-lexical-youtube', this.__id);
-    element.setAttribute('width', '560');
-    element.setAttribute('height', '315');
-    element.setAttribute(
-      'src',
-      `https://www.youtube-nocookie.com/embed/${this.__id}`,
-    );
-    element.setAttribute('frameborder', '0');
-    element.setAttribute(
-      'allow',
-      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture',
-    );
-    element.setAttribute('allowfullscreen', 'true');
-    element.setAttribute('title', 'YouTube video');
-    
-    return element;
-
-    /*return new SvelteComponent({
-      target: document.createElement("div"),
-      props: {
-        videoId: this.__id
-      }
-    });*/
+    return this.createElement();
   }
 }
 
@@ -207,4 +146,16 @@ export function $isYouTubeNode(
   node: YouTubeNode | LexicalNode | null | undefined,
 ): node is YouTubeNode {
   return node instanceof YouTubeNode;
+}
+
+export function registerYouTubePlugin(editor: LexicalEditor): () => void {
+  return editor.registerCommand(
+    INSERT_YOUTUBE_COMMAND,
+    (videoId: string) => {
+      const youtubeNode = $createYouTubeNode(videoId);
+      $insertNodeToNearestRoot(youtubeNode);
+      return true;
+    },
+    COMMAND_PRIORITY_EDITOR,
+  );
 }

@@ -11,4 +11,4 @@
 <Brand x={16} y={8} />
 <SearchBox />
 <Navigation />
-<LexicalEditor />
+<ShareEditor />
