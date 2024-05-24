@@ -62,7 +62,7 @@
     z-index: 1;
   }
 
-  :global(.video-container) {
+  :global(.yt-container) {
     position: relative;
     width: 100%;
     height: 80vh;
@@ -76,7 +76,7 @@
     outline: 2px solid var(--accent-color);
   }
 
-  :global(.video-container iframe) {
+  :global(.yt-container iframe) {
     height: 100%;
     aspect-ratio: 16 / 9;
     border: 0;

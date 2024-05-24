@@ -84,7 +84,7 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
 
   createElement(): HTMLElement {
     const container = document.createElement("div");
-    container.classList.add("video-container");
+    container.classList.add("yt-container");
     container.setAttribute("data-lexical-youtube-node-id", this.__key);
 
     const element = document.createElement("iframe");
