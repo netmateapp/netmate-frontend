@@ -1,26 +1,9 @@
 <script src="lexical-editor.ts" lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-  import { dispatchInsertYoutubeCommand, init, isEditorEmpty } from "./lexical-editor";
+  import { dispatchInsertYoutubeCommand, init } from "./lexical-editor";
+  import { canShowPlaceholder } from "./placeholder-plugin.svelte";
 
   const _ = createTranslator("common", "navigation");
-
-  function updatePlaceholder(element: HTMLElement | null) {
-    if (element == null) return;
-
-    if (element.innerText == "" || element.innerText == "\n") {
-      element.innerText = "";
-      element.classList.add("is-empty");
-    } else {
-      element.classList.remove("is-empty");
-    }
-  }
-  
-  function handleIn(event: InputEvent) {
-    if (contentDiv == null) return;
-
-    updatePlaceholder(contentDiv);
-  }
-  let contentDiv: HTMLElement | null = $state(null);
 
   $effect(() => {
     init();
@@ -32,14 +15,14 @@
 <div class="overlay"></div>
 
 <div class="share-editor">
-  <div class="tags is-empty" data-placeholder="タグをつける…"></div>
+  <div class="tags">
+    <div class="placeholder">タグをつける…</div>
+  </div>
   <div class="separator"></div>
-  <div
-    bind:this={contentDiv}
-    id="editor"
-    class="content"
-    contenteditable
-    data-placeholder="なにかを共有する…"></div>
+  <div class="content">
+    <div class="editor" id="editor" contenteditable></div>
+    <div class="placeholder" hidden={!canShowPlaceholder()}>何かを共有する…</div>
+  </div>
   <div class="separator"></div>
   <div class="toolbar">
     <div class="left-aligned-tools">
@@ -87,7 +70,10 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    background-color: pink;
+  }
+
+  :global(.selected iframe) {
+    outline: 2px solid var(--accent-color);
   }
 
   :global(.video-container iframe) {
@@ -119,13 +105,37 @@
     z-index: 1;
   }
 
-  .content {
+  .tags {
+    position: relative;
     width: 100%;
-    min-height: 34px;
+    min-height: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .content {
+    position: relative;
+    width: 100%;
     white-space: pre-wrap;
     overflow: auto;
     scrollbar-width: thin;
     scrollbar-color: #888 #fff;
+  }
+  
+  .editor {
+    width: 100%;
+    height: 100%;
+  }
+
+  .placeholder {
+    position: absolute;
+    top: 0px;
+    color: var(--light-gray);
+    font-family: var(--primary-font);
+    font-size: 0.9375rem;
+    pointer-events: none;
+    white-space: nowrap;
   }
 
   /* WebKitベースのブラウザ用 */
@@ -156,20 +166,6 @@
     width: 90%;
     height: 0.04188rem;
     background-color: var(--lighter-gray);
-  }
-
-  .tags::before,
-  .content::before {
-    content: attr(data-placeholder);
-    color: var(--light-gray);
-    font-family: var(--primary-font);
-    font-size: 0.9375rem;
-    pointer-events: none;
-  }
-
-  .tags:not(.is-empty)::before,
-  .content:not(.is-empty)::before {
-    content: none;
   }
 
   .left-aligned-tools {

@@ -23,6 +23,9 @@ importers:
       '@lexical/selection':
         specifier: ^0.15.0
         version: 0.15.0
+      '@lexical/text':
+        specifier: ^0.15.0
+        version: 0.15.0
       '@lexical/utils':
         specifier: ^0.15.0
         version: 0.15.0
@@ -406,6 +409,9 @@ packages:
 
   '@lexical/table@0.15.0':
     resolution: {integrity: sha512-3IRBg8IoIHetqKozRQbJQ2aPyG0ziXZ+lc8TOIAGs6METW/wxntaV+rTNrODanKAgvk2iJTIyfFkYjsqS9+VFg==}
+
+  '@lexical/text@0.15.0':
+    resolution: {integrity: sha512-WsAkAt9T1RH1iDrVuWeoRUeMCOAWar5oSFtnQ4m9vhT/zuf5b8efK87GiqCH00ZAn4DGzOuAfyXlMFqBVCQdkQ==}
 
   '@lexical/utils@0.15.0':
     resolution: {integrity: sha512-/6954LDmTcVFgexhy5WOZDa4TxNQOEZNrf8z7TRAFiAQkihcME/GRoq1en5cbXoVNF8jv5AvNyyc7x0MByRJ6A==}
@@ -1517,6 +1523,10 @@ snapshots:
   '@lexical/table@0.15.0':
     dependencies:
       '@lexical/utils': 0.15.0
+      lexical: 0.15.0
+
+  '@lexical/text@0.15.0':
+    dependencies:
       lexical: 0.15.0
 
   '@lexical/utils@0.15.0':
