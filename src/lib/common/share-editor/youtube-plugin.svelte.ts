@@ -85,6 +85,7 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
   createElement(): HTMLElement {
     const container = document.createElement("div");
     container.classList.add("video-container");
+    container.setAttribute("data-lexical-youtube-node-id", this.__key);
 
     const element = document.createElement("iframe");
     element.setAttribute("data-lexical-youtube", this.__id);
@@ -143,12 +144,6 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
   }
 
   decorate(_editor: LexicalEditor, config: EditorConfig): HTMLElement {
-    /*const embedBlockTheme = config.theme.embedBlock || {};
-  const className = {
-    base: embedBlockTheme.base || '',
-    focus: embedBlockTheme.focus || '',
-  };*/
-
     const [isSelected, setSelected, clearSelected] = useLexicalNodeSelection(
       _editor,
       this.__key,
@@ -170,52 +165,19 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
 
     $effect.root(() => {
       return mergeRegister(
-        _editor.registerCommand<ElementFormatType>(
-          FORMAT_ELEMENT_COMMAND,
-          (formatType) => {
-            if (isSelected) {
-              const selection = getSelection();
-              console.log("format");
-
-              if (isNodeSelection(selection)) {
-                const node = getNodeByKey(this.__key);
-
-                if (isYouTubeNode(node)) {
-                  //node.setFormat(formatType);
-                }
-              } else if (isRangeSelection(selection)) {
-                const nodes = selection.getNodes();
-
-                for (const node of nodes) {
-                  if (isYouTubeNode(node)) {
-                    //node.setFormat(formatType);
-                  } else {
-                    const element =
-                      getNearestBlockElementAncestorOrThrow(node);
-                    element.setFormat(formatType);
-                  }
-                }
-              }
-
-              return true;
-            }
-
-            return false;
-          },
-          COMMAND_PRIORITY_LOW,
-        ),
         _editor.registerCommand<MouseEvent>(
           CLICK_COMMAND,
           (event) => {
-            /*if (event.target === ref.current) {
-            event.preventDefault();
-            if (!event.shiftKey) {
-              clearSelected();
-            }
+            const element = event.target;
+            if (element && element instanceof HTMLElement && element.getAttribute("data-lexical-youtube-node-id") === this.__key) {
+              event.preventDefault();
+              if (!event.shiftKey) {
+                clearSelected();
+              }
 
-            setSelected(!isSelected);
-            return true;
-          }*/
+              setSelected(!isSelected);
+              return true;
+            }
 
             return false;
           },
@@ -233,7 +195,9 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
         ),
       );
     }); // [clearSelection, editor, isSelected, nodeKey, $onDelete, setSelected]
-    return this.createElement();
+    const element = this.createElement();
+    element.setAttribute("data-lexical-youtube-node-id", this.__key);
+    return element;
   }
 }
 
@@ -258,7 +222,6 @@ export function useLexicalNodeSelection(
   $effect.root(() => {
     let isMounted = true;
     const unregister = _editor.registerUpdateListener(() => {
-      console.log("update");
       if (isMounted) {
         isSelected = isNodeSelected(_editor, key);
         const ele = _editor.getElementByKey(key);
