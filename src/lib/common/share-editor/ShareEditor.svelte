@@ -68,6 +68,7 @@
         onclick={() =>
           dispatchInsertSlideCommand([
             "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
+            "https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096"
           ])}
       >
         <svg class="icon">

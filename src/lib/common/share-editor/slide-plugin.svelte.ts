@@ -27,31 +27,40 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
 } from "lexical";
+import type { ComponentProps, SvelteComponent } from "svelte";
+import ImageSlide from "./ImageSlide.svelte";
 
-export const INSERT_SLIDE_COMMAND: LexicalCommand<string> = createCommand("INSERT_SLIDE_COMMAND");
+export const INSERT_IMAGE_SLIDE_COMMAND: LexicalCommand<string> = createCommand("INSERT_IMAGE_SLIDE_COMMAND");
 
-type SerializedSlideNode = Spread<
+type DecoratorImageSlideType = {
+  componentClass: typeof SvelteComponent<any>;
+  props: ComponentProps<ImageSlide>;
+}
+
+type SerializedImageSlideNode = Spread<
   {
-    slide: ImageSlide;
+    slide: ImageSlideData;
   },
   SerializedLexicalNode
 >;
 
+const NODE_ATTRIBUTE = "data-lexical-image-slide";
+
 // 修正必要?
-function convertSlideElement(
+function convertImageSlideElement(
   domNode: HTMLElement,
 ): null | DOMConversionOutput {
-  const stringSlide = domNode.getAttribute("data-lexical-slide");
+  const stringSlide = domNode.getAttribute(NODE_ATTRIBUTE);
   if (stringSlide) {
-    const node = createSlideNode(ImageSlide.fromString(stringSlide));
+    const node = createSlideNode(ImageSlideData.fromString(stringSlide));
     return { node };
   }
   return null;
 }
 
-const CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME = "data-lexical-slide-node-id";
+const IDENTITY_ATTRIBUTE = "data-lexical-image-slide-key";
 
-export class ImageSlide {
+export class ImageSlideData {
   imagesPaths: string[] = [];
 
   constructor(imagePaths: string[]) {
@@ -59,92 +68,49 @@ export class ImageSlide {
   }
 
   toString(): string {
-    return this.imagesPaths.join(",");
+    return this.imagesPaths.toString();
   }
 
-  static fromString(stringSlide: string): ImageSlide {
-    const imagePaths = stringSlide.split(",");
-    return new ImageSlide(imagePaths);
+  static fromString(imagePathsStr: string): ImageSlideData {
+    const imagePaths: string[] = imagePathsStr.split(",");
+    return new ImageSlideData(imagePaths);
   }
 }
 
-export class SlideNode extends DecoratorNode<HTMLElement> {
-  __slide: ImageSlide;
+export class ImageSlideNode extends DecoratorNode<DecoratorImageSlideType> {
+  __slide: ImageSlideData;
 
   static getType(): string {
-    return "slide";
+    return "image-slide";
   }
 
-  static clone(node: SlideNode): SlideNode {
-    return new SlideNode(node.__slide, node.__key);
+  static clone(node: ImageSlideNode): ImageSlideNode {
+    return new ImageSlideNode(node.__slide, node.__key);
   }
 
-  constructor(slide: ImageSlide, key?: NodeKey) {
+  constructor(slide: ImageSlideData, key?: NodeKey) {
     super(key);
     this.__slide = slide;
   }
 
-  exportJSON(): SerializedSlideNode {
+  exportJSON(): SerializedImageSlideNode {
     return {
       ...super.exportJSON(),
       slide: this.__slide,
     };
   }
 
-  static importJSON(serializedNode: SerializedSlideNode): SlideNode {
+  static importJSON(serializedNode: SerializedImageSlideNode): ImageSlideNode {
     const node = createSlideNode(serializedNode.slide);
     return node;
   }
 
   createElement(): HTMLElement {
-    const container = document.createElement("div");
-    container.classList.add("slide-editor");
-
-    const editSlideButtons = document.createElement("div");
-    editSlideButtons.classList.add("edit-slide-buttons");
-
-    const addImageButton = document.createElement("div");
-    addImageButton.classList.add("edit-slide-button");
-    const addSvg = document.createElement("svg");
-    addSvg.classList.add("edit-slide-button-icon");
-    const addIcon = document.createElement("use");
-    addIcon.setAttribute(
-      "href",
-      "/src/lib/assets/common/add.svg#add",
-    );
-    addSvg.appendChild(addIcon);
-    addImageButton.appendChild(addSvg);
-    editSlideButtons.appendChild(addImageButton);
-    container.appendChild(editSlideButtons);
-
-    const slide = document.createElement("div");
-    slide.classList.add("slide");
-    container.appendChild(slide);
-
-    // 修正必要
-    const image = document.createElement("img");
-    image.classList.add("image");
-    image.setAttribute(
-      "src",
-      "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
-    );
-    slide.appendChild(image);
-
-    const centeredDotsIndicator = document.createElement("div");
-    centeredDotsIndicator.classList.add("centered-dots-indicator");
-    const dotsIndicator = document.createElement("div");
-    dotsIndicator.classList.add("dots-indicator");
-    for (var i = 0; i < 3; i++) {
-      const dot = document.createElement("div");
-      dot.classList.add("dot");
-      dotsIndicator.appendChild(dot);
-    }
-    centeredDotsIndicator.appendChild(dotsIndicator);
-    container.appendChild(centeredDotsIndicator);
-    //container.setAttribute(CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME, this.__key);
-
-    //element.setAttribute("data-lexical-slide", this.__slide.toString());
-    return container;
+    const imageSlide = document.createElement("image-slide");
+    imageSlide.setAttribute("images-paths", JSON.stringify(this.__slide.imagesPaths));
+    imageSlide.setAttribute(NODE_ATTRIBUTE, this.__slide.toString());
+    imageSlide.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
+    return imageSlide;
   }
 
   exportDOM(): DOMExportOutput {
@@ -153,14 +119,13 @@ export class SlideNode extends DecoratorNode<HTMLElement> {
 
   // 修正必要
   static importDOM(): DOMConversionMap | null {
-    console.log("run importDOM");
     return {
       iframe: (domNode: HTMLElement) => {
-        if (!domNode.hasAttribute("data-lexical-slide")) {
+        if (!domNode.hasAttribute(NODE_ATTRIBUTE)) {
           return null;
         }
         return {
-          conversion: convertSlideElement,
+          conversion: convertImageSlideElement,
           priority: 1,
         };
       },
@@ -171,7 +136,7 @@ export class SlideNode extends DecoratorNode<HTMLElement> {
     return false;
   }
 
-  getSlide(): ImageSlide {
+  getSlide(): ImageSlideData {
     return this.__slide;
   }
 
@@ -179,14 +144,14 @@ export class SlideNode extends DecoratorNode<HTMLElement> {
     _includeInert?: boolean | undefined,
     _includeDirectionless?: false | undefined,
   ): string {
-    return `slide-node\n`;
+    return this.__slide.toString();
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
     return this.createElement();
   }
 
-  decorate(editor: LexicalEditor, _config: EditorConfig): HTMLElement {
+  decorate(editor: LexicalEditor, _config: EditorConfig): DecoratorImageSlideType {
     const [isSelected, setSelected, clearSelected] = useLexicalNodeSelection(
       editor,
       this.__key,
@@ -194,7 +159,7 @@ export class SlideNode extends DecoratorNode<HTMLElement> {
 
     const onDelete = (event: KeyboardEvent) => {
       const type = getSelection()?.getNodes()[0].__type;
-      if ((isSelected || type === "slide") && isNodeSelection(getSelection())) {
+      if ((isSelected || type === "image-slide") && isNodeSelection(getSelection())) {
         event.preventDefault();
         const node = getNodeByKey(this.__key);
         if (isDecoratorNode(node)) {
@@ -212,7 +177,12 @@ export class SlideNode extends DecoratorNode<HTMLElement> {
           CLICK_COMMAND,
           (event) => {
             const element = event.target;
-            if (element && element instanceof HTMLElement && element.getAttribute(CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME) === this.__key) {
+            if (!element || !(element instanceof HTMLElement)) return false;
+
+            const parent = element.parentNode;
+            if (!parent || !(parent instanceof HTMLElement)) return false;
+
+            if (parent.getAttribute(IDENTITY_ATTRIBUTE) === this.__key) {
               event.preventDefault();
               if (!event.shiftKey) {
                 clearSelected();
@@ -238,7 +208,13 @@ export class SlideNode extends DecoratorNode<HTMLElement> {
         ),
       );
     });
-    return this.createElement();
+
+    return {
+      componentClass: ImageSlide,
+      props: {
+        imagesPaths: this.__slide.imagesPaths
+      }
+    }
   }
 }
 
@@ -315,21 +291,21 @@ export function useLexicalNodeSelection(
   return [isSelected, setSelected, clearSelected];
 }
 
-export function createSlideNode(slide: ImageSlide): SlideNode {
-  return new SlideNode(slide);
+export function createSlideNode(slide: ImageSlideData): ImageSlideNode {
+  return new ImageSlideNode(slide);
 }
 
 export function isSlideNode(
-  node: SlideNode | LexicalNode | null | undefined,
-): node is SlideNode {
-  return node instanceof SlideNode;
+  node: ImageSlideNode | LexicalNode | null | undefined,
+): node is ImageSlideNode {
+  return node instanceof ImageSlideNode;
 }
 
 export function registerSlidePlugin(editor: LexicalEditor): () => void {
   return editor.registerCommand(
-    INSERT_SLIDE_COMMAND,
+    INSERT_IMAGE_SLIDE_COMMAND,
     (imagePaths: string) => {
-      const slideNode = createSlideNode(ImageSlide.fromString(imagePaths));
+      const slideNode = createSlideNode(ImageSlideData.fromString(imagePaths));
       insertNodeToNearestRoot(slideNode);
       return true;
     },

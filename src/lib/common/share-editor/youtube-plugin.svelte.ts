@@ -27,12 +27,10 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
 } from "lexical";
-import type {SvelteComponent, ComponentProps} from 'svelte';
+import type { SvelteComponent, ComponentProps } from 'svelte';
 import YouTubeEmbed from "./YouTubeEmbed.svelte";
 
-export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand(
-  "INSERT_YOUTUBE_COMMAND",
-);
+export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand("INSERT_YOUTUBE_COMMAND");
 
 type DecoratorYouTubeType = {
   componentClass: typeof SvelteComponent<any>;
@@ -46,9 +44,11 @@ type SerializedYouTubeNode = Spread<
   SerializedLexicalNode
 >;
 
+const NODE_ATTRIBUTE = "data-lexical-youtube";
+
 // 要修正
 function convertYoutubeElement(domNode: HTMLElement): null | DOMConversionOutput {
-  const videoId = domNode.getAttribute("data-lexical-youtube");
+  const videoId = domNode.getAttribute(NODE_ATTRIBUTE);
   if (videoId) {
     const node = createYouTubeNode(videoId);
     return { node };
@@ -89,8 +89,8 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
   createElement(): HTMLElement {
     const youtubeEmbed = document.createElement("youtube-embed");
     youtubeEmbed.setAttribute("video-id", this.__videoId);
+    youtubeEmbed.setAttribute(NODE_ATTRIBUTE, this.__videoId);
     youtubeEmbed.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
-    //youtubeEmbed.setAttribute("selected", "false");
     return youtubeEmbed;
   }
 
@@ -104,7 +104,7 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
   static importDOM(): DOMConversionMap | null {
     return {
       iframe: (domNode: HTMLElement) => {
-        if (!domNode.hasAttribute("data-lexical-youtube")) {
+        if (!domNode.hasAttribute(NODE_ATTRIBUTE)) {
           return null;
         }
         return {
@@ -198,7 +198,7 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
       props: {
         videoId: this.__videoId
       },
-    }
+    };
   }
 }
 
@@ -214,6 +214,8 @@ function isNodeSelected(editor: LexicalEditor, key: NodeKey): boolean {
   });
 }
 
+const SELECTED_CLASS = "selected";
+
 export function useLexicalNodeSelection(
   _editor: LexicalEditor,
   key: NodeKey,
@@ -228,9 +230,9 @@ export function useLexicalNodeSelection(
         const element = _editor.getElementByKey(key);
         if (element) {
           if (isSelected) {
-            element.classList.add("selected");
+            element.classList.add(SELECTED_CLASS);
           } else {
-            element.classList.remove("selected");
+            element.classList.remove(SELECTED_CLASS);
           }
         }
       }
@@ -289,7 +291,6 @@ export function registerYouTubePlugin(editor: LexicalEditor): () => void {
   return editor.registerCommand(
     INSERT_YOUTUBE_COMMAND,
     (videoId: string) => {
-      console.log("insert youtube");
       const youtubeNode = createYouTubeNode(videoId);
       insertNodeToNearestRoot(youtubeNode);
       return true;
