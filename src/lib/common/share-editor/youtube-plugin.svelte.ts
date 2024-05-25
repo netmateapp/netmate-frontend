@@ -134,7 +134,7 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
     _includeInert?: boolean | undefined,
     _includeDirectionless?: false | undefined,
   ): string {
-    return `https://www.youtube.com/watch?v=${this.__id}`;
+    return `https://www.youtube.com/watch?v=${this.__id}\n`;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {

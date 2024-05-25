@@ -1,5 +1,6 @@
 <script src="lexical-editor.ts" lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
+  import { getCharactersCount } from "./characters-conter-plugin.svelte";
   import { dispatchInsertYoutubeCommand, init } from "./lexical-editor";
   import { canShowPlaceholder } from "./placeholder-plugin.svelte";
 
@@ -10,6 +11,16 @@
   });
 
   let videoId = "XUTj1nz94ik";
+
+  function currentCharactersCount(): number {
+    return getCharactersCount();
+  }
+
+  function isLimitOver(): boolean {
+    return currentCharactersCount() > CHARACTERS_LIMIT;
+  }
+
+  const CHARACTERS_LIMIT = 10000;
 </script>
 
 <div class="overlay"></div>
@@ -21,7 +32,9 @@
   <div class="separator"></div>
   <div class="content">
     <div class="editor" id="editor" contenteditable></div>
-    <div class="placeholder" hidden={!canShowPlaceholder()}>何かを共有する…</div>
+    <div class="placeholder" hidden={!canShowPlaceholder()}>
+      何かを共有する…
+    </div>
   </div>
   <div class="separator"></div>
   <div class="toolbar">
@@ -41,12 +54,23 @@
           <use href="/src/lib/assets/common/music_note.svg#music_note"></use>
         </svg>
       </button>
-      <button class="icon-button" onclick={() => dispatchInsertYoutubeCommand(videoId)}>
+      <button
+        class="icon-button"
+        onclick={() => dispatchInsertYoutubeCommand(videoId)}
+      >
         <svg class="icon">
           <use href="/src/lib/assets/common/smart_display.svg#smart_display"
           ></use>
         </svg>
       </button>
+    </div>
+    <div class="right-aligned-tools">
+      <div class="characters-counter">
+        <span class="characters-count" class:limit-over={isLimitOver()}
+          >{currentCharactersCount()}</span
+        >
+        <span class="characters-limit">/{CHARACTERS_LIMIT}</span>
+      </div>
     </div>
   </div>
 </div>
@@ -122,7 +146,7 @@
     scrollbar-width: thin;
     scrollbar-color: #888 #fff;
   }
-  
+
   .editor {
     width: 100%;
     height: 100%;
@@ -140,22 +164,22 @@
 
   /* WebKitベースのブラウザ用 */
   .content::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    width: 8px;
+    height: 8px;
   }
 
   .content::-webkit-scrollbar-track {
-      background: #fff;
+    background: #fff;
   }
 
   .content::-webkit-scrollbar-thumb {
-      background-color: #888;
-      border-radius: 10px;
-      border: 2px solid #fff;
+    background-color: #888;
+    border-radius: 10px;
+    border: 2px solid #fff;
   }
 
   .content::-webkit-scrollbar-thumb:hover {
-      background-color: #555;
+    background-color: #555;
   }
 
   :global(.tag, .handle, .share, .link) {
@@ -166,6 +190,13 @@
     width: 90%;
     height: 0.04188rem;
     background-color: var(--lighter-gray);
+  }
+
+  .toolbar {
+    display: flex;
+    width: 61.625rem;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .left-aligned-tools {
@@ -197,5 +228,34 @@
   .icon {
     width: 1.5rem;
     height: 1.5rem;
+  }
+
+  .right-aligned-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .characters-counter {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .characters-count {
+    color: var(--light-gray);
+    font-family: Roboto;
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+  }
+
+  .limit-over {
+    color: var(--warning-color);
+  }
+
+  .characters-limit {
+    color: var(--light-gray);
+    font-family: Roboto;
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
   }
 </style>

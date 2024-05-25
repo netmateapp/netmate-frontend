@@ -1,11 +1,12 @@
 import { HeadingNode, QuoteNode, registerRichText } from '@lexical/rich-text';
-import { mergeRegister } from '@lexical/utils';
-import { $createParagraphNode as createParagraphNode, $getRoot as getRoot, $getSelection as getSelection, createEditor, type EditorState, type LexicalEditor, $getNearestNodeFromDOMNode as getNearestNodeFromDOMNode, $isDecoratorNode as isDecoratorNode } from 'lexical';
+import { CAN_USE_BEFORE_INPUT, IS_APPLE_WEBKIT, IS_IOS, IS_SAFARI, mergeRegister } from '@lexical/utils';
+import { $createParagraphNode as createParagraphNode, $getRoot as getRoot, $getSelection as getSelection, createEditor, type EditorState, type LexicalEditor, $getNearestNodeFromDOMNode as getNearestNodeFromDOMNode, $isDecoratorNode as isDecoratorNode, $getSelection, $isRangeSelection as isRangeSelection, COMMAND_PRIORITY_EDITOR, INSERT_LINE_BREAK_COMMAND, INSERT_PARAGRAPH_COMMAND, KEY_ENTER_COMMAND, COMMAND_PRIORITY_LOW } from 'lexical';
 import { INSERT_YOUTUBE_COMMAND, registerYouTubePlugin, YouTubeNode } from './youtube-plugin.svelte';
 import { createEmptyHistoryState, registerHistory } from '@lexical/history';
 import { AutoLinkNode } from '@lexical/link';
 import { registerAutoLinkPlugin } from './auto-link-plugin';
 import { registerPlaceholderPlugin } from './placeholder-plugin.svelte';
+import { registerCharactersCounterPlugin } from './characters-conter-plugin.svelte';
 
 export type InitialEditorStateType = null | string | EditorState | (() => void);
 
@@ -37,10 +38,6 @@ export function init() {
 
 }
 
-export function isEditorEmpty(): boolean {
-  return editor?.getEditorState().isEmpty() ?? true;
-}
-
 export function dispatchInsertYoutubeCommand(videoId: string) {
   editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, videoId);
 }
@@ -54,14 +51,44 @@ export function register(
     registerAutoLinkPlugin(editor),
     registerYouTubePlugin(editor),
     registerPlaceholderPlugin(editor),
+    registerCharactersCounterPlugin(editor),
+    registerEnterListener(editor),
   );
   initializeEditor(editor, initialEditorState);
   return removeListener;
 }
 
-function isTargetWithinDecorator(target: HTMLElement): boolean {
-  const node = getNearestNodeFromDOMNode(target);
-  return isDecoratorNode(node);
+// 改行と改段落の統一
+function registerEnterListener(editor: LexicalEditor) {
+  return editor.registerCommand<KeyboardEvent | null>(
+    KEY_ENTER_COMMAND,
+    (event) => {
+      const selection = getSelection();
+      if (!isRangeSelection(selection)) {
+        return false;
+      }
+      if (event !== null) {
+        // beforeinputイベントが利用できる場合、デフォルトの動作をブロックせずに済みます。
+        // これにより、iOSが段落を挿入していることを正しく認識し、
+        // オートコンプリートやオートキャピタライズなどが意図した通りに動作することが保証されます。
+        // しかし、これによりSafariで奇妙なパフォーマンスの問題が発生する可能性もあります。
+        // 具体的には、Enterキーの押下を防ぐことによる明らかな遅延が生じることがあります。
+        if (
+          (IS_IOS || IS_SAFARI || IS_APPLE_WEBKIT) &&
+          CAN_USE_BEFORE_INPUT
+        ) {
+          return false;
+        }
+        event.preventDefault();
+        console.log("shift cancel");
+        /*if (event.shiftKey) {
+          return editor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, false);
+        }*/
+      }
+      return editor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, false);
+    },
+    COMMAND_PRIORITY_LOW,
+  );
 }
 
 function initializeEditor(
