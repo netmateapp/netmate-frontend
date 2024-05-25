@@ -1,5 +1,4 @@
 import {
-  $getNearestBlockElementAncestorOrThrow as getNearestBlockElementAncestorOrThrow,
   $insertNodeToNearestRoot as insertNodeToNearestRoot,
   mergeRegister,
 } from "@lexical/utils";
@@ -23,11 +22,8 @@ import {
   $createNodeSelection as createNodeSelection,
   $setSelection as setSelection,
   $isDecoratorNode as isDecoratorNode,
-  type ElementFormatType,
-  $isRangeSelection as isRangeSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
-  FORMAT_ELEMENT_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
 } from "lexical";
@@ -53,6 +49,8 @@ function convertYoutubeElement(
   }
   return null;
 }
+
+const CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME = "data-lexical-youtube-node-id";
 
 export class YouTubeNode extends DecoratorNode<HTMLElement> {
   __id: string;
@@ -85,7 +83,7 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
   createElement(): HTMLElement {
     const container = document.createElement("div");
     container.classList.add("yt-container");
-    container.setAttribute("data-lexical-youtube-node-id", this.__key);
+    container.setAttribute(CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME, this.__key);
 
     const element = document.createElement("iframe");
     element.setAttribute("data-lexical-youtube", this.__id);
@@ -139,19 +137,19 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
     return `https://www.youtube.com/watch?v=${this.__id}`;
   }
 
-  createDOM(config: EditorConfig): HTMLElement {
+  createDOM(_config: EditorConfig): HTMLElement {
     return this.createElement();
   }
 
-  decorate(_editor: LexicalEditor, config: EditorConfig): HTMLElement {
+  decorate(editor: LexicalEditor, _config: EditorConfig): HTMLElement {
     const [isSelected, setSelected, clearSelected] = useLexicalNodeSelection(
-      _editor,
+      editor,
       this.__key,
     );
 
     const onDelete = (event: KeyboardEvent) => {
-      if (isSelected && isNodeSelection(getSelection())) {
-        console.log("delete");
+      const type = getSelection()?.getNodes()[0].__type;
+      if ((isSelected || type === "youtube") && isNodeSelection(getSelection())) {
         event.preventDefault();
         const node = getNodeByKey(this.__key);
         if (isDecoratorNode(node)) {
@@ -161,15 +159,15 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
       }
 
       return false;
-    }; //[isSelected, nodeKey]
+    };
 
     $effect.root(() => {
       return mergeRegister(
-        _editor.registerCommand<MouseEvent>(
+        editor.registerCommand<MouseEvent>(
           CLICK_COMMAND,
           (event) => {
             const element = event.target;
-            if (element && element instanceof HTMLElement && element.getAttribute("data-lexical-youtube-node-id") === this.__key) {
+            if (element && element instanceof HTMLElement && element.getAttribute(CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME) === this.__key) {
               event.preventDefault();
               if (!event.shiftKey) {
                 clearSelected();
@@ -183,21 +181,19 @@ export class YouTubeNode extends DecoratorNode<HTMLElement> {
           },
           COMMAND_PRIORITY_LOW,
         ),
-        _editor.registerCommand(
+        editor.registerCommand(
           KEY_DELETE_COMMAND,
           onDelete,
           COMMAND_PRIORITY_LOW,
         ),
-        _editor.registerCommand(
+        editor.registerCommand(
           KEY_BACKSPACE_COMMAND,
           onDelete,
           COMMAND_PRIORITY_LOW,
         ),
       );
-    }); // [clearSelection, editor, isSelected, nodeKey, $onDelete, setSelected]
-    const element = this.createElement();
-    element.setAttribute("data-lexical-youtube-node-id", this.__key);
-    return element;
+    });
+    return this.createElement();
   }
 }
 
@@ -224,12 +220,12 @@ export function useLexicalNodeSelection(
     const unregister = _editor.registerUpdateListener(() => {
       if (isMounted) {
         isSelected = isNodeSelected(_editor, key);
-        const ele = _editor.getElementByKey(key);
-        if (ele) {
+        const element = _editor.getElementByKey(key);
+        if (element) {
           if (isSelected) {
-            ele.classList.add("selected");
+            element.classList.add("selected");
           } else {
-            ele.classList.remove("selected");
+            element.classList.remove("selected");
           }
         }
       }
@@ -239,7 +235,7 @@ export function useLexicalNodeSelection(
       isMounted = false;
       unregister();
     };
-  }); // [_editor, key];
+  });
 
   const setSelected = (selected: boolean) => {
     _editor.update(() => {
@@ -251,6 +247,7 @@ export function useLexicalNodeSelection(
       }
 
       if (isNodeSelection(selection)) {
+        isSelected = selected;
         if (selected) {
           selection.add(key);
         } else {
@@ -258,7 +255,7 @@ export function useLexicalNodeSelection(
         }
       }
     });
-  }; // [_editor, key];
+  };
 
   const clearSelected = () => {
     _editor.update(() => {
@@ -268,7 +265,7 @@ export function useLexicalNodeSelection(
         selection.clear();
       }
     });
-  }; //[editor];
+  };
 
   return [isSelected, setSelected, clearSelected];
 }
