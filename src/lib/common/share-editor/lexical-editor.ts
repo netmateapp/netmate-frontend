@@ -80,7 +80,6 @@ function registerEnterListener(editor: LexicalEditor) {
           return false;
         }
         event.preventDefault();
-        console.log("shift cancel");
         /*if (event.shiftKey) {
           return editor.dispatchCommand(INSERT_LINE_BREAK_COMMAND, false);
         }*/

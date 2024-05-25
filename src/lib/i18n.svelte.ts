@@ -6,7 +6,9 @@ import { get } from "svelte/store";
   register(locale, () => import(`$lib/locales/${locale}.json`));
 });
 
-const defaultLocale = "ja";
+type Language = "ja" | "ko" | "zh-TW" | "en-US";
+
+const defaultLocale: Language = "ja";
 
 init({
   fallbackLocale: "ja",

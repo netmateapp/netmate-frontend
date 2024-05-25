@@ -1,8 +1,10 @@
 <script src="lexical-editor.ts" lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
+  import { locale } from "svelte-i18n";
   import { getCharactersCount } from "./characters-conter-plugin.svelte";
   import { dispatchInsertYoutubeCommand, init } from "./lexical-editor";
   import { canShowPlaceholder } from "./placeholder-plugin.svelte";
+  import { get } from "svelte/store";
 
   const _ = createTranslator("common", "navigation");
 
@@ -16,11 +18,23 @@
     return getCharactersCount();
   }
 
+  const CHARACTERS_LIMIT = 20000;
+
   function isLimitOver(): boolean {
     return currentCharactersCount() > CHARACTERS_LIMIT;
   }
 
-  const CHARACTERS_LIMIT = 10000;
+  let isCJKLanguageUsed = $derived(
+    ["ja", "ko", "zh-TW"].includes(get(locale) as string),
+  );
+
+  function apparentCharactersCount() {
+    return currentCharactersCount() / (isCJKLanguageUsed ? 2 : 1);
+  }
+
+  function apparentCharactersLimit() {
+    return CHARACTERS_LIMIT / (isCJKLanguageUsed ? 2 : 1);
+  }
 </script>
 
 <div class="overlay"></div>
@@ -67,9 +81,9 @@
     <div class="right-aligned-tools">
       <div class="characters-counter">
         <span class="characters-count" class:limit-over={isLimitOver()}
-          >{currentCharactersCount()}</span
+          >{apparentCharactersCount()}</span
         >
-        <span class="characters-limit">/{CHARACTERS_LIMIT}</span>
+        <span class="characters-limit">/{apparentCharactersLimit()}</span>
       </div>
     </div>
   </div>
@@ -194,9 +208,9 @@
 
   .toolbar {
     display: flex;
-    width: 61.625rem;
     justify-content: space-between;
     align-items: center;
+    align-self: stretch;
   }
 
   .left-aligned-tools {
