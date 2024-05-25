@@ -27,88 +27,140 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
 } from "lexical";
-import type {SvelteComponent, ComponentProps} from 'svelte';
-import YouTubeEmbed from "./YouTubeEmbed.svelte";
 
-export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand(
-  "INSERT_YOUTUBE_COMMAND",
-);
+export const INSERT_SLIDE_COMMAND: LexicalCommand<string> = createCommand("INSERT_SLIDE_COMMAND");
 
-type DecoratorYouTubeType = {
-  componentClass: typeof SvelteComponent<any>;
-  props: ComponentProps<YouTubeEmbed>;
-}
-
-type SerializedYouTubeNode = Spread<
+type SerializedSlideNode = Spread<
   {
-    videoID: string;
+    slide: ImageSlide;
   },
   SerializedLexicalNode
 >;
 
-// 要修正
-function convertYoutubeElement(domNode: HTMLElement): null | DOMConversionOutput {
-  const videoId = domNode.getAttribute("data-lexical-youtube");
-  if (videoId) {
-    const node = createYouTubeNode(videoId);
+// 修正必要?
+function convertSlideElement(
+  domNode: HTMLElement,
+): null | DOMConversionOutput {
+  const stringSlide = domNode.getAttribute("data-lexical-slide");
+  if (stringSlide) {
+    const node = createSlideNode(ImageSlide.fromString(stringSlide));
     return { node };
   }
   return null;
 }
 
-const IDENTITY_ATTRIBUTE = "data-lexical-youtube-key";
+const CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME = "data-lexical-slide-node-id";
 
-export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
-  __videoId: string;
+export class ImageSlide {
+  imagesPaths: string[] = [];
+
+  constructor(imagePaths: string[]) {
+    this.imagesPaths = imagePaths;
+  }
+
+  toString(): string {
+    return this.imagesPaths.join(",");
+  }
+
+  static fromString(stringSlide: string): ImageSlide {
+    const imagePaths = stringSlide.split(",");
+    return new ImageSlide(imagePaths);
+  }
+}
+
+export class SlideNode extends DecoratorNode<HTMLElement> {
+  __slide: ImageSlide;
 
   static getType(): string {
-    return "youtube";
+    return "slide";
   }
 
-  static clone(node: YouTubeNode): YouTubeNode {
-    return new YouTubeNode(node.__videoId, node.__key);
+  static clone(node: SlideNode): SlideNode {
+    return new SlideNode(node.__slide, node.__key);
   }
 
-  constructor(videoId: string, key?: NodeKey) {
+  constructor(slide: ImageSlide, key?: NodeKey) {
     super(key);
-    this.__videoId = videoId;
+    this.__slide = slide;
   }
 
-  exportJSON(): SerializedYouTubeNode {
+  exportJSON(): SerializedSlideNode {
     return {
       ...super.exportJSON(),
-      videoID: this.__videoId,
+      slide: this.__slide,
     };
   }
 
-  static importJSON(serializedNode: SerializedYouTubeNode): YouTubeNode {
-    const node = createYouTubeNode(serializedNode.videoID);
+  static importJSON(serializedNode: SerializedSlideNode): SlideNode {
+    const node = createSlideNode(serializedNode.slide);
     return node;
   }
 
   createElement(): HTMLElement {
-    const youtubeEmbed = document.createElement("youtube-embed");
-    youtubeEmbed.setAttribute("video-id", this.__videoId);
-    youtubeEmbed.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
-    //youtubeEmbed.setAttribute("selected", "false");
-    return youtubeEmbed;
+    const container = document.createElement("div");
+    container.classList.add("slide-editor");
+
+    const editSlideButtons = document.createElement("div");
+    editSlideButtons.classList.add("edit-slide-buttons");
+
+    const addImageButton = document.createElement("div");
+    addImageButton.classList.add("edit-slide-button");
+    const addSvg = document.createElement("svg");
+    addSvg.classList.add("edit-slide-button-icon");
+    const addIcon = document.createElement("use");
+    addIcon.setAttribute(
+      "href",
+      "/src/lib/assets/common/add.svg#add",
+    );
+    addSvg.appendChild(addIcon);
+    addImageButton.appendChild(addSvg);
+    editSlideButtons.appendChild(addImageButton);
+    container.appendChild(editSlideButtons);
+
+    const slide = document.createElement("div");
+    slide.classList.add("slide");
+    container.appendChild(slide);
+
+    // 修正必要
+    const image = document.createElement("img");
+    image.classList.add("image");
+    image.setAttribute(
+      "src",
+      "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
+    );
+    slide.appendChild(image);
+
+    const centeredDotsIndicator = document.createElement("div");
+    centeredDotsIndicator.classList.add("centered-dots-indicator");
+    const dotsIndicator = document.createElement("div");
+    dotsIndicator.classList.add("dots-indicator");
+    for (var i = 0; i < 3; i++) {
+      const dot = document.createElement("div");
+      dot.classList.add("dot");
+      dotsIndicator.appendChild(dot);
+    }
+    centeredDotsIndicator.appendChild(dotsIndicator);
+    container.appendChild(centeredDotsIndicator);
+    //container.setAttribute(CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME, this.__key);
+
+    //element.setAttribute("data-lexical-slide", this.__slide.toString());
+    return container;
   }
 
-  // このノード固有のDOMを定義(上位クラスがあればsuper呼び出し？)
   exportDOM(): DOMExportOutput {
     return { element: this.createElement() };
   }
 
-  // 要修正
-  // このノード固有のDOMを構築
+  // 修正必要
   static importDOM(): DOMConversionMap | null {
+    console.log("run importDOM");
     return {
       iframe: (domNode: HTMLElement) => {
-        if (!domNode.hasAttribute("data-lexical-youtube")) {
+        if (!domNode.hasAttribute("data-lexical-slide")) {
           return null;
         }
         return {
-          conversion: convertYoutubeElement,
+          conversion: convertSlideElement,
           priority: 1,
         };
       },
@@ -119,23 +171,22 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
     return false;
   }
 
-  getVideoId(): string {
-    return this.__videoId;
+  getSlide(): ImageSlide {
+    return this.__slide;
   }
 
   getTextContent(
     _includeInert?: boolean | undefined,
     _includeDirectionless?: false | undefined,
   ): string {
-    return `https://www.youtube.com/watch?v=${this.__videoId}`;
+    return `slide-node\n`;
   }
 
-  // このノードをDOM化した場合、どうなるか？を書く
   createDOM(_config: EditorConfig): HTMLElement {
     return this.createElement();
   }
 
-  decorate(editor: LexicalEditor, _config: EditorConfig): DecoratorYouTubeType {
+  decorate(editor: LexicalEditor, _config: EditorConfig): HTMLElement {
     const [isSelected, setSelected, clearSelected] = useLexicalNodeSelection(
       editor,
       this.__key,
@@ -143,7 +194,7 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
 
     const onDelete = (event: KeyboardEvent) => {
       const type = getSelection()?.getNodes()[0].__type;
-      if ((isSelected || type === "youtube") && isNodeSelection(getSelection())) {
+      if ((isSelected || type === "slide") && isNodeSelection(getSelection())) {
         event.preventDefault();
         const node = getNodeByKey(this.__key);
         if (isDecoratorNode(node)) {
@@ -161,12 +212,7 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
           CLICK_COMMAND,
           (event) => {
             const element = event.target;
-            if (!element || !(element instanceof HTMLElement)) return false;
-
-            const parent = element.parentNode;
-            if (!parent || !(parent instanceof HTMLElement)) return false;
-
-            if (parent.getAttribute(IDENTITY_ATTRIBUTE) === this.__key) {
+            if (element && element instanceof HTMLElement && element.getAttribute(CONTAINER_CUSTOM_DATA_ATTRIBUTE_NAME) === this.__key) {
               event.preventDefault();
               if (!event.shiftKey) {
                 clearSelected();
@@ -192,13 +238,7 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
         ),
       );
     });
-
-    return {
-      componentClass: YouTubeEmbed,
-      props: {
-        videoId: this.__videoId
-      },
-    }
+    return this.createElement();
   }
 }
 
@@ -275,23 +315,22 @@ export function useLexicalNodeSelection(
   return [isSelected, setSelected, clearSelected];
 }
 
-export function createYouTubeNode(videoID: string): YouTubeNode {
-  return new YouTubeNode(videoID);
+export function createSlideNode(slide: ImageSlide): SlideNode {
+  return new SlideNode(slide);
 }
 
-export function isYouTubeNode(
-  node: YouTubeNode | LexicalNode | null | undefined,
-): node is YouTubeNode {
-  return node instanceof YouTubeNode;
+export function isSlideNode(
+  node: SlideNode | LexicalNode | null | undefined,
+): node is SlideNode {
+  return node instanceof SlideNode;
 }
 
-export function registerYouTubePlugin(editor: LexicalEditor): () => void {
+export function registerSlidePlugin(editor: LexicalEditor): () => void {
   return editor.registerCommand(
-    INSERT_YOUTUBE_COMMAND,
-    (videoId: string) => {
-      console.log("insert youtube");
-      const youtubeNode = createYouTubeNode(videoId);
-      insertNodeToNearestRoot(youtubeNode);
+    INSERT_SLIDE_COMMAND,
+    (imagePaths: string) => {
+      const slideNode = createSlideNode(ImageSlide.fromString(imagePaths));
+      insertNodeToNearestRoot(slideNode);
       return true;
     },
     COMMAND_PRIORITY_EDITOR,

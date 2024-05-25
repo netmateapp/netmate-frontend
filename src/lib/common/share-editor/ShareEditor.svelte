@@ -2,7 +2,12 @@
   import { createTranslator } from "$lib/i18n.svelte";
   import { locale } from "svelte-i18n";
   import { getCharactersCount } from "./characters-conter-plugin.svelte";
-  import { dispatchInsertYoutubeCommand, init } from "./lexical-editor";
+  import {
+    dispatchInsertSlideCommand,
+    dispatchInsertYoutubeCommand,
+    init,
+    insertHeadingNode,
+  } from "./lexical-editor";
   import { canShowPlaceholder } from "./placeholder-plugin.svelte";
   import { get } from "svelte/store";
 
@@ -29,7 +34,7 @@
   );
 
   function apparentCharactersCount() {
-    return currentCharactersCount() / (isCJKLanguageUsed ? 2 : 1);
+    return Math.trunc(currentCharactersCount() / (isCJKLanguageUsed ? 2 : 1));
   }
 
   function apparentCharactersLimit() {
@@ -53,12 +58,18 @@
   <div class="separator"></div>
   <div class="toolbar">
     <div class="left-aligned-tools">
-      <button class="icon-button">
+      <button class="icon-button" onclick={() => insertHeadingNode()}>
         <svg class="icon">
           <use href="/src/lib/assets/common/title.svg#title"></use>
         </svg>
       </button>
-      <button class="icon-button">
+      <button
+        class="icon-button"
+        onclick={() =>
+          dispatchInsertSlideCommand([
+            "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
+          ])}
+      >
         <svg class="icon">
           <use href="/src/lib/assets/common/image.svg#image"></use>
         </svg>
@@ -122,6 +133,86 @@
 
   :global(a) {
     color: var(--accent-color);
+  }
+
+  :global(.slide-editor) {
+    position: relative;
+    width: 100%;
+    max-height: 31.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    align-self: stretch;
+  }
+
+  :global(.edit-slide-buttons) {
+    position: absolute;
+    right: 0rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  :global(.edit-slide-button) {
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    padding: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+  }
+
+  :global(.edit-slide-button:hover) {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  :global(.edit-slide-button-icon) {
+    width: 2rem;
+    height: 2rem;
+    fill: var(--dominant-color);
+  }
+
+  :global(.slide) {
+    display: flex;
+    max-height: 400px;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: stretch;
+    background-color: red;
+  }
+
+  :global(.image) {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    background-color: blue;
+  }
+
+  :global(.centered-dots-indicator) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: stretch;
+  }
+
+  :global(.dots-indicator) {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  :global(.dot) {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: var(--light-gray);
+    border-radius: 50%;
   }
 
   .share-editor {

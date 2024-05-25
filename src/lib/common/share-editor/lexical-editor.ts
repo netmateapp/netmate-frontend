@@ -1,18 +1,19 @@
-import { HeadingNode, QuoteNode, registerRichText } from '@lexical/rich-text';
+import { $createHeadingNode as createHeadingNode, HeadingNode, registerRichText } from '@lexical/rich-text';
 import { CAN_USE_BEFORE_INPUT, IS_APPLE_WEBKIT, IS_IOS, IS_SAFARI, mergeRegister } from '@lexical/utils';
-import { $createParagraphNode as createParagraphNode, $getRoot as getRoot, $getSelection as getSelection, createEditor, type EditorState, type LexicalEditor, $getNearestNodeFromDOMNode as getNearestNodeFromDOMNode, $isDecoratorNode as isDecoratorNode, $getSelection, $isRangeSelection as isRangeSelection, COMMAND_PRIORITY_EDITOR, INSERT_LINE_BREAK_COMMAND, INSERT_PARAGRAPH_COMMAND, KEY_ENTER_COMMAND, COMMAND_PRIORITY_LOW } from 'lexical';
+import { $createParagraphNode as createParagraphNode, $getRoot as getRoot, $getSelection as getSelection, createEditor, type EditorState, type LexicalEditor, $isRangeSelection as isRangeSelection, INSERT_LINE_BREAK_COMMAND, KEY_ENTER_COMMAND, COMMAND_PRIORITY_LOW, $createTextNode as createTextNode } from 'lexical';
 import { INSERT_YOUTUBE_COMMAND, registerYouTubePlugin, YouTubeNode } from './youtube-plugin.svelte';
 import { createEmptyHistoryState, registerHistory } from '@lexical/history';
 import { AutoLinkNode } from '@lexical/link';
 import { registerAutoLinkPlugin } from './auto-link-plugin';
 import { registerPlaceholderPlugin } from './placeholder-plugin.svelte';
 import { registerCharactersCounterPlugin } from './characters-conter-plugin.svelte';
+import { INSERT_SLIDE_COMMAND, registerSlidePlugin, SlideNode } from './slide-plugin.svelte';
 
 export type InitialEditorStateType = null | string | EditorState | (() => void);
 
 const config = {
   namespace: 'MyEditor',
-  nodes: [HeadingNode, QuoteNode, YouTubeNode, AutoLinkNode],
+  nodes: [HeadingNode, YouTubeNode, AutoLinkNode, SlideNode],
   onError: console.error
 };
 const options = {tag: 'history-merge'};
@@ -42,6 +43,18 @@ export function dispatchInsertYoutubeCommand(videoId: string) {
   editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, videoId);
 }
 
+export function dispatchInsertSlideCommand(imagePaths: string[]) {
+  editor.dispatchCommand(INSERT_SLIDE_COMMAND, imagePaths.join(","));
+}
+
+export function insertHeadingNode() {
+  const root = getRoot();
+
+  const heading = createHeadingNode("h1");
+  heading.append(createTextNode(""));
+  root.append(heading);
+}
+
 export function register(
   editor: LexicalEditor,
   initialEditorState?: InitialEditorStateType,
@@ -53,6 +66,7 @@ export function register(
     registerPlaceholderPlugin(editor),
     registerCharactersCounterPlugin(editor),
     registerEnterListener(editor),
+    registerSlidePlugin(editor),
   );
   initializeEditor(editor, initialEditorState);
   return removeListener;
