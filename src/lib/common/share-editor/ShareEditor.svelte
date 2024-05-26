@@ -42,8 +42,8 @@
   }
 </script>
 
-<div class="viewer">
-  <div class="spaced">
+<div class="virtual-viewport">
+  <div class="floating">
     <div class="spacer"></div>
     <div class="share-editor">
       <div class="tags">
@@ -123,15 +123,17 @@
     color: var(--accent-color);
   }
 
-  .viewer {
+  .virtual-viewport {
     position: fixed;
-    overflow-y: auto;
+    overflow-y: scroll;
     width: 100vw;
+    left: 50%;
+    transform: translate(-50%, 0%);
     height: 100vh;
     z-index: 2;
   }
 
-  .spaced {
+  .floating {
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -175,7 +177,6 @@
   .editor {
     width: 100%;
     height: 100%;
-    overflow-x: hidden;
   }
 
   .placeholder {
@@ -188,7 +189,6 @@
     white-space: nowrap;
   }
 
-  /* WebKitベースのブラウザ用 */
   ::-webkit-scrollbar {
     width: 0.375rem;
   }
