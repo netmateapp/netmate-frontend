@@ -16,8 +16,6 @@ init({
 })
 
 const translate = $derived.by(() => {
-  console.log("error check");
-  console.log(locale);
   locale;
   return (namespace: String, moduleName: string) => (nodeName: string, values?: any) => {
     return get(_)(`${namespace}.${moduleName}.${nodeName}`, {values});
