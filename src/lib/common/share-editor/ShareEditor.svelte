@@ -19,6 +19,9 @@
 
   let videoId = "XUTj1nz94ik";
 
+  let mediaCount = $state(0);
+
+  // 文字数カウンター関連
   function currentCharactersCount(): number {
     return getCharactersCount();
   }
@@ -113,8 +116,8 @@
             onclick={() =>
               dispatchInsertSlideCommand([
                 "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
-                "https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096",
-                "https://pbs.twimg.com/media/F7kCyj3bAAAIJRW?format=jpg&name=4096x4096",
+                //"https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096",
+                //"https://pbs.twimg.com/media/F7kCyj3bAAAIJRW?format=jpg&name=4096x4096",
               ])}
           >
             <svg class="icon">
@@ -238,12 +241,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: var(--light-gray);
+    background-color: var(--dark-gray);
     border-radius: 2rem;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #bebebe;
+    background-color: #5c5c5c;
   }
 
   .separator {

@@ -26,8 +26,7 @@
   .youtube-container {
     position: relative;
     width: 100%;
-    height: 80vh;
-    max-height: 400px;
+    height: 85vh;
     display: flex;
     align-items: center;
     flex-direction: column;

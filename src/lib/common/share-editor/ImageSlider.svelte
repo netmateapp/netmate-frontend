@@ -4,22 +4,26 @@
     shadow: "none",
     props: {
       imagesPaths: { attribute: "images-paths", type: "Array" },
+      mediaCount: { attribute: "media-count", type: "Number", reflect: true },
     },
   }}
 />
 
 <script lang="ts">
-  let { imagesPaths }: { imagesPaths: string[] } = $props();
+  let { imagesPaths, mediaCount }: { imagesPaths: string[], mediaCount: number } = $props();
+
+  const MAX_MEDIA_COUNT = 4;
+
   let slidesRefs: HTMLElement[] = [];
 
   let currentIndex = $state(0);
 
   let slideCount = $derived(imagesPaths.length);
   let isDragging = false;
-    let startPos = 0;
-    let currentTranslate = 0;
-    let prevTranslate = 0;
-    let animationID: number;
+  let startPos = 0;
+  let currentTranslate = 0;
+  let prevTranslate = 0;
+  let animationID: number;
 
   function isCurrentPageNumber(pageNumber: number) {
     return pageNumber === currentIndex;
@@ -27,64 +31,60 @@
 
   // スライド関連
   function touchStart(index: number) {
-      return function (event: TouchEvent | MouseEvent) {
-        currentIndex = index;
-        startPos = getPositionX(event);
-        isDragging = true;
+    return function (event: TouchEvent | MouseEvent) {
+      currentIndex = index;
+      startPos = getPositionX(event);
+      isDragging = true;
 
-        animationID = requestAnimationFrame(animation);
-        //slider.classList.add("grabbing");
-      };
+      animationID = requestAnimationFrame(animation);
+    };
+  }
+
+  function touchEnd() {
+    isDragging = false;
+    cancelAnimationFrame(animationID);
+
+    const movedBy = currentTranslate - prevTranslate;
+
+    if (movedBy < -100 && currentIndex < slideCount - 1) {
+      currentIndex += 1;
     }
 
-    function touchEnd() {
-      isDragging = false;
-      cancelAnimationFrame(animationID);
-
-      const movedBy = currentTranslate - prevTranslate;
-
-      if (movedBy < -100 && currentIndex < slideCount - 1) {
-        currentIndex += 1;
-      }
-
-      if (movedBy > 100 && currentIndex > 0) {
-        currentIndex -= 1;
-      }
-
-      setPositionByIndex();
-
-      //slider.classList.remove("grabbing");
+    if (movedBy > 100 && currentIndex > 0) {
+      currentIndex -= 1;
     }
 
-    function touchMove(event: TouchEvent | MouseEvent) {
-      if (isDragging) {
-        const currentPosition = getPositionX(event);
-        currentTranslate = prevTranslate + currentPosition - startPos;
-      }
-    }
+    setPositionByIndex();
+  }
 
-    function getPositionX(event: TouchEvent | MouseEvent): number {
-      return event.type.includes("mouse")
-        ? (event as MouseEvent).pageX
-        : (event as TouchEvent).touches[0].clientX;
+  function touchMove(event: TouchEvent | MouseEvent) {
+    if (isDragging) {
+      const currentPosition = getPositionX(event);
+      currentTranslate = prevTranslate + currentPosition - startPos;
     }
+  }
 
-    function animation() {
-      setSliderPosition();
-      if (isDragging) requestAnimationFrame(animation);
-    }
+  function getPositionX(event: TouchEvent | MouseEvent): number {
+    return event.type.includes("mouse")
+      ? (event as MouseEvent).pageX
+      : (event as TouchEvent).touches[0].clientX;
+  }
 
-    function setSliderPosition() {
-      const slider = document.querySelector(".slider") as HTMLElement;
-      slider.style.transform = `translateX(${currentTranslate}px)`;
-    }
+  function animation() {
+    setSliderPosition();
+    if (isDragging) requestAnimationFrame(animation);
+  }
 
-    function setPositionByIndex() {
-      //console.log(sliderEditorWidth());
-      currentTranslate = currentIndex * -sliderEditorWidth();
-      prevTranslate = currentTranslate;
-      setSliderPosition();
-    }
+  let sliderRef: MaybeHTMLElement = $state(null);
+  function setSliderPosition() {
+    if (sliderRef) sliderRef.style.transform = `translateX(${currentTranslate}px)`;
+  }
+
+  function setPositionByIndex() {
+    currentTranslate = currentIndex * -sliderEditorWidth();
+    prevTranslate = currentTranslate;
+    setSliderPosition();
+  }
 
   const MAX_SLIDER_WIDTH = 986;
   let sliderEditorRef: MaybeHTMLElement = $state(null);
@@ -94,36 +94,14 @@
       : MAX_SLIDER_WIDTH;
   }
 
-  /*$effect(() => {
-    const slider = document.querySelector(".slider") as HTMLElement;
-    const slides = document.querySelectorAll(
-      ".slide",
-    ) as NodeListOf<HTMLElement>;
-    const slideCount = slides.length;
-
-
-    slides.forEach((slide, index) => {
-      const img = slide as HTMLImageElement;
-      img.addEventListener("dragstart", (e) => e.preventDefault());
-
-      slide.addEventListener("touchstart", touchStart(index));
-      slide.addEventListener("touchend", touchEnd);
-      slide.addEventListener("touchmove", touchMove);
-
-      slide.addEventListener("mousedown", touchStart(index));
-      slide.addEventListener("mouseup", touchEnd);
-      slide.addEventListener("mouseleave", touchEnd);
-      slide.addEventListener("mousemove", touchMove);
-    });
-
-
-  });*/
-
-
-
   //画像追加ボタン関連
+  function canAddImage(): boolean {
+    return mediaCount < MAX_MEDIA_COUNT;
+  }
+
+  let imageInputRef: MaybeHTMLElement = $state(null);
   function onClickAddImageButton() {
-    document.getElementById("imageInput")?.click();
+    imageInputRef?.click();
   }
 
   function onChange(event: Event) {
@@ -132,29 +110,26 @@
       const file = target.files[0];
       if (file) {
         const filePath = URL.createObjectURL(file);
-        console.log("Selected file path:", filePath);
         imagesPaths.push(filePath);
       }
-      console.log("Selected file:", file.name);
       console.log(file);
     }
   }
 
-  //画像削除ボタン関連
-  function onClickRemoveImageButton() {
-  }
+  // 画像削除ボタン関連
+  function onClickRemoveImageButton() {}
 </script>
 
 <div bind:this={sliderEditorRef} class="slider-editor">
   <div class="edit-slider-buttons">
-    <button class="edit-slider-button" onclick={onClickAddImageButton}>
+    <button class="edit-slider-button" onclick={onClickAddImageButton} disabled={canAddImage()}>
       <svg class="edit-slider-button-icon">
         <use href="/src/lib/assets/common/add.svg#add"></use>
       </svg>
     </button>
     <input
+      bind:this={imageInputRef}
       type="file"
-      id="imageInput"
       accept=".jpg, .jpeg, .png, .webp"
       style="display: none;"
       onchange={onChange}
@@ -165,21 +140,22 @@
       </svg>
     </button>
   </div>
-  <div class="slider">
+  <div bind:this={sliderRef} class="slider">
     {#each imagesPaths as imagePath, index}
-      <img
-        bind:this={slidesRefs[index]}
-        class="slide"
-        src={imagePath}
-        ondragstart={(e) => e.preventDefault()}
-        ontouchstart={touchStart(index)}
-        ontouchend={touchEnd}
-        ontouchmove={touchMove}
-        onmousedown={touchStart(index)}
-        onmouseup={touchEnd}
-        onmouseleave={touchEnd}
-        onmousemove={touchMove}
+      <div class="slide">
+        <img
+          bind:this={slidesRefs[index]}
+          src={imagePath}
+          ondragstart={(e) => e.preventDefault()}
+          ontouchstart={touchStart(index)}
+          ontouchend={touchEnd}
+          ontouchmove={touchMove}
+          onmousedown={touchStart(index)}
+          onmouseup={touchEnd}
+          onmouseleave={touchEnd}
+          onmousemove={touchMove}
         />
+      </div>
     {/each}
   </div>
   <div class="dots-indicator">
@@ -201,14 +177,14 @@
     align-items: center;
     gap: 0.5rem;
     align-self: stretch;
+    overflow-x: hidden;
   }
 
   .slider {
-    max-height: 384px;
+    max-height: 85vh;
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0.5rem;
     align-self: stretch;
     transition: transform 0.5s ease;
   }
@@ -218,9 +194,17 @@
   }
 
   .slide {
-    width: 100%;
+    width: 61.625rem;
     max-width: 61.625rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     align-self: stretch;
+  }
+
+  .slide img {
+    max-width: 61.625rem;
+    border-radius: 1rem;
     object-fit: contain;
   }
 
@@ -255,9 +239,9 @@
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.4);
     display: flex;
-    width: 3rem;
-    height: 3rem;
-    padding: 0.5rem;
+    width: 2.75rem;
+height: 2.75rem;
+padding: 0.375rem;
     justify-content: center;
     align-items: center;
   }
