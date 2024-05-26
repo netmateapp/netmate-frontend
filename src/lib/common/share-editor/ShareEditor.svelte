@@ -42,65 +42,71 @@
   }
 </script>
 
-<div class="overlay"></div>
-
-<div class="share-editor">
-  <div class="tags">
-    <div class="placeholder">タグをつける…</div>
-  </div>
-  <div class="separator"></div>
-  <div class="content">
-    <div class="editor" id="editor" contenteditable></div>
-    <div class="placeholder" hidden={!canShowPlaceholder()}>
-      何かを共有する…
-    </div>
-  </div>
-  <div class="separator"></div>
-  <div class="toolbar">
-    <div class="left-aligned-tools">
-      <button class="icon-button" onclick={() => insertHeadingNode()}>
-        <svg class="icon">
-          <use href="/src/lib/assets/common/title.svg#title"></use>
-        </svg>
-      </button>
-      <button
-        class="icon-button"
-        onclick={() =>
-          dispatchInsertSlideCommand([
-            "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
-            "https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096",
-            "https://pbs.twimg.com/media/F7kCyj3bAAAIJRW?format=jpg&name=4096x4096"
-          ])}
-      >
-        <svg class="icon">
-          <use href="/src/lib/assets/common/image.svg#image"></use>
-        </svg>
-      </button>
-      <button class="icon-button">
-        <svg class="icon">
-          <use href="/src/lib/assets/common/music_note.svg#music_note"></use>
-        </svg>
-      </button>
-      <button
-        class="icon-button"
-        onclick={() => dispatchInsertYoutubeCommand(videoId)}
-      >
-        <svg class="icon">
-          <use href="/src/lib/assets/common/smart_display.svg#smart_display"
-          ></use>
-        </svg>
-      </button>
-    </div>
-    <div class="right-aligned-tools">
-      <div class="characters-counter">
-        <span class="characters-count" class:limit-over={isLimitOver()}
-          >{apparentCharactersCount()}</span
-        >
-        <span class="characters-limit">/{apparentCharactersLimit()}</span>
+<div class="viewer">
+  <div class="spaced">
+    <div class="spacer"></div>
+    <div class="share-editor">
+      <div class="tags">
+        <div class="placeholder">タグをつける…</div>
+      </div>
+      <div class="separator"></div>
+      <div class="content">
+        <div class="editor" id="editor" contenteditable></div>
+        <div class="placeholder" hidden={!canShowPlaceholder()}>
+          何かを共有する…
+        </div>
+      </div>
+      <div class="separator"></div>
+      <div class="toolbar">
+        <div class="left-aligned-tools">
+          <button class="icon-button" onclick={() => insertHeadingNode()}>
+            <svg class="icon">
+              <use href="/src/lib/assets/common/title.svg#title"></use>
+            </svg>
+          </button>
+          <button
+            class="icon-button"
+            onclick={() =>
+              dispatchInsertSlideCommand([
+                "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
+                "https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096",
+                "https://pbs.twimg.com/media/F7kCyj3bAAAIJRW?format=jpg&name=4096x4096",
+              ])}
+          >
+            <svg class="icon">
+              <use href="/src/lib/assets/common/image.svg#image"></use>
+            </svg>
+          </button>
+          <button class="icon-button">
+            <svg class="icon">
+              <use href="/src/lib/assets/common/music_note.svg#music_note"
+              ></use>
+            </svg>
+          </button>
+          <button
+            class="icon-button"
+            onclick={() => dispatchInsertYoutubeCommand(videoId)}
+          >
+            <svg class="icon">
+              <use href="/src/lib/assets/common/smart_display.svg#smart_display"
+              ></use>
+            </svg>
+          </button>
+        </div>
+        <div class="right-aligned-tools">
+          <div class="characters-counter">
+            <span class="characters-count" class:limit-over={isLimitOver()}
+              >{apparentCharactersCount()}</span
+            >
+            <span class="characters-limit">/{apparentCharactersLimit()}</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<div class="overlay"></div>
 
 <style>
   .overlay {
@@ -117,23 +123,38 @@
     color: var(--accent-color);
   }
 
-  .share-editor {
+  .viewer {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    overflow-y: auto;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+  }
+
+  .spaced {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  .spacer {
+    width: 1px;
+    flex: 1 0 0;
+    max-height: 35vh;
+  }
+
+  .share-editor {
     width: 95%;
     max-width: 63.125rem;
-    max-height: 90%;
     padding: 0.75rem 0.75rem 0.5rem 0.75rem;
-    border-radius: 1rem;
     background-color: var(--dominant-color);
+    border-radius: 1rem;
     box-shadow: var(--soft-shadow);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
-    z-index: 1;
   }
 
   .tags {
@@ -149,13 +170,12 @@
     position: relative;
     width: 100%;
     white-space: pre-wrap;
-    overflow-y: scroll;
-    overflow-x: hidden;
   }
 
   .editor {
     width: 100%;
     height: 100%;
+    overflow-x: hidden;
   }
 
   .placeholder {
