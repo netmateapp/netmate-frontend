@@ -7,13 +7,13 @@ import { AutoLinkNode } from '@lexical/link';
 import { registerAutoLinkPlugin } from './auto-link-plugin';
 import { registerPlaceholderPlugin } from './placeholder-plugin.svelte';
 import { registerCharactersCounterPlugin } from './characters-conter-plugin.svelte';
-import { INSERT_IMAGE_SLIDE_COMMAND, registerSlidePlugin, ImageSlideNode } from './slide-plugin.svelte';
+import { INSERT_IMAGE_SLIDER_COMMAND, registerSlidePlugin, ImageSliderNode } from './slide-plugin.svelte';
 
 export type InitialEditorStateType = null | string | EditorState | (() => void);
 
 const config = {
   namespace: 'MyEditor',
-  nodes: [HeadingNode, YouTubeNode, AutoLinkNode, ImageSlideNode],
+  nodes: [HeadingNode, YouTubeNode, AutoLinkNode, ImageSliderNode],
   onError: console.error
 };
 const options = {tag: 'history-merge'};
@@ -44,7 +44,7 @@ export function dispatchInsertYoutubeCommand(videoId: string) {
 }
 
 export function dispatchInsertSlideCommand(imagePaths: string[]) {
-  editor.dispatchCommand(INSERT_IMAGE_SLIDE_COMMAND, imagePaths.toString());
+  editor.dispatchCommand(INSERT_IMAGE_SLIDER_COMMAND, imagePaths.toString());
 }
 
 export function insertHeadingNode() {

@@ -68,7 +68,8 @@
         onclick={() =>
           dispatchInsertSlideCommand([
             "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
-            "https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096"
+            "https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096",
+            "https://pbs.twimg.com/media/F7kCyj3bAAAIJRW?format=jpg&name=4096x4096"
           ])}
       >
         <svg class="icon">
@@ -112,108 +113,8 @@
     z-index: 1;
   }
 
-  :global(.yt-container) {
-    position: relative;
-    width: 100%;
-    height: 80vh;
-    max-height: 400px;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-
-  :global(.selected iframe) {
-    outline: 2px solid var(--accent-color);
-  }
-
-  :global(.yt-container iframe) {
-    height: 100%;
-    aspect-ratio: 16 / 9;
-    border: 0;
-  }
-
   :global(a) {
     color: var(--accent-color);
-  }
-
-  :global(.slide-editor) {
-    position: relative;
-    width: 100%;
-    max-height: 31.25rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    align-self: stretch;
-  }
-
-  :global(.edit-slide-buttons) {
-    position: absolute;
-    right: 0rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  :global(.edit-slide-button) {
-    display: flex;
-    width: 3rem;
-    height: 3rem;
-    padding: 0.5rem;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.4);
-    border-radius: 50%;
-  }
-
-  :global(.edit-slide-button:hover) {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-
-  :global(.edit-slide-button-icon) {
-    width: 2rem;
-    height: 2rem;
-    fill: var(--dominant-color);
-  }
-
-  :global(.slide) {
-    display: flex;
-    max-height: 400px;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    align-self: stretch;
-    background-color: red;
-  }
-
-  :global(.image) {
-    max-width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-    background-color: blue;
-  }
-
-  :global(.centered-dots-indicator) {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    align-self: stretch;
-  }
-
-  :global(.dots-indicator) {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  :global(.dot) {
-    width: 0.5rem;
-    height: 0.5rem;
-    background-color: var(--light-gray);
-    border-radius: 50%;
   }
 
   .share-editor {
@@ -248,9 +149,8 @@
     position: relative;
     width: 100%;
     white-space: pre-wrap;
-    overflow: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #888 #fff;
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 
   .editor {
@@ -269,27 +169,17 @@
   }
 
   /* WebKitベースのブラウザ用 */
-  .content::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  ::-webkit-scrollbar {
+    width: 0.375rem;
   }
 
-  .content::-webkit-scrollbar-track {
-    background: #fff;
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--light-gray);
+    border-radius: 2rem;
   }
 
-  .content::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 10px;
-    border: 2px solid #fff;
-  }
-
-  .content::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
-  }
-
-  :global(.tag, .handle, .share, .link) {
-    color: var(--accent-color);
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #bebebe;
   }
 
   .separator {

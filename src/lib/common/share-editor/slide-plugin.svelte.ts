@@ -28,23 +28,23 @@ import {
   KEY_DELETE_COMMAND,
 } from "lexical";
 import type { ComponentProps, SvelteComponent } from "svelte";
-import ImageSlide from "./ImageSlide.svelte";
+import ImageSlide from "./ImageSlider.svelte";
 
-export const INSERT_IMAGE_SLIDE_COMMAND: LexicalCommand<string> = createCommand("INSERT_IMAGE_SLIDE_COMMAND");
+export const INSERT_IMAGE_SLIDER_COMMAND: LexicalCommand<string> = createCommand("INSERT_IMAGE_SLIDER_COMMAND");
 
-type DecoratorImageSlideType = {
+type DecoratorImageSliderType = {
   componentClass: typeof SvelteComponent<any>;
   props: ComponentProps<ImageSlide>;
 }
 
-type SerializedImageSlideNode = Spread<
+type SerializedImageSliderNode = Spread<
   {
-    slide: ImageSlideData;
+    slide: Images;
   },
   SerializedLexicalNode
 >;
 
-const NODE_ATTRIBUTE = "data-lexical-image-slide";
+const NODE_ATTRIBUTE = "data-lexical-image-slider";
 
 // 修正必要?
 function convertImageSlideElement(
@@ -52,15 +52,15 @@ function convertImageSlideElement(
 ): null | DOMConversionOutput {
   const stringSlide = domNode.getAttribute(NODE_ATTRIBUTE);
   if (stringSlide) {
-    const node = createSlideNode(ImageSlideData.fromString(stringSlide));
+    const node = createSlideNode(Images.fromString(stringSlide));
     return { node };
   }
   return null;
 }
 
-const IDENTITY_ATTRIBUTE = "data-lexical-image-slide-key";
+const IDENTITY_ATTRIBUTE = "data-lexical-image-slider-key";
 
-export class ImageSlideData {
+export class Images {
   imagesPaths: string[] = [];
 
   constructor(imagePaths: string[]) {
@@ -71,42 +71,42 @@ export class ImageSlideData {
     return this.imagesPaths.toString();
   }
 
-  static fromString(imagePathsStr: string): ImageSlideData {
+  static fromString(imagePathsStr: string): Images {
     const imagePaths: string[] = imagePathsStr.split(",");
-    return new ImageSlideData(imagePaths);
+    return new Images(imagePaths);
   }
 }
 
-export class ImageSlideNode extends DecoratorNode<DecoratorImageSlideType> {
-  __slide: ImageSlideData;
+export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
+  __slide: Images;
 
   static getType(): string {
-    return "image-slide";
+    return "image-slider";
   }
 
-  static clone(node: ImageSlideNode): ImageSlideNode {
-    return new ImageSlideNode(node.__slide, node.__key);
+  static clone(node: ImageSliderNode): ImageSliderNode {
+    return new ImageSliderNode(node.__slide, node.__key);
   }
 
-  constructor(slide: ImageSlideData, key?: NodeKey) {
+  constructor(slide: Images, key?: NodeKey) {
     super(key);
     this.__slide = slide;
   }
 
-  exportJSON(): SerializedImageSlideNode {
+  exportJSON(): SerializedImageSliderNode {
     return {
       ...super.exportJSON(),
       slide: this.__slide,
     };
   }
 
-  static importJSON(serializedNode: SerializedImageSlideNode): ImageSlideNode {
+  static importJSON(serializedNode: SerializedImageSliderNode): ImageSliderNode {
     const node = createSlideNode(serializedNode.slide);
     return node;
   }
 
   createElement(): HTMLElement {
-    const imageSlide = document.createElement("image-slide");
+    const imageSlide = document.createElement("image-slider");
     imageSlide.setAttribute("images-paths", JSON.stringify(this.__slide.imagesPaths));
     imageSlide.setAttribute(NODE_ATTRIBUTE, this.__slide.toString());
     imageSlide.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
@@ -136,7 +136,7 @@ export class ImageSlideNode extends DecoratorNode<DecoratorImageSlideType> {
     return false;
   }
 
-  getSlide(): ImageSlideData {
+  getSlide(): Images {
     return this.__slide;
   }
 
@@ -151,7 +151,7 @@ export class ImageSlideNode extends DecoratorNode<DecoratorImageSlideType> {
     return this.createElement();
   }
 
-  decorate(editor: LexicalEditor, _config: EditorConfig): DecoratorImageSlideType {
+  decorate(editor: LexicalEditor, _config: EditorConfig): DecoratorImageSliderType {
     const [isSelected, setSelected, clearSelected] = useLexicalNodeSelection(
       editor,
       this.__key,
@@ -159,7 +159,7 @@ export class ImageSlideNode extends DecoratorNode<DecoratorImageSlideType> {
 
     const onDelete = (event: KeyboardEvent) => {
       const type = getSelection()?.getNodes()[0].__type;
-      if ((isSelected || type === "image-slide") && isNodeSelection(getSelection())) {
+      if ((isSelected || type === "image-slider") && isNodeSelection(getSelection())) {
         event.preventDefault();
         const node = getNodeByKey(this.__key);
         if (isDecoratorNode(node)) {
@@ -291,21 +291,21 @@ export function useLexicalNodeSelection(
   return [isSelected, setSelected, clearSelected];
 }
 
-export function createSlideNode(slide: ImageSlideData): ImageSlideNode {
-  return new ImageSlideNode(slide);
+export function createSlideNode(slide: Images): ImageSliderNode {
+  return new ImageSliderNode(slide);
 }
 
 export function isSlideNode(
-  node: ImageSlideNode | LexicalNode | null | undefined,
-): node is ImageSlideNode {
-  return node instanceof ImageSlideNode;
+  node: ImageSliderNode | LexicalNode | null | undefined,
+): node is ImageSliderNode {
+  return node instanceof ImageSliderNode;
 }
 
 export function registerSlidePlugin(editor: LexicalEditor): () => void {
   return editor.registerCommand(
-    INSERT_IMAGE_SLIDE_COMMAND,
+    INSERT_IMAGE_SLIDER_COMMAND,
     (imagePaths: string) => {
-      const slideNode = createSlideNode(ImageSlideData.fromString(imagePaths));
+      const slideNode = createSlideNode(Images.fromString(imagePaths));
       insertNodeToNearestRoot(slideNode);
       return true;
     },

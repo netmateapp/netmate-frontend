@@ -25,12 +25,12 @@
 <style>
   .youtube-container {
     position: relative;
-  width: 100%;
-  height: 80vh;
-  max-height: 400px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
+    width: 100%;
+    height: 80vh;
+    max-height: 400px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
   }
 
   .youtube-iframe {
@@ -39,7 +39,7 @@
     border: 0;
   }
 
-  .selected iframe {
+  :global(.selected iframe) {
     outline: 2px solid var(--accent-color);
   }
 </style>
