@@ -40,9 +40,53 @@
   function apparentCharactersLimit() {
     return CHARACTERS_LIMIT / (isCJKLanguageUsed ? 2 : 1);
   }
+
+  // ドラッグによるスクロール
+  let isDragging = false;
+  let startX: number;
+  let startY: number;
+  let scrollLeft: number;
+  let scrollTop: number;
+  let scrollableElement: MaybeHTMLElement = $state(null);
+
+  function onMouseDown(e: MouseEvent): void {
+    if (!scrollableElement) return;
+    isDragging = true;
+    startX = e.pageX - scrollableElement.offsetLeft;
+    startY = e.pageY - scrollableElement.offsetTop;
+    scrollLeft = scrollableElement.scrollLeft;
+    scrollTop = scrollableElement.scrollTop;
+    e.preventDefault();
+  }
+
+  function onMouseMove(e: MouseEvent): void {
+    if (!isDragging || !scrollableElement) return;
+    const x = e.pageX - scrollableElement.offsetLeft;
+    const y = e.pageY - scrollableElement.offsetTop;
+    const walkX = x - startX;
+    const walkY = y - startY;
+    scrollableElement.scrollLeft = scrollLeft - walkX;
+    scrollableElement.scrollTop = scrollTop - walkY;
+    e.preventDefault();
+  }
+
+  function onMouseUp(): void {
+    isDragging = false;
+  }
+
+  function onMouseLeave(): void {
+    isDragging = false;
+  }
 </script>
 
-<div class="virtual-viewport">
+<div
+  bind:this={scrollableElement}
+  class="virtual-viewport"
+  onmousedown={onMouseDown}
+  onmousemove={onMouseMove}
+  onmouseup={onMouseUp}
+  onmouseleave={onMouseLeave}
+>
   <div class="floating">
     <div class="spacer"></div>
     <div class="share-editor">
