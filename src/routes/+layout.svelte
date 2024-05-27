@@ -1,5 +1,6 @@
 <script>
   import { browser } from "$app/environment";
+    import Toast from "$lib/common/toast/Toast.svelte";
     import Tooltip from "$lib/common/tooltip/Tooltip.svelte";
   
   import "../app.css";
@@ -20,5 +21,6 @@
 </script>
 
 <Tooltip />
+<Toast />
 
 <slot />

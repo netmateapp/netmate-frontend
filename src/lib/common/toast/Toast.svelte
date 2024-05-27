@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getToastData } from "./toast.svelte";
+  import { getToastData } from "./useToast.svelte";
 </script>
 
 {#if getToastData().show}
@@ -10,6 +10,7 @@
   .toast {
     position: fixed;
     left: 50%;
+    bottom: 2rem;
     transform: translate(-50%, 0%);
     padding: 0.25rem 0.5rem;
     border-radius: 0.5rem;
@@ -17,5 +18,6 @@
     color: var(--dominant-color);
     font-family: var(--primary-font);
     font-size: 0.875rem;
+    z-index: 1000;
   }
 </style>
