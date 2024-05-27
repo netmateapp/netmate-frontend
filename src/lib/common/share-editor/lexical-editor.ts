@@ -7,15 +7,15 @@ import { AutoLinkNode } from '@lexical/link';
 import { registerAutoLinkPlugin } from './auto-link-plugin';
 import { registerPlaceholderPlugin } from './placeholder-plugin.svelte';
 import { registerCharactersCounterPlugin } from './characters-conter-plugin.svelte';
-import { INSERT_IMAGE_SLIDER_COMMAND, registerSlidePlugin, ImageSliderNode, DELETE_IMAGE_SLIDER_COMMAND } from './slide-plugin.svelte';
+import { INSERT_IMAGE_SLIDER_COMMAND, registerSlidePlugin, ImageSliderNode, DELETE_IMAGE_SLIDER_COMMAND } from './image-slide-plugin.svelte';
 import { CursorPositionObserver, registerTitlePlugin } from './title-plugin.svelte';
-import { INSERT_SOUNDCLOUD_COMMAND } from './soundcloud-plugin.svelte';
+import { INSERT_SOUNDCLOUD_COMMAND, registerSoundCloudPlugin, SoundCloudNode } from './soundcloud-plugin.svelte';
 
 export type InitialEditorStateType = null | string | EditorState | (() => void);
 
 const config = {
   namespace: 'MyEditor',
-  nodes: [HeadingNode, YouTubeNode, AutoLinkNode, ImageSliderNode],
+  nodes: [HeadingNode, YouTubeNode, AutoLinkNode, ImageSliderNode, SoundCloudNode],
   onError: console.error
 };
 const options = {tag: 'history-merge'};
@@ -86,6 +86,7 @@ export function register(
     registerEnterListener(editor),
     registerSlidePlugin(editor),
     registerTitlePlugin(editor),
+    registerSoundCloudPlugin(editor),
   );
   initializeEditor(editor, initialEditorState);
   return removeListener;

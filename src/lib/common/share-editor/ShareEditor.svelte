@@ -23,7 +23,7 @@
   import { toast } from "../toast/useToast.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
     import { apparentCharactersCosts } from "$lib/cjk.svelte";
-    import SoundCloudEmbed from "./SoundCloudEmbed.svelte";
+    import SoundCloudLinkDialog from "./SoundCloudLinkDialog.svelte";
 
   $effect(() => {
     init();
@@ -242,10 +242,11 @@
             </svg>
           </button>
           {#if soundcloudLinkDialogData.isVisible}
-            <SoundCloudEmbed
+            <SoundCloudLinkDialog
               bind:this={soundcloudLinkDialogData.dialog}
               basePoint={soundcloudLinkDialogData.buttonRef.getBoundingClientRect()}
-              closeDialog={closeSoundCloudLinkDialog} />
+              closeDialog={closeSoundCloudLinkDialog}
+            />
           {/if}
           <button
             bind:this={youtubeLinkDialogData.buttonRef}

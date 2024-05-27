@@ -13,7 +13,7 @@
     import { MEDIA_COUNT, MAX_MEDIA_COUNT } from "./ShareEditor.svelte";
     import { _ } from "./editor.svelte";
     import { dispatchDeleteSlideCommand } from "./lexical-editor";
-    import { IDENTITY_ATTRIBUTE } from "./slide-plugin.svelte";
+    import { IDENTITY_ATTRIBUTE } from "./image-slide-plugin.svelte";
 
     let { imagesPaths }: { imagesPaths: string[] } = $props();
 

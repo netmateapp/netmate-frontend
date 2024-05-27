@@ -33,6 +33,7 @@
     if (event.key === "Enter") {
       closeDialog();
       dispatchInsertYoutubeCommand(videoId);
+      MEDIA_COUNT.reactiveValue++;
     }
   }
 

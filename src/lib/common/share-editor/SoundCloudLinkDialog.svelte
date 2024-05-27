@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { MEDIA_COUNT } from "./ShareEditor.svelte";
   import { _, calculateMenuPosition } from "./editor.svelte";
   import { dispatchInsertSoundCloudCommand } from "./lexical-editor";
 
@@ -15,6 +16,7 @@
     if (event.key === "Enter") {
       closeDialog();
       dispatchInsertSoundCloudCommand(trackId);
+      MEDIA_COUNT.reactiveValue++;
     }
   }
 
@@ -23,11 +25,7 @@
   function handlePaste(event: ClipboardEvent) {
     const text = event.clipboardData?.getData("text/plain");
     const match = text?.match(TRACK_ID_REGEX);
-    if (match) {
-      trackId = match[1];
-      console.log(match[0]);
-      console.log(match[1]);
-    }
+    if (match) trackId = match[1];
     event.preventDefault();
   }
 </script>
@@ -91,5 +89,12 @@
     font-size: 0.9375rem;
     line-height: 1.25rem;
     width: 6.5rem;
+  }
+
+  .annotation {
+    color: var(--light-gray);
+    font-family: var(--primary-font);
+    font-size: 0.875rem;
+    line-height: 1.3125rem;
   }
 </style>
