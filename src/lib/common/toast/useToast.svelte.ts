@@ -3,6 +3,7 @@ export class ToastData {
 }
 
 let toastData = $state(new ToastData("", false));
+let cancel: (() => void) | null;
 
 export function getToastData(): ToastData {
   return toastData;
@@ -17,6 +18,17 @@ function hideToast() {
 }
 
 export function toast(text: string) {
+  if (cancel) {
+    cancel();
+    cancel = null;
+  }
+
   showToast(text);
-  setTimeout(hideToast, 3000);
+  
+  const timeoutId = setTimeout(() => {
+    cancel = null;
+    hideToast();
+  }, 3000);
+  
+  cancel = () => clearTimeout(timeoutId);
 }
