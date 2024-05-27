@@ -1,4 +1,5 @@
 import { type LinkAttributes, $createAutoLinkNode, AutoLinkNode, $isAutoLinkNode, $isLinkNode } from "@lexical/link";
+import { $isHeadingNode } from "@lexical/rich-text";
 import { type LexicalNode, $isElementNode, $isLineBreakNode, $isTextNode, TextNode, $createTextNode, $getSelection, $isRangeSelection, $isNodeSelection, ElementNode, type LexicalEditor } from "lexical";
 
 type LinkMatcherResult = {
@@ -401,7 +402,7 @@ export function registerAutoLinkPlugin(editor: LexicalEditor): () => void {
     const previous = textNode.getPreviousSibling();
     if ($isAutoLinkNode(parent)) {
       handleLinkEdit(parent, MATCHERS); //, onChangeWrapped);
-    } else if (!$isLinkNode(parent)) {
+    } else if (!$isLinkNode(parent) && !$isHeadingNode(parent)) {
       if (
         textNode.isSimpleText() &&
         (startsWithSeparator(textNode.getTextContent()) ||
