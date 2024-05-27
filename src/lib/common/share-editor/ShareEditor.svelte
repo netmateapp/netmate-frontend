@@ -60,25 +60,29 @@
   let scrollTop: number;
   let scrollableElement: MaybeHTMLElement = $state(null);
 
-  function onMouseDown(e: MouseEvent): void {
+  function onMouseDown(event: MouseEvent): void {
     if (!scrollableElement) return;
+    
+    const tagName: string = (event.target as Element).tagName;
+    if (tagName == "P" || tagName == "SPAN") return;
+
     isDragging = true;
-    startX = e.pageX - scrollableElement.offsetLeft;
-    startY = e.pageY - scrollableElement.offsetTop;
+    startX = event.pageX - scrollableElement.offsetLeft;
+    startY = event.pageY - scrollableElement.offsetTop;
     scrollLeft = scrollableElement.scrollLeft;
     scrollTop = scrollableElement.scrollTop;
-    e.preventDefault();
+    event.preventDefault();
   }
 
-  function onMouseMove(e: MouseEvent): void {
+  function onMouseMove(event: MouseEvent): void {
     if (!isDragging || !scrollableElement) return;
-    const x = e.pageX - scrollableElement.offsetLeft;
-    const y = e.pageY - scrollableElement.offsetTop;
+    const x = event.pageX - scrollableElement.offsetLeft;
+    const y = event.pageY - scrollableElement.offsetTop;
     const walkX = x - startX;
     const walkY = y - startY;
     scrollableElement.scrollLeft = scrollLeft - walkX;
     scrollableElement.scrollTop = scrollTop - walkY;
-    e.preventDefault();
+    event.preventDefault();
   }
 
   function onMouseUp(): void {

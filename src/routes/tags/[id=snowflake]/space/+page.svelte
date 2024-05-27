@@ -12,7 +12,6 @@
     if (isShareEditorVisible) {
       const target = event.target as Element;
       if (!shareEditor?.getShareEditorRef()?.contains(target)) isShareEditorVisible = false;
-      console.log(isShareEditorVisible);
     } else {
       isShareEditorVisible = true;
     }
