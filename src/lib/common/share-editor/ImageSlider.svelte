@@ -134,7 +134,6 @@
     const imagesCount = imagesPaths.length;
     if (imagesCount == 1) {
       const key = sliderEditorRef?.parentElement?.getAttribute(IDENTITY_ATTRIBUTE);
-      console.log("key");
       if (key) dispatchDeleteSlideCommand(key);
     } else {
       if (currentIndex == (imagesCount - 1)) {

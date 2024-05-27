@@ -17,6 +17,9 @@
   import { get } from "svelte/store";
   import { ReactiveStore } from "$lib/stores.svelte";
     import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
+    import { _ } from "./editor.svelte";
+    import { toast } from "../toast/useToast.svelte";
+    import { registerInteractHandler } from "$lib/utils.svelte";
 
   $effect(() => {
     init();
@@ -71,7 +74,6 @@
     startY = event.pageY - scrollableElement.offsetTop;
     scrollLeft = scrollableElement.scrollLeft;
     scrollTop = scrollableElement.scrollTop;
-    event.preventDefault();
   }
 
   function onMouseMove(event: MouseEvent): void {
@@ -93,11 +95,12 @@
     isDragging = false;
   }
 
-  // 画像関連
-  function canAddImage(): boolean {
+  // メディア関連
+  function canAddMedia(): boolean {
     return MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT;
   }
 
+  // 画像関連
   let imageInputRef: MaybeHTMLElement = $state(null);
   function onClickAddImageButton() {
     imageInputRef?.click();
@@ -110,7 +113,7 @@
     const count = files.length;
     if (count == 0) return;
 
-    if (count <= MAX_MEDIA_COUNT - MEDIA_COUNT.reactiveValue) {
+    if (count <= (MAX_MEDIA_COUNT - MEDIA_COUNT.reactiveValue)) {
       const imagesPaths: string[] = [];
       for (var file of files) {
         const filePath = URL.createObjectURL(file);
@@ -119,7 +122,7 @@
       MEDIA_COUNT.reactiveValue += count;
       dispatchInsertSlideCommand(imagesPaths);
     } else {
-      // トーストを表示
+      toast(_("failed-to-add-media", { limit: MAX_MEDIA_COUNT }));
     }
   }
 
@@ -137,22 +140,27 @@
   const youtubeLinkDialogData = new MediaLinkDialogData();
   const soundcloudLinkDialogData = new MediaLinkDialogData();
 
-  function handleInteractToDialog(event: InteractEvent) {
-    [youtubeLinkDialogData, soundcloudLinkDialogData].forEach(data => {
-      const target = event.target;
-      if (target) {
-        if (data.isVisible) {
-          
-        } else {
-
-        }
+  // 動画関連
+  function onClickAddYouTubeButton(event: InteractEvent) {
+    const element = event.target as Element;
+    if (youtubeLinkDialogData.isVisible) {
+      if (!youtubeLinkDialogData.dialog?.contains(element)) {
+        youtubeLinkDialogData.isVisible = false;
       }
-    });
+    } else {
+      if (youtubeLinkDialogData.buttonRef?.contains(element)) {
+        youtubeLinkDialogData.isVisible = true;
+      }
+    }
   }
 
-  // 動画関連
-  let isVideoButtonToggled = $state(false);
+  function closeYouTubeLinkDialog() {
+    youtubeLinkDialogData.isVisible = false;
+  }
 
+  [
+    onClickAddYouTubeButton
+  ].forEach(registerInteractHandler);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -168,13 +176,13 @@
     <div class="spacer"></div>
     <div bind:this={shareEditorRef} class="share-editor">
       <div class="tags">
-        <div class="placeholder">タグをつける…</div>
+        <div class="placeholder">{_("to-tag")}</div>
       </div>
       <div class="separator"></div>
       <div class="content">
         <div class="editor" id="editor" contenteditable></div>
         {#if canShowPlaceholder()}
-          <div class="placeholder">何かを共有する…</div>
+          <div class="placeholder">{_("to-share-something")}</div>
         {/if}
       </div>
       <div class="separator"></div>
@@ -187,7 +195,7 @@
           </button>
           <button
             class="icon-button"
-            disabled={!canAddImage()}
+            disabled={!canAddMedia()}
             onclick={onClickAddImageButton}
           >
             <input
@@ -202,22 +210,28 @@
               <use href="/src/lib/assets/common/image.svg#image"></use>
             </svg>
           </button>
-          <button class="icon-button">
+          <button
+            class="icon-button"
+            disabled={!canAddMedia()}>
             <svg class="icon">
               <use href="/src/lib/assets/common/music_note.svg#music_note"
               ></use>
             </svg>
           </button>
           <button
+            bind:this={youtubeLinkDialogData.buttonRef}
             class="icon-button"
-            onclick={() => dispatchInsertYoutubeCommand(videoId)}>
+            disabled={!canAddMedia()}>
             <svg class="icon">
               <use href="/src/lib/assets/common/smart_display.svg#smart_display"
               ></use>
             </svg>
           </button>
           {#if youtubeLinkDialogData.isVisible}
-            <YouTubeLinkDialog />
+            <YouTubeLinkDialog
+              bind:this={youtubeLinkDialogData.dialog}
+              basePoint={youtubeLinkDialogData.buttonRef.getBoundingClientRect()}
+              closeDialog={closeYouTubeLinkDialog}/>
           {/if}
         </div>
         <div class="right-aligned-tools">

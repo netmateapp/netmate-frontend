@@ -34,6 +34,7 @@
 
   .youtube-iframe {
     height: 100%;
+    border-radius: 1rem;
     aspect-ratio: 16 / 9;
     border: 0;
   }
