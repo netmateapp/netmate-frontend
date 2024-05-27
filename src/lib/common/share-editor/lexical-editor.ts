@@ -43,8 +43,8 @@ export function dispatchInsertYoutubeCommand(videoId: string) {
   editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, videoId);
 }
 
-export function dispatchInsertSlideCommand(imagePaths: string[]) {
-  editor.dispatchCommand(INSERT_IMAGE_SLIDER_COMMAND, imagePaths.toString());
+export function dispatchInsertSlideCommand(imagesPaths: string[]) {
+  editor.dispatchCommand(INSERT_IMAGE_SLIDER_COMMAND, { imagesPaths });
 }
 
 export function insertHeadingNode() {

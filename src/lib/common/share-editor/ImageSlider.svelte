@@ -3,33 +3,31 @@
     tag: "image-slider",
     shadow: "none",
     props: {
-      imagesPaths: { attribute: "images-paths", type: "Array" },
-      mediaCount: { attribute: "media-count", type: "Number", reflect: true },
+      imagesPaths: { attribute: "images-paths", type: "Array" }
     },
   }}
 />
 
 <script lang="ts">
-  let { imagesPaths, mediaCount }: { imagesPaths: string[], mediaCount: number } = $props();
+    import { MEDIA_COUNT, MAX_MEDIA_COUNT } from "./ShareEditor.svelte";
 
-  const MAX_MEDIA_COUNT = 4;
-
-  let slidesRefs: HTMLElement[] = [];
+  let { imagesPaths }: { imagesPaths: string[] } = $props();
 
   let currentIndex = $state(0);
-
-  let slideCount = $derived(imagesPaths.length);
-  let isDragging = false;
-  let startPos = 0;
-  let currentTranslate = 0;
-  let prevTranslate = 0;
-  let animationID: number;
 
   function isCurrentPageNumber(pageNumber: number) {
     return pageNumber === currentIndex;
   }
 
   // スライド関連
+  let slideCount = $derived(imagesPaths.length);
+  let slidesRefs: HTMLElement[] = [];
+  let isDragging = false;
+  let startPos = 0;
+  let currentTranslate = 0;
+  let prevTranslate = 0;
+  let animationID: number;
+
   function touchStart(index: number) {
     return function (event: TouchEvent | MouseEvent) {
       currentIndex = index;
@@ -96,7 +94,8 @@
 
   //画像追加ボタン関連
   function canAddImage(): boolean {
-    return mediaCount < MAX_MEDIA_COUNT;
+    console.log(MEDIA_COUNT.reactiveValue + " : "  + MAX_MEDIA_COUNT);
+    return MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT;
   }
 
   let imageInputRef: MaybeHTMLElement = $state(null);
@@ -104,15 +103,21 @@
     imageInputRef?.click();
   }
 
-  function onChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.files && target.files.length > 0) {
-      const file = target.files[0];
-      if (file) {
+  function onInputImageFiles(event: Event) {
+    const files = (event.target as HTMLInputElement)?.files;
+    if (!files) return;
+
+    const count = files.length;
+    if (count == 0) return;
+    
+    if (count <= (MAX_MEDIA_COUNT - MEDIA_COUNT.reactiveValue)) {
+      for (var file of files) {
         const filePath = URL.createObjectURL(file);
         imagesPaths.push(filePath);
       }
-      console.log(file);
+      MEDIA_COUNT.reactiveValue += count;
+    } else {
+      // トーストを表示
     }
   }
 
@@ -122,7 +127,10 @@
 
 <div bind:this={sliderEditorRef} class="slider-editor">
   <div class="edit-slider-buttons">
-    <button class="edit-slider-button" onclick={onClickAddImageButton} disabled={canAddImage()}>
+    <button
+      class="edit-slider-button"
+      onclick={onClickAddImageButton}
+      disabled={!canAddImage()}>
       <svg class="edit-slider-button-icon">
         <use href="/src/lib/assets/common/add.svg#add"></use>
       </svg>
@@ -132,8 +140,8 @@
       type="file"
       accept=".jpg, .jpeg, .png, .webp"
       style="display: none;"
-      onchange={onChange}
-    />
+      multiple
+      onchange={onInputImageFiles} />
     <button class="edit-slider-button">
       <svg class="edit-slider-button-icon">
         <use href="/src/lib/assets/common/remove.svg#remove"></use>

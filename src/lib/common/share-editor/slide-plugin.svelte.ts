@@ -30,7 +30,13 @@ import {
 import type { ComponentProps, SvelteComponent } from "svelte";
 import ImageSlide from "./ImageSlider.svelte";
 
-export const INSERT_IMAGE_SLIDER_COMMAND: LexicalCommand<string> = createCommand("INSERT_IMAGE_SLIDER_COMMAND");
+export interface ImagePayload {
+  imagesPaths: string[];
+}
+
+export type InsertImagePayload = Readonly<ImagePayload>;
+
+export const INSERT_IMAGE_SLIDER_COMMAND: LexicalCommand<InsertImagePayload> = createCommand("INSERT_IMAGE_SLIDER_COMMAND");
 
 type DecoratorImageSliderType = {
   componentClass: typeof SvelteComponent<any>;
@@ -39,7 +45,7 @@ type DecoratorImageSliderType = {
 
 type SerializedImageSliderNode = Spread<
   {
-    slide: Images;
+    slide: ImageSliderData;
   },
   SerializedLexicalNode
 >;
@@ -50,9 +56,9 @@ const NODE_ATTRIBUTE = "data-lexical-image-slider";
 function convertImageSlideElement(
   domNode: HTMLElement,
 ): null | DOMConversionOutput {
-  const stringSlide = domNode.getAttribute(NODE_ATTRIBUTE);
+  const stringSlide = domNode.getAttribute("images-paths");
   if (stringSlide) {
-    const node = createSlideNode(Images.fromString(stringSlide));
+    const node = createSlideNode(ImageSliderData.fromString(stringSlide));
     return { node };
   }
   return null;
@@ -60,7 +66,7 @@ function convertImageSlideElement(
 
 const IDENTITY_ATTRIBUTE = "data-lexical-image-slider-key";
 
-export class Images {
+export class ImageSliderData {
   imagesPaths: string[] = [];
 
   constructor(imagePaths: string[]) {
@@ -71,32 +77,32 @@ export class Images {
     return this.imagesPaths.toString();
   }
 
-  static fromString(imagePathsStr: string): Images {
-    const imagePaths: string[] = imagePathsStr.split(",");
-    return new Images(imagePaths);
+  static fromString(imagesPathsStr: string): ImageSliderData {
+    const imagePaths: string[] = imagesPathsStr.split(",");
+    return new ImageSliderData(imagePaths);
   }
 }
 
 export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
-  __slide: Images;
+  __data: ImageSliderData;
 
   static getType(): string {
     return "image-slider";
   }
 
   static clone(node: ImageSliderNode): ImageSliderNode {
-    return new ImageSliderNode(node.__slide, node.__key);
+    return new ImageSliderNode(node.__data, node.__key);
   }
 
-  constructor(slide: Images, key?: NodeKey) {
+  constructor(data: ImageSliderData, key?: NodeKey) {
     super(key);
-    this.__slide = slide;
+    this.__data = data;
   }
 
   exportJSON(): SerializedImageSliderNode {
     return {
       ...super.exportJSON(),
-      slide: this.__slide,
+      slide: this.__data,
     };
   }
 
@@ -107,8 +113,8 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
 
   createElement(): HTMLElement {
     const imageSlide = document.createElement("image-slider");
-    imageSlide.setAttribute("images-paths", JSON.stringify(this.__slide.imagesPaths));
-    imageSlide.setAttribute(NODE_ATTRIBUTE, this.__slide.toString());
+    imageSlide.setAttribute("images-paths", JSON.stringify(this.__data.imagesPaths));
+    //imageSlide.setAttribute(NODE_ATTRIBUTE, this.__data.toString());
     imageSlide.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
     return imageSlide;
   }
@@ -136,15 +142,15 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
     return false;
   }
 
-  getSlide(): Images {
-    return this.__slide;
+  getSlide(): ImageSliderData {
+    return this.__data;
   }
 
   getTextContent(
     _includeInert?: boolean | undefined,
     _includeDirectionless?: false | undefined,
   ): string {
-    return this.__slide.toString();
+    return this.__data.toString();
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
@@ -212,7 +218,7 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
     return {
       componentClass: ImageSlide,
       props: {
-        imagesPaths: this.__slide.imagesPaths
+        imagesPaths: this.__data.imagesPaths
       }
     }
   }
@@ -291,7 +297,7 @@ export function useLexicalNodeSelection(
   return [isSelected, setSelected, clearSelected];
 }
 
-export function createSlideNode(slide: Images): ImageSliderNode {
+export function createSlideNode(slide: ImageSliderData): ImageSliderNode {
   return new ImageSliderNode(slide);
 }
 
@@ -304,8 +310,8 @@ export function isSlideNode(
 export function registerSlidePlugin(editor: LexicalEditor): () => void {
   return editor.registerCommand(
     INSERT_IMAGE_SLIDER_COMMAND,
-    (imagePaths: string) => {
-      const slideNode = createSlideNode(Images.fromString(imagePaths));
+    (payload: InsertImagePayload) => {
+      const slideNode = createSlideNode(new ImageSliderData(payload.imagesPaths));
       insertNodeToNearestRoot(slideNode);
       return true;
     },

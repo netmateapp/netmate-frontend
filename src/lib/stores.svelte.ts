@@ -1,6 +1,6 @@
 import { browser } from "$app/environment";
 
-export function createPersistedStore(key: string, startValue: any) {
+export function createPersistedStore<T>(key: string, startValue: T): T {
   let value = startValue;
 
   if (browser) {
@@ -19,7 +19,7 @@ export function createPersistedStore(key: string, startValue: any) {
 
 export const language = createPersistedStore("language", "ja");
 
-export function createSessionStore(key: string, startValue: any) {
+export function createSessionStore<T>(key: string, startValue: T): T {
   let value = startValue;
 
   if (browser) {
@@ -40,3 +40,10 @@ export function createSessionStore(key: string, startValue: any) {
 export const userLocationX = createSessionStore("userLocationX", 0);
 export const userLocationY = createSessionStore("userLocationY", 0);
 // export const userLocation = $derived([userLocationX, userLocationY]);
+
+export class ReactiveStore<T> {
+  reactiveValue: T = $state() as T;
+  constructor(initialValue: T) {
+    this.reactiveValue = initialValue;
+  }
+}

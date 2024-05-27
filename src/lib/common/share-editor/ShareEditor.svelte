@@ -1,3 +1,9 @@
+<script lang="ts" context="module">
+  // メディア関連
+  export const MAX_MEDIA_COUNT = 4;
+  export const MEDIA_COUNT = new ReactiveStore(0);
+</script>
+
 <script src="lexical-editor.ts" lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
   import { locale } from "svelte-i18n";
@@ -10,6 +16,7 @@
   } from "./lexical-editor";
   import { canShowPlaceholder } from "./placeholder-plugin.svelte";
   import { get } from "svelte/store";
+  import { ReactiveStore } from "$lib/stores.svelte";
 
   const _ = createTranslator("common", "navigation");
 
@@ -18,8 +25,6 @@
   });
 
   let videoId = "XUTj1nz94ik";
-
-  let mediaCount = $state(0);
 
   // 文字数カウンター関連
   function currentCharactersCount(): number {
@@ -80,8 +85,39 @@
   function onMouseLeave(): void {
     isDragging = false;
   }
+
+  // 画像関連
+  function canAddImage(): boolean {
+    return MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT;
+  }
+
+  let imageInputRef: MaybeHTMLElement = $state(null);
+  function onClickAddImageButton() {
+    imageInputRef?.click();
+  }
+
+  function onInputImageFiles(event: Event) {
+    const files = (event.target as HTMLInputElement)?.files;
+    if (!files) return;
+
+    const count = files.length;
+    if (count == 0) return;
+
+    if (count <= MAX_MEDIA_COUNT - MEDIA_COUNT.reactiveValue) {
+      const imagesPaths: string[] = [];
+      for (var file of files) {
+        const filePath = URL.createObjectURL(file);
+        imagesPaths.push(filePath);
+      }
+      MEDIA_COUNT.reactiveValue += count;
+      dispatchInsertSlideCommand(imagesPaths);
+    } else {
+      // トーストを表示
+    }
+  }
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   bind:this={scrollableElement}
   class="virtual-viewport"
@@ -113,13 +149,17 @@
           </button>
           <button
             class="icon-button"
-            onclick={() =>
-              dispatchInsertSlideCommand([
-                "https://pbs.twimg.com/media/F7kCxiPbYAAM0QU?format=jpg&name=4096x4096",
-                //"https://pbs.twimg.com/media/F7kCyCuaEAAMMg1?format=jpg&name=4096x4096",
-                //"https://pbs.twimg.com/media/F7kCyj3bAAAIJRW?format=jpg&name=4096x4096",
-              ])}
+            disabled={!canAddImage()}
+            onclick={onClickAddImageButton}
           >
+            <input
+              bind:this={imageInputRef}
+              type="file"
+              accept=".jpg, .jpeg, .png, .webp"
+              style="display: none;"
+              multiple
+              onchange={onInputImageFiles}
+            />
             <svg class="icon">
               <use href="/src/lib/assets/common/image.svg#image"></use>
             </svg>
@@ -282,9 +322,10 @@
   .icon-button:disabled {
     background-color: var(--dominant-color-hover);
     fill: var(--dark-gray);
+    cursor: default;
   }
 
-  .icon-button:hover:not(:disabled) {
+  .icon-button:not(:disabled):hover {
     background-color: var(--dominant-color-hover);
   }
 
