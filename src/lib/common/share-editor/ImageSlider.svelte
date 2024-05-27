@@ -181,7 +181,7 @@
   }
 
   .slider {
-    max-height: 85vh;
+    height: 85vh;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -195,7 +195,8 @@
 
   .slide {
     width: 61.625rem;
-    max-width: 61.625rem;
+    height: 85vh;
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -203,7 +204,8 @@
   }
 
   .slide img {
-    max-width: 61.625rem;
+    height: 100%;
+    max-height: 85vh;
     border-radius: 1rem;
     object-fit: contain;
   }
