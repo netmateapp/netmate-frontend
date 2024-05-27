@@ -9,7 +9,11 @@
 />
 
 <script lang="ts">
+    import { toast } from "../toast/useToast.svelte";
     import { MEDIA_COUNT, MAX_MEDIA_COUNT } from "./ShareEditor.svelte";
+    import { _ } from "./editor.svelte";
+    import { dispatchDeleteSlideCommand } from "./lexical-editor";
+    import { IDENTITY_ATTRIBUTE } from "./slide-plugin.svelte";
 
     let { imagesPaths }: { imagesPaths: string[] } = $props();
 
@@ -92,9 +96,13 @@
       : MAX_SLIDER_WIDTH;
   }
 
+  // インジケータ関連
+  function shouldDisplayDotsIndicator(): boolean {
+    return imagesPaths.length >= 2;
+  }
+
   //画像追加ボタン関連
   function canAddImage(): boolean {
-    console.log(MEDIA_COUNT.reactiveValue + " : "  + MAX_MEDIA_COUNT);
     return MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT;
   }
 
@@ -117,12 +125,29 @@
       }
       MEDIA_COUNT.reactiveValue += count;
     } else {
-      // トーストを表示
+      toast(_("failed-to-add-media", { limit: MAX_MEDIA_COUNT }));
     }
   }
 
   // 画像削除ボタン関連
-  function onClickRemoveImageButton() {}
+  function onClickRemoveImageButton() {
+    const imagesCount = imagesPaths.length;
+    if (imagesCount == 1) {
+      const key = sliderEditorRef?.parentElement?.getAttribute(IDENTITY_ATTRIBUTE);
+      console.log("key");
+      if (key) dispatchDeleteSlideCommand(key);
+    } else {
+      if (currentIndex == (imagesCount - 1)) {
+        currentIndex--;
+        imagesPaths = imagesPaths.filter((v, index, a) => index != (currentIndex + 1));
+        setPositionByIndex();
+        MEDIA_COUNT.reactiveValue--;
+      } else {
+        imagesPaths = imagesPaths.filter((v, index, a) => index != currentIndex);
+        MEDIA_COUNT.reactiveValue--;
+      }
+    }
+  }
 </script>
 
 <div bind:this={sliderEditorRef} class="slider-editor">
@@ -142,7 +167,9 @@
       style="display: none;"
       multiple
       onchange={onInputImageFiles} />
-    <button class="edit-slider-button">
+    <button
+      class="edit-slider-button"
+      onclick={onClickRemoveImageButton}>
       <svg class="edit-slider-button-icon">
         <use href="/src/lib/assets/common/remove.svg#remove"></use>
       </svg>
@@ -166,14 +193,16 @@
       </div>
     {/each}
   </div>
-  <div class="dots-indicator">
-    {#each imagesPaths as _, pageNumber}
-      <div
-        class="dot"
-        class:current-page={isCurrentPageNumber(pageNumber)}
-      ></div>
-    {/each}
-  </div>
+  {#if shouldDisplayDotsIndicator()}
+    <div class="dots-indicator">
+      {#each imagesPaths as _, pageNumber}
+        <div
+          class="dot"
+          class:current-page={isCurrentPageNumber(pageNumber)}
+        ></div>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>

@@ -30,11 +30,11 @@
   }
 
   // 文字数カウンター関連
+  const CHARACTERS_LIMIT = 20000;
+
   function currentCharactersCount(): number {
     return getCharactersCount();
   }
-
-  const CHARACTERS_LIMIT = 20000;
 
   function isLimitOver(): boolean {
     return currentCharactersCount() > CHARACTERS_LIMIT;
@@ -173,9 +173,9 @@
       <div class="separator"></div>
       <div class="content">
         <div class="editor" id="editor" contenteditable></div>
-        <div class="placeholder" hidden={!canShowPlaceholder()}>
-          何かを共有する…
-        </div>
+        {#if canShowPlaceholder()}
+          <div class="placeholder">何かを共有する…</div>
+        {/if}
       </div>
       <div class="separator"></div>
       <div class="toolbar">
@@ -298,12 +298,12 @@
   .content {
     position: relative;
     width: 100%;
+    min-height: 2.125rem;
     white-space: pre-wrap;
   }
 
   .editor {
     width: 100%;
-    height: 100%;
   }
 
   .placeholder {

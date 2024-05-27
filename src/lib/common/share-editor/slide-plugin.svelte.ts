@@ -37,6 +37,7 @@ export interface ImagePayload {
 export type InsertImagePayload = Readonly<ImagePayload>;
 
 export const INSERT_IMAGE_SLIDER_COMMAND: LexicalCommand<InsertImagePayload> = createCommand("INSERT_IMAGE_SLIDER_COMMAND");
+export const DELETE_IMAGE_SLIDER_COMMAND: LexicalCommand<string> = createCommand("DELETE_IMAGE_SLIDER_COMMAND");
 
 type DecoratorImageSliderType = {
   componentClass: typeof SvelteComponent<any>;
@@ -64,7 +65,7 @@ function convertImageSlideElement(
   return null;
 }
 
-const IDENTITY_ATTRIBUTE = "data-lexical-image-slider-key";
+export const IDENTITY_ATTRIBUTE = "data-lexical-image-slider-key";
 
 export class ImageSliderData {
   imagesPaths: string[] = [];
@@ -177,6 +178,18 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
       return false;
     };
 
+    const onSelfDelete = (key: string) => {
+      if (key !== this.__key) return false;
+
+      const node = getNodeByKey(this.__key);
+      if (isDecoratorNode(node)) {
+        node.remove();
+        return true;
+      }
+      
+      return false;
+    };
+
     $effect.root(() => {
       return mergeRegister(
         editor.registerCommand<MouseEvent>(
@@ -212,6 +225,11 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
           onDelete,
           COMMAND_PRIORITY_LOW,
         ),
+        editor.registerCommand(
+          DELETE_IMAGE_SLIDER_COMMAND,
+          onSelfDelete,
+          COMMAND_PRIORITY_EDITOR,
+        )
       );
     });
 

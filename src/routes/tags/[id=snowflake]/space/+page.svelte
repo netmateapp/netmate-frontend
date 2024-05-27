@@ -11,7 +11,7 @@
   function handleInteractEvent(event: InteractEvent) {
     if (isShareEditorVisible) {
       const target = event.target as Element;
-      if (!shareEditor?.getShareEditorRef()?.contains(target)) isShareEditorVisible = false;
+      //if (!shareEditor?.getShareEditorRef()?.contains(target)) isShareEditorVisible = false;
     } else {
       isShareEditorVisible = true;
     }
