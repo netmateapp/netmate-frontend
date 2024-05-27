@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { MEDIA_COUNT } from "./ShareEditor.svelte";
   import { _, calculateMenuPosition } from "./editor.svelte";
   import { dispatchInsertYoutubeCommand } from "./lexical-editor";
 
@@ -33,7 +34,6 @@
     if (event.key === "Enter") {
       closeDialog();
       dispatchInsertYoutubeCommand(videoId);
-      MEDIA_COUNT.reactiveValue++;
     }
   }
 

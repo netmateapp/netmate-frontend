@@ -122,7 +122,7 @@
         const filePath = URL.createObjectURL(file);
         imagesPaths.push(filePath);
       }
-      MEDIA_COUNT.reactiveValue += count;
+      //MEDIA_COUNT.reactiveValue += count;
       dispatchInsertSlideCommand(imagesPaths);
     } else {
       toast(_("failed-to-add-media", { limit: MAX_MEDIA_COUNT }));

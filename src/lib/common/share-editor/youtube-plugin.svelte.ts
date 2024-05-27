@@ -26,9 +26,13 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
+  $isParagraphNode as isParagraphNode,
 } from "lexical";
 import type { SvelteComponent, ComponentProps } from 'svelte';
 import YouTubeEmbed from "./YouTubeEmbed.svelte";
+import { MAX_MEDIA_COUNT, MEDIA_COUNT } from "./ShareEditor.svelte";
+import { toast } from "../toast/useToast.svelte";
+import { _ } from "./editor.svelte";
 
 export const INSERT_YOUTUBE_COMMAND: LexicalCommand<string> = createCommand("INSERT_YOUTUBE_COMMAND");
 
@@ -56,13 +60,14 @@ function convertYoutubeElement(domNode: HTMLElement): null | DOMConversionOutput
   return null;
 }
 
+const TYPE = "youtube";
 const IDENTITY_ATTRIBUTE = "data-lexical-youtube-key";
 
 export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
   __videoId: string;
 
   static getType(): string {
-    return "youtube";
+    return TYPE;
   }
 
   static clone(node: YouTubeNode): YouTubeNode {
@@ -76,7 +81,8 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
 
   exportJSON(): SerializedYouTubeNode {
     return {
-      ...super.exportJSON(),
+      type: TYPE,
+      version: 1,
       videoID: this.__videoId,
     };
   }
@@ -94,16 +100,13 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
     return youtubeEmbed;
   }
 
-  // このノード固有のDOMを定義(上位クラスがあればsuper呼び出し？)
   exportDOM(): DOMExportOutput {
     return { element: this.createElement() };
   }
 
-  // 要修正
-  // このノード固有のDOMを構築
   static importDOM(): DOMConversionMap | null {
     return {
-      iframe: (domNode: HTMLElement) => {
+      youtube_embed: (domNode: HTMLElement) => {
         if (!domNode.hasAttribute(NODE_ATTRIBUTE)) {
           return null;
         }
@@ -143,7 +146,7 @@ export class YouTubeNode extends DecoratorNode<DecoratorYouTubeType> {
 
     const onDelete = (event: KeyboardEvent) => {
       const type = getSelection()?.getNodes()[0].__type;
-      if ((isSelected || type === "youtube") && isNodeSelection(getSelection())) {
+      if ((isSelected || type === TYPE) && isNodeSelection(getSelection())) {
         event.preventDefault();
         const node = getNodeByKey(this.__key);
         if (isDecoratorNode(node)) {
@@ -288,6 +291,13 @@ export function isYouTubeNode(
 }
 
 export function registerYouTubePlugin(editor: LexicalEditor): () => void {
+  return mergeRegister(
+    registerInsertYouTubeCommand(editor),
+    registerYouTubeNodeMutationListener(editor)
+  )
+}
+
+function registerInsertYouTubeCommand(editor: LexicalEditor): () => void {
   return editor.registerCommand(
     INSERT_YOUTUBE_COMMAND,
     (videoId: string) => {
@@ -297,4 +307,25 @@ export function registerYouTubePlugin(editor: LexicalEditor): () => void {
     },
     COMMAND_PRIORITY_EDITOR,
   );
+}
+
+function registerYouTubeNodeMutationListener(editor: LexicalEditor): () => void {
+  return editor.registerMutationListener(YouTubeNode, (mutatedNodes) => {
+    for (var [nodeKey, mutation] of mutatedNodes) {
+      if (mutation === "created") {
+        if (MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT) {
+          MEDIA_COUNT.reactiveValue++;
+        } else {
+          editor.update(() => {
+            MEDIA_COUNT.reactiveValue++;
+            const node = getNodeByKey(nodeKey) as YouTubeNode;
+            node.remove();
+            toast(_("failed-to-add-media", { limit: MAX_MEDIA_COUNT }));
+          });
+        }
+      } else if (mutation === "destroyed") {
+        MEDIA_COUNT.reactiveValue--;
+      }
+    }
+  });
 }

@@ -29,6 +29,8 @@ import {
 } from "lexical";
 import type { ComponentProps, SvelteComponent } from "svelte";
 import ImageSlide from "./ImageSlider.svelte";
+import { MAX_MEDIA_COUNT, MEDIA_COUNT } from "./ShareEditor.svelte";
+import { toast } from "../toast/useToast.svelte";
 
 export interface ImagePayload {
   imagesPaths: string[];
@@ -51,15 +53,15 @@ type SerializedImageSliderNode = Spread<
   SerializedLexicalNode
 >;
 
-const NODE_ATTRIBUTE = "data-lexical-image-slider";
+const TYPE = "image-slider";
+const NODE_ATTRIBUTE = "images-paths";
 
-// 修正必要?
 function convertImageSlideElement(
   domNode: HTMLElement,
 ): null | DOMConversionOutput {
-  const stringSlide = domNode.getAttribute("images-paths");
+  const stringSlide = domNode.getAttribute(NODE_ATTRIBUTE);
   if (stringSlide) {
-    const node = createSlideNode(ImageSliderData.fromString(stringSlide));
+    const node = createSlideNode(JSON.parse(stringSlide));
     return { node };
   }
   return null;
@@ -88,7 +90,7 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
   __data: ImageSliderData;
 
   static getType(): string {
-    return "image-slider";
+    return TYPE;
   }
 
   static clone(node: ImageSliderNode): ImageSliderNode {
@@ -102,7 +104,8 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
 
   exportJSON(): SerializedImageSliderNode {
     return {
-      ...super.exportJSON(),
+      type: TYPE,
+      version: 1,
       slide: this.__data,
     };
   }
@@ -114,8 +117,7 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
 
   createElement(): HTMLElement {
     const imageSlide = document.createElement("image-slider");
-    imageSlide.setAttribute("images-paths", JSON.stringify(this.__data.imagesPaths));
-    //imageSlide.setAttribute(NODE_ATTRIBUTE, this.__data.toString());
+    imageSlide.setAttribute(NODE_ATTRIBUTE, JSON.stringify(this.__data.imagesPaths));
     imageSlide.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
     return imageSlide;
   }
@@ -124,10 +126,9 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
     return { element: this.createElement() };
   }
 
-  // 修正必要
   static importDOM(): DOMConversionMap | null {
     return {
-      iframe: (domNode: HTMLElement) => {
+      image_slider: (domNode: HTMLElement) => {
         if (!domNode.hasAttribute(NODE_ATTRIBUTE)) {
           return null;
         }
@@ -143,7 +144,7 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
     return false;
   }
 
-  getSlide(): ImageSliderData {
+  getImageSliderData(): ImageSliderData {
     return this.__data;
   }
 
@@ -166,7 +167,7 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
 
     const onDelete = (event: KeyboardEvent) => {
       const type = getSelection()?.getNodes()[0].__type;
-      if ((isSelected || type === "image-slider") && isNodeSelection(getSelection())) {
+      if ((isSelected || type === TYPE) && isNodeSelection(getSelection())) {
         event.preventDefault();
         const node = getNodeByKey(this.__key);
         if (isDecoratorNode(node)) {
@@ -326,6 +327,13 @@ export function isSlideNode(
 }
 
 export function registerSlidePlugin(editor: LexicalEditor): () => void {
+  return mergeRegister(
+    registerInsertImageSliderCommand(editor),
+    registerImageSliderMutationListener(editor)
+  )
+}
+
+function registerInsertImageSliderCommand(editor: LexicalEditor): () => void {
   return editor.registerCommand(
     INSERT_IMAGE_SLIDER_COMMAND,
     (payload: InsertImagePayload) => {
@@ -335,4 +343,33 @@ export function registerSlidePlugin(editor: LexicalEditor): () => void {
     },
     COMMAND_PRIORITY_EDITOR,
   );
+}
+
+
+function registerImageSliderMutationListener(editor: LexicalEditor): () => void {
+  return editor.registerMutationListener(ImageSliderNode, (mutatedNodes) => {
+    for (var [nodeKey, mutation] of mutatedNodes) {
+      if (mutation === "created") {
+        editor.update(() => {
+          let node = getNodeByKey(nodeKey) as ImageSliderNode;
+          let imagesCount = node.getImageSliderData().imagesPaths.length;
+          console.log("media count: " + MEDIA_COUNT.reactiveValue + " : " + imagesCount);
+          if (MEDIA_COUNT.reactiveValue + imagesCount <= MAX_MEDIA_COUNT) {
+            MEDIA_COUNT.reactiveValue += imagesCount;
+          } else {
+            console.log("media count: " + MEDIA_COUNT.reactiveValue);
+            node.remove();
+            toast("メディア数上限を超えていたため、貼り付けられた画像は削除されました。");
+          }
+        });
+      } else if (mutation === "destroyed") {
+        editor.getEditorState().read(() => {
+          let node = getNodeByKey(nodeKey) as ImageSliderNode;
+          console.log("node: " + node);
+          let imagesCount = node.getImageSliderData().imagesPaths.length;
+          MEDIA_COUNT.reactiveValue -= imagesCount;
+        });
+      }
+    }
+  });
 }

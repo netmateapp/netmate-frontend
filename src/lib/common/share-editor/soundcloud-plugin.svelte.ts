@@ -29,6 +29,9 @@ import {
 } from "lexical";
 import type { SvelteComponent, ComponentProps } from 'svelte';
 import SoundCloudEmbed from "./SoundCloudEmbed.svelte";
+import { MAX_MEDIA_COUNT, MEDIA_COUNT } from "./ShareEditor.svelte";
+import { toast } from "../toast/useToast.svelte";
+import { _ } from "./editor.svelte";
 
 export const INSERT_SOUNDCLOUD_COMMAND: LexicalCommand<string> = createCommand("INSERT_SOUNDCLOUD_COMMAND");
 
@@ -56,13 +59,14 @@ function convertSoundCloudElement(domNode: HTMLElement): null | DOMConversionOut
   return null;
 }
 
+const TYPE = "soundcloud";
 const IDENTITY_ATTRIBUTE = "data-lexical-soundcloud-key";
 
 export class SoundCloudNode extends DecoratorNode<DecoratorSoundCloudType> {
   __trackId: string;
 
   static getType(): string {
-    return "soundcloud";
+    return TYPE;
   }
 
   static clone(node: SoundCloudNode): SoundCloudNode {
@@ -76,7 +80,8 @@ export class SoundCloudNode extends DecoratorNode<DecoratorSoundCloudType> {
 
   exportJSON(): SerializedSoundCloudNode {
     return {
-      ...super.exportJSON(),
+      type: TYPE,
+      version: 1,
       trackID: this.__trackId,
     };
   }
@@ -94,16 +99,13 @@ export class SoundCloudNode extends DecoratorNode<DecoratorSoundCloudType> {
     return soundcloudEmbed;
   }
 
-  // このノード固有のDOMを定義(上位クラスがあればsuper呼び出し？)
   exportDOM(): DOMExportOutput {
     return { element: this.createElement() };
   }
 
-  // 要修正
-  // このノード固有のDOMを構築
   static importDOM(): DOMConversionMap | null {
     return {
-      iframe: (domNode: HTMLElement) => {
+      soundcloud_embed: (domNode: HTMLElement) => {
         if (!domNode.hasAttribute(NODE_ATTRIBUTE)) {
           return null;
         }
@@ -119,7 +121,7 @@ export class SoundCloudNode extends DecoratorNode<DecoratorSoundCloudType> {
     return false;
   }
 
-  getVideoId(): string {
+  getTrackId(): string {
     return this.__trackId;
   }
 
@@ -143,7 +145,7 @@ export class SoundCloudNode extends DecoratorNode<DecoratorSoundCloudType> {
 
     const onDelete = (event: KeyboardEvent) => {
       const type = getSelection()?.getNodes()[0].__type;
-      if ((isSelected || type === "soundcloud") && isNodeSelection(getSelection())) {
+      if ((isSelected || type === TYPE) && isNodeSelection(getSelection())) {
         event.preventDefault();
         const node = getNodeByKey(this.__key);
         if (isDecoratorNode(node)) {
@@ -288,6 +290,13 @@ export function isSoundCloudNode(
 }
 
 export function registerSoundCloudPlugin(editor: LexicalEditor): () => void {
+  return mergeRegister(
+    registerInsertSoundCloudCommand(editor),
+    registerSoundCloudNodeMutationListener(editor)
+  );
+}
+
+function registerInsertSoundCloudCommand(editor: LexicalEditor): () => void {
   return editor.registerCommand(
     INSERT_SOUNDCLOUD_COMMAND,
     (trackId: string) => {
@@ -297,4 +306,25 @@ export function registerSoundCloudPlugin(editor: LexicalEditor): () => void {
     },
     COMMAND_PRIORITY_EDITOR,
   );
+}
+
+function registerSoundCloudNodeMutationListener(editor: LexicalEditor): () => void {
+  return editor.registerMutationListener(SoundCloudNode, (mutatedNodes) => {
+    for (var [nodeKey, mutation] of mutatedNodes) {
+      if (mutation === "created") {
+        if (MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT) {
+          MEDIA_COUNT.reactiveValue++;
+        } else {
+          editor.update(() => {
+            MEDIA_COUNT.reactiveValue++;
+            const node = getNodeByKey(nodeKey) as SoundCloudNode;
+            node.remove();
+            toast(_("failed-to-add-media", { limit: MAX_MEDIA_COUNT }));
+          });
+        }
+      } else if (mutation === "destroyed") {
+        MEDIA_COUNT.reactiveValue--;
+      }
+    }
+  });
 }

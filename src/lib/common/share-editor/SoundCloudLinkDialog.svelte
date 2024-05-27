@@ -16,7 +16,6 @@
     if (event.key === "Enter") {
       closeDialog();
       dispatchInsertSoundCloudCommand(trackId);
-      MEDIA_COUNT.reactiveValue++;
     }
   }
 
@@ -35,7 +34,7 @@
   class="dialog"
   style={calculateMenuPosition(basePoint, dialogRef)}
 >
-  <span class="title">{_("add-youtube-video")}</span>
+  <span class="title">{_("add-soundcloud-audio")}</span>
   <div class="text-field">
     <label class="label">https://api.soundcloud.com/tracks/</label>
     <input
