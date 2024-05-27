@@ -4,23 +4,26 @@
   export const MEDIA_COUNT = new ReactiveStore(0);
 
   export const CURSOR_AT_FIRST_LINE_START = new ReactiveStore(true);
+  export const HAS_TITLE = new ReactiveStore(false);
+
+  export const TITLE_COSTS_LIMIT = 48;
 </script>
 
 <script src="lexical-editor.ts" lang="ts">
-  import { locale } from "svelte-i18n";
-  import { getCharactersCount } from "./characters-conter-plugin.svelte";
+  import { charactersCosts } from "./characters-conter-plugin.svelte";
   import {
     dispatchInsertSlideCommand,
     init,
     insertHeadingNode,
   } from "./lexical-editor";
   import { canShowPlaceholder } from "./placeholder-plugin.svelte";
-  import { get } from "svelte/store";
   import { ReactiveStore } from "$lib/stores.svelte";
   import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
   import { _ } from "./editor.svelte";
   import { toast } from "../toast/useToast.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
+    import { apparentCharactersCosts } from "$lib/cjk.svelte";
+    import SoundCloudEmbed from "./SoundCloudEmbed.svelte";
 
   $effect(() => {
     init();
@@ -33,30 +36,26 @@
 
   // タイトル関連
   function canInsertTitle(): boolean {
-    return CURSOR_AT_FIRST_LINE_START.reactiveValue;
+    return CURSOR_AT_FIRST_LINE_START.reactiveValue && !HAS_TITLE.reactiveValue;
   }
 
   // 文字数カウンター関連
-  const CHARACTERS_LIMIT = 20000;
+  const CHARACTERS_COSTS_LIMIT = 20000;
 
-  function currentCharactersCount(): number {
-    return getCharactersCount();
+  function currentCharactersCosts(): number {
+    return charactersCosts();
   }
 
-  function isLimitOver(): boolean {
-    return currentCharactersCount() > CHARACTERS_LIMIT;
+  function isCharactersCostsLimitOver(): boolean {
+    return currentCharactersCosts() > CHARACTERS_COSTS_LIMIT;
   }
-
-  let isCJKLanguageUsed = $derived(
-    ["ja", "ko", "zh-TW"].includes(get(locale) as string),
-  );
 
   function apparentCharactersCount() {
-    return Math.trunc(currentCharactersCount() / (isCJKLanguageUsed ? 2 : 1));
+    return apparentCharactersCosts(currentCharactersCosts());
   }
 
   function apparentCharactersLimit() {
-    return CHARACTERS_LIMIT / (isCJKLanguageUsed ? 2 : 1);
+    return apparentCharactersCosts(CHARACTERS_COSTS_LIMIT);
   }
 
   // ドラッグによるスクロール
@@ -144,6 +143,24 @@
   const youtubeLinkDialogData = new MediaLinkDialogData();
   const soundcloudLinkDialogData = new MediaLinkDialogData();
 
+  // 音楽関連
+  function onClickAddSoundCloudButton(event: InteractEvent) {
+    const element = event.target as Element;
+    if (soundcloudLinkDialogData.isVisible) {
+      if (!soundcloudLinkDialogData.dialog?.contains(element)) {
+        soundcloudLinkDialogData.isVisible = false;
+      }
+    } else {
+      if (soundcloudLinkDialogData.buttonRef?.contains(element)) {
+        soundcloudLinkDialogData.isVisible = true;
+      }
+    }
+  }
+
+  function closeSoundCloudLinkDialog() {
+    soundcloudLinkDialogData.isVisible = false;
+  }
+
   // 動画関連
   function onClickAddYouTubeButton(event: InteractEvent) {
     const element = event.target as Element;
@@ -162,7 +179,7 @@
     youtubeLinkDialogData.isVisible = false;
   }
 
-  [onClickAddYouTubeButton].forEach(registerInteractHandler);
+  [onClickAddYouTubeButton, onClickAddSoundCloudButton].forEach(registerInteractHandler);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -215,12 +232,21 @@
               <use href="/src/lib/assets/common/image.svg#image"></use>
             </svg>
           </button>
-          <button class="icon-button" disabled={!canAddMedia()}>
+          <button
+            bind:this={soundcloudLinkDialogData.buttonRef}
+            class="icon-button"
+            disabled={!canAddMedia()}>
             <svg class="icon">
               <use href="/src/lib/assets/common/music_note.svg#music_note"
               ></use>
             </svg>
           </button>
+          {#if soundcloudLinkDialogData.isVisible}
+            <SoundCloudEmbed
+              bind:this={soundcloudLinkDialogData.dialog}
+              basePoint={soundcloudLinkDialogData.buttonRef.getBoundingClientRect()}
+              closeDialog={closeSoundCloudLinkDialog} />
+          {/if}
           <button
             bind:this={youtubeLinkDialogData.buttonRef}
             class="icon-button"
@@ -241,7 +267,7 @@
         </div>
         <div class="right-aligned-tools">
           <div class="characters-counter">
-            <span class="characters-count" class:limit-over={isLimitOver()}
+            <span class="characters-count" class:limit-over={isCharactersCostsLimitOver()}
               >{apparentCharactersCount()}</span
             >
             <span class="characters-limit">/{apparentCharactersLimit()}</span>
@@ -267,6 +293,13 @@
 
   :global(a) {
     color: var(--accent-color);
+  }
+
+  :global(h1) {
+    color: var(--accent-color);
+    font-family: var(--primary-font);
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   }
 
   .virtual-viewport {

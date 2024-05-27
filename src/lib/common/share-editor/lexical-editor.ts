@@ -1,6 +1,6 @@
 import { $createHeadingNode as createHeadingNode, HeadingNode, registerRichText } from '@lexical/rich-text';
 import { CAN_USE_BEFORE_INPUT, IS_APPLE_WEBKIT, IS_IOS, IS_SAFARI, mergeRegister } from '@lexical/utils';
-import { $createParagraphNode as createParagraphNode, $getRoot as getRoot, $getSelection as getSelection, createEditor, type EditorState, type LexicalEditor, $isRangeSelection as isRangeSelection, INSERT_LINE_BREAK_COMMAND, KEY_ENTER_COMMAND, COMMAND_PRIORITY_LOW, $createTextNode as createTextNode } from 'lexical';
+import { $createParagraphNode as createParagraphNode, $getRoot as getRoot, $getSelection as getSelection, createEditor, type EditorState, type LexicalEditor, $isRangeSelection as isRangeSelection, INSERT_LINE_BREAK_COMMAND, KEY_ENTER_COMMAND, COMMAND_PRIORITY_LOW, $createTextNode as createTextNode, $setSelection as setSelection, $createRangeSelection as createRangeSelection } from 'lexical';
 import { INSERT_YOUTUBE_COMMAND, registerYouTubePlugin, YouTubeNode } from './youtube-plugin.svelte';
 import { createEmptyHistoryState, registerHistory } from '@lexical/history';
 import { AutoLinkNode } from '@lexical/link';
@@ -8,7 +8,8 @@ import { registerAutoLinkPlugin } from './auto-link-plugin';
 import { registerPlaceholderPlugin } from './placeholder-plugin.svelte';
 import { registerCharactersCounterPlugin } from './characters-conter-plugin.svelte';
 import { INSERT_IMAGE_SLIDER_COMMAND, registerSlidePlugin, ImageSliderNode, DELETE_IMAGE_SLIDER_COMMAND } from './slide-plugin.svelte';
-import { CursorPositionObserver } from './title-plugin.svelte';
+import { CursorPositionObserver, registerTitlePlugin } from './title-plugin.svelte';
+import { INSERT_SOUNDCLOUD_COMMAND } from './soundcloud-plugin.svelte';
 
 export type InitialEditorStateType = null | string | EditorState | (() => void);
 
@@ -46,6 +47,10 @@ export function dispatchInsertYoutubeCommand(videoId: string) {
   editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, videoId);
 }
 
+export function dispatchInsertSoundCloudCommand(trackId: string) {
+  editor.dispatchCommand(INSERT_SOUNDCLOUD_COMMAND, trackId);
+}
+
 export function dispatchInsertSlideCommand(imagesPaths: string[]) {
   editor.dispatchCommand(INSERT_IMAGE_SLIDER_COMMAND, { imagesPaths });
 }
@@ -59,7 +64,12 @@ export function insertHeadingNode() {
     const root = getRoot();
     const heading = createHeadingNode("h1");
     heading.append(createTextNode(""));
-    root.append(heading);
+    root.getFirstChild()?.insertBefore(heading);
+
+    const selection = createRangeSelection();
+    selection.anchor.set(heading.getKey(), 0, "element");
+    selection.focus.set(heading.getKey(), 0, "element");
+    setSelection(selection);
   });
 }
 
@@ -75,6 +85,7 @@ export function register(
     registerCharactersCounterPlugin(editor),
     registerEnterListener(editor),
     registerSlidePlugin(editor),
+    registerTitlePlugin(editor),
   );
   initializeEditor(editor, initialEditorState);
   return removeListener;
