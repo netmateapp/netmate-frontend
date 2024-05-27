@@ -2,6 +2,8 @@
   // メディア関連
   export const MAX_MEDIA_COUNT = 4;
   export const MEDIA_COUNT = new ReactiveStore(0);
+
+  export const CURSOR_AT_FIRST_LINE_START = new ReactiveStore(true);
 </script>
 
 <script src="lexical-editor.ts" lang="ts">
@@ -9,27 +11,29 @@
   import { getCharactersCount } from "./characters-conter-plugin.svelte";
   import {
     dispatchInsertSlideCommand,
-    dispatchInsertYoutubeCommand,
     init,
     insertHeadingNode,
   } from "./lexical-editor";
   import { canShowPlaceholder } from "./placeholder-plugin.svelte";
   import { get } from "svelte/store";
   import { ReactiveStore } from "$lib/stores.svelte";
-    import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
-    import { _ } from "./editor.svelte";
-    import { toast } from "../toast/useToast.svelte";
-    import { registerInteractHandler } from "$lib/utils.svelte";
+  import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
+  import { _ } from "./editor.svelte";
+  import { toast } from "../toast/useToast.svelte";
+  import { registerInteractHandler } from "$lib/utils.svelte";
 
   $effect(() => {
     init();
   });
 
-  let videoId = "XUTj1nz94ik";
-
   let shareEditorRef: MaybeHTMLElement = $state(null);
   export function getShareEditorRef(): MaybeHTMLElement {
     return shareEditorRef;
+  }
+
+  // タイトル関連
+  function canInsertTitle(): boolean {
+    return CURSOR_AT_FIRST_LINE_START.reactiveValue;
   }
 
   // 文字数カウンター関連
@@ -65,7 +69,7 @@
 
   function onMouseDown(event: MouseEvent): void {
     if (!scrollableElement) return;
-    
+
     const tagName: string = (event.target as Element).tagName;
     if (tagName == "P" || tagName == "SPAN") return;
 
@@ -113,7 +117,7 @@
     const count = files.length;
     if (count == 0) return;
 
-    if (count <= (MAX_MEDIA_COUNT - MEDIA_COUNT.reactiveValue)) {
+    if (count <= MAX_MEDIA_COUNT - MEDIA_COUNT.reactiveValue) {
       const imagesPaths: string[] = [];
       for (var file of files) {
         const filePath = URL.createObjectURL(file);
@@ -158,9 +162,7 @@
     youtubeLinkDialogData.isVisible = false;
   }
 
-  [
-    onClickAddYouTubeButton
-  ].forEach(registerInteractHandler);
+  [onClickAddYouTubeButton].forEach(registerInteractHandler);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -188,7 +190,10 @@
       <div class="separator"></div>
       <div class="toolbar">
         <div class="left-aligned-tools">
-          <button class="icon-button" onclick={() => insertHeadingNode()}>
+          <button
+            class="icon-button"
+            disabled={!canInsertTitle()}
+            onclick={() => insertHeadingNode()}>
             <svg class="icon">
               <use href="/src/lib/assets/common/title.svg#title"></use>
             </svg>
@@ -210,9 +215,7 @@
               <use href="/src/lib/assets/common/image.svg#image"></use>
             </svg>
           </button>
-          <button
-            class="icon-button"
-            disabled={!canAddMedia()}>
+          <button class="icon-button" disabled={!canAddMedia()}>
             <svg class="icon">
               <use href="/src/lib/assets/common/music_note.svg#music_note"
               ></use>
@@ -221,7 +224,8 @@
           <button
             bind:this={youtubeLinkDialogData.buttonRef}
             class="icon-button"
-            disabled={!canAddMedia()}>
+            disabled={!canAddMedia()}
+          >
             <svg class="icon">
               <use href="/src/lib/assets/common/smart_display.svg#smart_display"
               ></use>
@@ -231,7 +235,8 @@
             <YouTubeLinkDialog
               bind:this={youtubeLinkDialogData.dialog}
               basePoint={youtubeLinkDialogData.buttonRef.getBoundingClientRect()}
-              closeDialog={closeYouTubeLinkDialog}/>
+              closeDialog={closeYouTubeLinkDialog}
+            />
           {/if}
         </div>
         <div class="right-aligned-tools">

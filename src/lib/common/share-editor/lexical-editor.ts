@@ -8,6 +8,7 @@ import { registerAutoLinkPlugin } from './auto-link-plugin';
 import { registerPlaceholderPlugin } from './placeholder-plugin.svelte';
 import { registerCharactersCounterPlugin } from './characters-conter-plugin.svelte';
 import { INSERT_IMAGE_SLIDER_COMMAND, registerSlidePlugin, ImageSliderNode, DELETE_IMAGE_SLIDER_COMMAND } from './slide-plugin.svelte';
+import { CursorPositionObserver } from './title-plugin.svelte';
 
 export type InitialEditorStateType = null | string | EditorState | (() => void);
 
@@ -26,7 +27,8 @@ const updateOptions: {
   tag?: string,
 } = options;
 
-let editor: LexicalEditor 
+let editor: LexicalEditor;
+let curosrObserver: CursorPositionObserver;
 
 export function init() {
   editor = createEditor(config);
@@ -37,6 +39,7 @@ export function init() {
   register(editor);
   registerHistory(editor, createEmptyHistoryState(), 0);
 
+  curosrObserver = new CursorPositionObserver(editor);
 }
 
 export function dispatchInsertYoutubeCommand(videoId: string) {
@@ -52,11 +55,12 @@ export function dispatchDeleteSlideCommand(key: string) {
 }
 
 export function insertHeadingNode() {
-  const root = getRoot();
-
-  const heading = createHeadingNode("h1");
-  heading.append(createTextNode(""));
-  root.append(heading);
+  editor.update(() => {
+    const root = getRoot();
+    const heading = createHeadingNode("h1");
+    heading.append(createTextNode(""));
+    root.append(heading);
+  });
 }
 
 export function register(
