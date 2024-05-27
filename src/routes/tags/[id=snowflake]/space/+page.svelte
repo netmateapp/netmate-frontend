@@ -2,6 +2,7 @@
   import Brand from "$lib/common/brand/Brand.svelte";
   import Navigation from "$lib/common/navigation/Navigation.svelte";
   import SearchBox from "$lib/common/search-box/SearchBox.svelte";
+    import OpenShareEditorButton from "$lib/common/share-editor/OpenShareEditorButton.svelte";
   import ShareEditor from "$lib/common/share-editor/ShareEditor.svelte";
     import { registerInteractHandler } from "$lib/utils.svelte";
 
@@ -24,6 +25,7 @@
 <Brand x={16} y={8} />
 <SearchBox />
 <Navigation />
+<OpenShareEditorButton />
 {#if isShareEditorVisible}
   <ShareEditor bind:this={shareEditor} />
 {/if}
