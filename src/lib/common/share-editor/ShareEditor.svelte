@@ -5,7 +5,6 @@
 </script>
 
 <script src="lexical-editor.ts" lang="ts">
-  import { createTranslator } from "$lib/i18n.svelte";
   import { locale } from "svelte-i18n";
   import { getCharactersCount } from "./characters-conter-plugin.svelte";
   import {
@@ -17,14 +16,18 @@
   import { canShowPlaceholder } from "./placeholder-plugin.svelte";
   import { get } from "svelte/store";
   import { ReactiveStore } from "$lib/stores.svelte";
-
-  const _ = createTranslator("common", "share-editor");
+    import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
 
   $effect(() => {
     init();
   });
 
   let videoId = "XUTj1nz94ik";
+
+  let shareEditorRef: MaybeHTMLElement = $state(null);
+  export function getShareEditorRef(): MaybeHTMLElement {
+    return shareEditorRef;
+  }
 
   // 文字数カウンター関連
   function currentCharactersCount(): number {
@@ -116,7 +119,36 @@
     }
   }
 
+  // メディアリンクダイアログ関連
+  class MediaLinkDialogData {
+    buttonRef: MaybeElement = $state(null);
+    dialog: MaybeComponent = $state(null);
+    isVisible: boolean = $state(false);
+
+    openDialog() {
+      this.isVisible = true;
+    }
+  }
+
+  const youtubeLinkDialogData = new MediaLinkDialogData();
+  const soundcloudLinkDialogData = new MediaLinkDialogData();
+
+  function handleInteractToDialog(event: InteractEvent) {
+    [youtubeLinkDialogData, soundcloudLinkDialogData].forEach(data => {
+      const target = event.target;
+      if (target) {
+        if (data.isVisible) {
+          
+        } else {
+
+        }
+      }
+    });
+  }
+
   // 動画関連
+  let isVideoButtonToggled = $state(false);
+
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -130,7 +162,7 @@
 >
   <div class="floating">
     <div class="spacer"></div>
-    <div class="share-editor">
+    <div bind:this={shareEditorRef} class="share-editor">
       <div class="tags">
         <div class="placeholder">タグをつける…</div>
       </div>
@@ -180,10 +212,9 @@
               ></use>
             </svg>
           </button>
-          <div class="media-link-dialog">
-            <span class="media-link-dialog-title">{_("add-youtube-video")}</span>
-            <input class="media-link-input" placeholder="https://www.youtube.com/watch?v=" />
-          </div>
+          {#if youtubeLinkDialogData.isVisible}
+            <YouTubeLinkDialog />
+          {/if}
         </div>
         <div class="right-aligned-tools">
           <div class="characters-counter">

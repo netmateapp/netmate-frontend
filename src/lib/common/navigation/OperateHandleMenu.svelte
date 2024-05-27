@@ -5,12 +5,12 @@
 
   let { basePoint, handleId, onEdit }: { basePoint: DOMRect, handleId: string, onEdit: () => void } = $props();
 
-  let menu: MaybeElement = $state(null);
+  let menuRef: MaybeElement = $state(null);
   export function contains(element: Element): boolean {
-    return (menu?.contains(element) ?? false) || dialog?.contains(element);
+    return (menuRef?.contains(element) ?? false) || deleteHandleDialog?.contains(element);
   }
 
-  let dialog: MaybeComponent = $state(null);
+  let deleteHandleDialog: MaybeComponent = $state(null);
 
   let isToggled = $state(false);
   let editButton: MaybeElement = $state(null);
@@ -22,7 +22,7 @@
   function handleInteractEvent(event: InteractEvent) {
     const element = event.target as Element;
     if (isToggled) {
-      if (!dialog?.dialogRef()?.contains(element)) isToggled = false;
+      if (!deleteHandleDialog?.dialogRef()?.contains(element)) isToggled = false;
     } else {
       if (editButton?.contains(element)) {
         onEdit();
@@ -46,7 +46,7 @@
   }
 </script>
 
-<div bind:this={menu} class="menu" style={calculateMenuPosition(basePoint, menu)}>
+<div bind:this={menuRef} class="menu" style={calculateMenuPosition(basePoint, menuRef)}>
   <button
     bind:this={editButton}
     class="item"
@@ -62,7 +62,7 @@
 </div>
 
 {#if isToggled && currentIndex == 1}
-  <DeleteHandleDialog bind:this={dialog} handleId={handleId} closeDialog={closeDeleteHandleDialog} />
+  <DeleteHandleDialog bind:this={deleteHandleDialog} handleId={handleId} closeDialog={closeDeleteHandleDialog} />
 {/if}
 
 <style>
