@@ -11,13 +11,13 @@
 <script lang="ts">
     import { MEDIA_COUNT, MAX_MEDIA_COUNT } from "./ShareEditor.svelte";
 
-  let { imagesPaths }: { imagesPaths: string[] } = $props();
+    let { imagesPaths }: { imagesPaths: string[] } = $props();
 
-  let currentIndex = $state(0);
+    let currentIndex = $state(0);
 
-  function isCurrentPageNumber(pageNumber: number) {
-    return pageNumber === currentIndex;
-  }
+    function isCurrentPageNumber(pageNumber: number) {
+      return pageNumber === currentIndex;
+    }
 
   // スライド関連
   let slideCount = $derived(imagesPaths.length);

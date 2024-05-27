@@ -18,7 +18,7 @@
   import { get } from "svelte/store";
   import { ReactiveStore } from "$lib/stores.svelte";
 
-  const _ = createTranslator("common", "navigation");
+  const _ = createTranslator("common", "share-editor");
 
   $effect(() => {
     init();
@@ -115,6 +115,8 @@
       // トーストを表示
     }
   }
+
+  // 動画関連
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -172,13 +174,16 @@
           </button>
           <button
             class="icon-button"
-            onclick={() => dispatchInsertYoutubeCommand(videoId)}
-          >
+            onclick={() => dispatchInsertYoutubeCommand(videoId)}>
             <svg class="icon">
               <use href="/src/lib/assets/common/smart_display.svg#smart_display"
               ></use>
             </svg>
           </button>
+          <div class="media-link-dialog">
+            <span class="media-link-dialog-title">{_("add-youtube-video")}</span>
+            <input class="media-link-input" placeholder="https://www.youtube.com/watch?v=" />
+          </div>
         </div>
         <div class="right-aligned-tools">
           <div class="characters-counter">
