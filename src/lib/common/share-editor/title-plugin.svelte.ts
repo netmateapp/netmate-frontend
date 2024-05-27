@@ -1,8 +1,10 @@
 import { type LexicalEditor, $getSelection as getSelection, $isRangeSelection as isRangeSelection, type RangeSelection, $getRoot as getRoot, KEY_ENTER_COMMAND, COMMAND_PRIORITY_NORMAL, $getNodeByKey as getNodeByKey, $createParagraphNode as createParagraphNode, $isTextNode as isTextNode, $createRangeSelection as createRangeSelection, $setSelection as setSelection } from "lexical";
-import { CURSOR_AT_FIRST_LINE_START, HAS_TITLE } from "./ShareEditor.svelte";
+import { CURSOR_AT_FIRST_LINE_START, HAS_TITLE, TITLE_COSTS_LIMIT } from "./ShareEditor.svelte";
 import { $isHeadingNode as isHeadingNode, HeadingNode } from "@lexical/rich-text";
 import { mergeRegister } from "@lexical/utils";
-import { countCJKCharacters } from "$lib/cjk";
+import { apparentCharactersCosts, countCJKCharacters } from "$lib/cjk.svelte";
+import { toast } from "../toast/useToast.svelte";
+import { _ } from "./editor.svelte";
 
 export function registerTitlePlugin(editor: LexicalEditor): () => void {
   return mergeRegister(
@@ -70,8 +72,6 @@ function registerHeadingNodeEdit(editor: LexicalEditor): () => void {
   });
 }
 
-const TITLE_MAX_LENGTH = 48;
-
 function limitHeadingNodeLength() {
   const selection = getSelection();
   if (isRangeSelection(selection)) {
@@ -85,11 +85,11 @@ function limitHeadingNodeLength() {
 
       const text = child.getTextContent();
       const count = text.length + countCJKCharacters(text);
-      if (textCount + count > TITLE_MAX_LENGTH) {
+      if (textCount + count > TITLE_COSTS_LIMIT) {
         for (var i = text.length - 1; i > 0; i--) {
           const substr = text.slice(0, i);
           const subcount = substr.length + countCJKCharacters(substr);
-          if (textCount + subcount <= TITLE_MAX_LENGTH) {
+          if (textCount + subcount <= TITLE_COSTS_LIMIT) {
             child.setTextContent(substr);
 
             const selection = createRangeSelection();
@@ -97,6 +97,8 @@ function limitHeadingNodeLength() {
             selection.anchor.set(child.getKey(), offset, "text");
             selection.focus.set(child.getKey(), offset, "text");
             setSelection(selection);
+
+            toast(_("failed-to-spell-title", { limit: apparentCharactersCosts(TITLE_COSTS_LIMIT) }));
             break;
           }
         }

@@ -1,30 +1,29 @@
-import { countCJKCharacters } from "$lib/cjk";
+import { calculateCharactersCosts } from "$lib/cjk.svelte";
 import { LineBreakNode, TextNode, type LexicalEditor } from "lexical";
 
-let charactersCount = $state(0);
+let _charactersCosts = $state(0);
 
-export function getCharactersCount(): number {
-  return charactersCount;
+export function charactersCosts(): number {
+  return _charactersCosts;
 }
 
 const URL_REGEX = /(https?:\/\/)?([a-zA-Z0-9@:%._\+~#=\u00A1-\uFFFF]{1,64}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=*\u00A1-\uFFFF]*))/g;
 
 export function registerCharactersCounterPlugin(editor: LexicalEditor) {
   return editor.registerUpdateListener(({ editorState }) => {
-    let count = 0;
+    let charactersCosts = 0;
     for (var node of editorState._nodeMap.values()) {
       if (node instanceof TextNode) {
         const text = node.__text;
         if (URL_REGEX.test(text)) {
-          count += 16;
+          charactersCosts += 16;
         } else {
-          // CJKを2倍にカウント
-          count += text.length + countCJKCharacters(text);
+          charactersCosts += calculateCharactersCosts(text);
         }
       } else if (node instanceof LineBreakNode) {
-        count += 1;
+        charactersCosts += 1;
       }
     }
-    charactersCount = count;
+    _charactersCosts = charactersCosts;
   });
 }
