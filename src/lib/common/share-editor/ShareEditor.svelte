@@ -281,6 +281,7 @@
         </div>
       </div>
     </div>
+    <div class="padding"></div>
   </div>
 </div>
 
@@ -301,7 +302,7 @@
     color: var(--accent-color);
   }
 
-  :global(h1) {
+  :global(h1, h2, h3, h4, h5, h6) {
     color: var(--accent-color);
     font-family: var(--primary-font);
     font-size: 1.25rem;
@@ -328,7 +329,14 @@
   .spacer {
     width: 1px;
     flex: 1 0 0;
+    min-height: 1rem;
     max-height: 35vh;
+  }
+
+  .padding {
+    height: 1rem;
+    width: 1px;
+    flex-shrink: 0;
   }
 
   .share-editor {
@@ -362,6 +370,7 @@
 
   .editor {
     width: 100%;
+    font-family: "ＭＳ Ｐゴシック", var(--primary-font);
   }
 
   .placeholder {

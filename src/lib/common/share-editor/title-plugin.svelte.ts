@@ -45,12 +45,36 @@ function registerHeadingNodeMutationListener(editor: LexicalEditor): () => void 
       if (mutation === "created") {
           editor.update(() => {
             const node = getNodeByKey(nodeKey) as HeadingNode;
+
+            // 貼り付けや改行などで先頭行以外に生成された場合
             if (getRoot().getFirstChild() !== node) {
               const paragraphNode = createParagraphNode();
               paragraphNode.append(...node.getChildren());
               node.replace(paragraphNode); // destroyが呼ばれる
               headingNodeCount++;
               return;
+            } else {
+              // 文字数上限を超える貼り付けは削除
+              let textCount = 0;
+              const selection = getSelection();
+              for (var child of node.getChildren()) {
+                if (!isTextNode(child)) continue;
+          
+                const text = child.getTextContent();
+                const count = text.length + countCJKCharacters(text);
+                if (textCount + count > TITLE_COSTS_LIMIT) {
+                  for (var i = text.length - 1; i > 0; i--) {
+                    const substr = text.slice(0, i);
+                    const subcount = substr.length + countCJKCharacters(substr);
+                    if (textCount + subcount <= TITLE_COSTS_LIMIT) {
+                      child.setTextContent(substr);
+                      setSelection(selection);
+                      toast(_("failed-to-paste-title", { limit: apparentCharactersCosts(TITLE_COSTS_LIMIT) }));
+                      break;
+                    }
+                  }
+                }
+              }
             }
             headingNodeCount++;
             HAS_TITLE.reactiveValue = true;

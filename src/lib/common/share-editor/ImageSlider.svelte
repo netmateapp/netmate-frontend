@@ -288,13 +288,19 @@
     background-color: rgba(0, 0, 0, 0.4);
     display: flex;
     width: 2.75rem;
-height: 2.75rem;
-padding: 0.375rem;
+    height: 2.75rem;
+    padding: 0.375rem;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
   }
 
-  .edit-slider-button:hover {
+  .edit-slider-button:disabled {
+    background-color: rgba(0, 0, 0, 0.5);
+    cursor: default;
+  }
+
+  .edit-slider-button:not(:disabled):hover {
     background-color: rgba(0, 0, 0, 0.5);
   }
 
