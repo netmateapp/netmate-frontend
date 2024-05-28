@@ -1,4 +1,4 @@
-import { type LexicalEditor, $getSelection as getSelection, $isRangeSelection as isRangeSelection, type RangeSelection, $getRoot as getRoot, KEY_ENTER_COMMAND, COMMAND_PRIORITY_NORMAL, $getNodeByKey as getNodeByKey, $createParagraphNode as createParagraphNode, $isTextNode as isTextNode, $createRangeSelection as createRangeSelection, $setSelection as setSelection } from "lexical";
+import { type LexicalEditor, $getSelection as getSelection, $isRangeSelection as isRangeSelection, type RangeSelection, $getRoot as getRoot, KEY_ENTER_COMMAND, COMMAND_PRIORITY_NORMAL, $getNodeByKey as getNodeByKey, $createParagraphNode as createParagraphNode, $isTextNode as isTextNode, $createRangeSelection as createRangeSelection, $setSelection as setSelection, TextNode } from "lexical";
 import { CURSOR_AT_FIRST_LINE_START, HAS_TITLE, TITLE_COSTS_LIMIT } from "./ShareEditor.svelte";
 import { $isHeadingNode as isHeadingNode, HeadingNode } from "@lexical/rich-text";
 import { mergeRegister } from "@lexical/utils";
@@ -21,8 +21,17 @@ function registerLineBreakInHeadingNodeListener(editor: LexicalEditor): () => vo
       const selection = getSelection();
       if (isRangeSelection(selection)) {
         const anchorNode = selection.anchor.getNode();
-        if (isHeadingNode(anchorNode) ||  isHeadingNode(anchorNode.getParent())) {
+        if (isHeadingNode(anchorNode)) {
           event.preventDefault();
+          return true;
+        } else if (isHeadingNode(anchorNode.getParent())) {
+          const textNode = anchorNode as TextNode;
+          event.preventDefault();
+          if (textNode.__text.length > selection.anchor.offset) return true;
+
+          const paragraphNode = createParagraphNode();
+          paragraphNode.select();
+          anchorNode.getParent()?.insertAfter(paragraphNode);
           return true;
         }
       }
@@ -128,28 +137,6 @@ function limitHeadingNodeLength() {
         }
       }
     }
-
-    /*headingNode.forEachDescendant((descendant) => {
-      if ($isTextNode(descendant)) {
-        textContent += (descendant as TextNode).getTextContent();
-      }
-    });
-
-    if (textContent.length > HEADING_NODE_MAX_LENGTH) {
-      // 文字数を上限まで制限する
-      parentNode.getChildren().forEach((child) => {
-        if ($isTextNode(child)) {
-          const textNode = child as TextNode;
-          const text = textNode.getTextContent();
-          if (text.length > HEADING_NODE_MAX_LENGTH) {
-            textNode.setTextContent(text.substring(0, HEADING_NODE_MAX_LENGTH));
-          } else {
-            textNode.setTextContent(text);
-          }
-        }
-      });
-    }
-  }*/
   }
 }
 
@@ -198,9 +185,3 @@ export class CursorPositionObserver {
     this.listener(isFirstLine);
   }
 }
-
-//const cursorObserver = new CursorPositionObserver(editor);
-
-/*cursorObserver.onCursorPositionChange((isFirstLine) => {
-  console.log('Cursor is in first line:', isFirstLine);
-});*/
