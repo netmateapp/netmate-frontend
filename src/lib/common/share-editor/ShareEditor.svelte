@@ -109,6 +109,8 @@
     imageInputRef?.click();
   }
 
+  // スライドの新規作成時に追加される画像のカウントは、
+  // プラグインのMutationListenerで管理する
   function onInputImageFiles(event: Event) {
     const files = (event.target as HTMLInputElement)?.files;
     if (!files) return;

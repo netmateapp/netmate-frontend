@@ -118,6 +118,7 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
   createElement(): HTMLElement {
     const imageSlide = document.createElement("image-slider");
     imageSlide.setAttribute(NODE_ATTRIBUTE, JSON.stringify(this.__data.imagesPaths));
+    imageSlide.setAttribute("node-key", this.__key);
     imageSlide.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
     return imageSlide;
   }
@@ -237,7 +238,8 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
     return {
       componentClass: ImageSlide,
       props: {
-        imagesPaths: this.__data.imagesPaths
+        imagesPaths: this.__data.imagesPaths,
+        nodeKey: this.__key,
       }
     }
   }
@@ -345,6 +347,7 @@ function registerInsertImageSliderCommand(editor: LexicalEditor): () => void {
   );
 }
 
+export const IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA = new Map<string, ImageSliderData>();
 
 function registerImageSliderMutationListener(editor: LexicalEditor): () => void {
   return editor.registerMutationListener(ImageSliderNode, (mutatedNodes) => {
@@ -353,20 +356,19 @@ function registerImageSliderMutationListener(editor: LexicalEditor): () => void 
         editor.update(() => {
           let node = getNodeByKey(nodeKey) as ImageSliderNode;
           let imagesCount = node.getImageSliderData().imagesPaths.length;
-          console.log("media count: " + MEDIA_COUNT.reactiveValue + " : " + imagesCount);
+          IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.set(nodeKey, node.getImageSliderData());
           if (MEDIA_COUNT.reactiveValue + imagesCount <= MAX_MEDIA_COUNT) {
             MEDIA_COUNT.reactiveValue += imagesCount;
           } else {
-            console.log("media count: " + MEDIA_COUNT.reactiveValue);
+            MEDIA_COUNT.reactiveValue += imagesCount;
             node.remove();
             toast("メディア数上限を超えていたため、貼り付けられた画像は削除されました。");
           }
         });
       } else if (mutation === "destroyed") {
         editor.getEditorState().read(() => {
-          let node = getNodeByKey(nodeKey) as ImageSliderNode;
-          console.log("node: " + node);
-          let imagesCount = node.getImageSliderData().imagesPaths.length;
+          let imagesCount = IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.get(nodeKey)?.imagesPaths.length ?? 0;
+          IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.delete(nodeKey);
           MEDIA_COUNT.reactiveValue -= imagesCount;
         });
       }

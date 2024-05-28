@@ -3,7 +3,8 @@
     tag: "image-slider",
     shadow: "none",
     props: {
-      imagesPaths: { attribute: "images-paths", type: "Array" }
+      imagesPaths: { attribute: "images-paths", type: "Array" },
+      nodeKey: { attribute: "node-key", type: "String" }
     },
   }}
 />
@@ -13,9 +14,9 @@
     import { MEDIA_COUNT, MAX_MEDIA_COUNT } from "./ShareEditor.svelte";
     import { _ } from "./editor.svelte";
     import { dispatchDeleteSlideCommand } from "./lexical-editor";
-    import { IDENTITY_ATTRIBUTE } from "./image-slide-plugin.svelte";
+    import { IDENTITY_ATTRIBUTE, IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA } from "./image-slide-plugin.svelte";
 
-    let { imagesPaths }: { imagesPaths: string[] } = $props();
+    let { imagesPaths, nodeKey }: { imagesPaths: string[], nodeKey: string } = $props();
 
     let currentIndex = $state(0);
 
@@ -106,9 +107,12 @@
     return MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT;
   }
 
-  let imageInputRef: MaybeHTMLElement = $state(null);
+  let imageInputRef: MaybeHTMLInputElement = $state(null);
   function onClickAddImageButton() {
     imageInputRef?.click();
+
+    // 1度目と2度目でvalueが同じであると、onchangeが発火しないのでクリアする
+    if (imageInputRef) imageInputRef.value = "";
   }
 
   function onInputImageFiles(event: Event) {
@@ -124,6 +128,8 @@
         imagesPaths.push(filePath);
       }
       MEDIA_COUNT.reactiveValue += count;
+      const sliderData = IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.get(nodeKey);
+      if (sliderData) sliderData.imagesPaths = imagesPaths.slice();
     } else {
       toast(_("failed-to-add-media", { limit: MAX_MEDIA_COUNT }));
     }
@@ -140,11 +146,12 @@
         currentIndex--;
         imagesPaths = imagesPaths.filter((v, index, a) => index != (currentIndex + 1));
         setPositionByIndex();
-        MEDIA_COUNT.reactiveValue--;
       } else {
         imagesPaths = imagesPaths.filter((v, index, a) => index != currentIndex);
-        MEDIA_COUNT.reactiveValue--;
       }
+      MEDIA_COUNT.reactiveValue--;
+      const sliderData = IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.get(nodeKey);
+      if (sliderData) sliderData.imagesPaths = imagesPaths.slice();
     }
   }
 </script>
