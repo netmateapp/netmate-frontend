@@ -1,8 +1,8 @@
-import { type LexicalEditor, $getSelection as getSelection, $isRangeSelection as isRangeSelection, type RangeSelection, $getRoot as getRoot, KEY_ENTER_COMMAND, COMMAND_PRIORITY_NORMAL, $getNodeByKey as getNodeByKey, $createParagraphNode as createParagraphNode, $isTextNode as isTextNode, $createRangeSelection as createRangeSelection, $setSelection as setSelection, TextNode } from "lexical";
+import { type LexicalEditor, $getSelection as getSelection, $isRangeSelection as isRangeSelection, type RangeSelection, $getRoot as getRoot, KEY_ENTER_COMMAND, COMMAND_PRIORITY_NORMAL, $getNodeByKey as getNodeByKey, $createParagraphNode as createParagraphNode, $isTextNode as isTextNode, $createRangeSelection as createRangeSelection, $setSelection as setSelection, TextNode, type LexicalNode, $createTextNode as createTextNode } from "lexical";
 import { CURSOR_AT_FIRST_LINE_START, HAS_TITLE, TITLE_COSTS_LIMIT } from "./ShareEditor.svelte";
 import { $isHeadingNode as isHeadingNode, HeadingNode } from "@lexical/rich-text";
 import { mergeRegister } from "@lexical/utils";
-import { apparentCharactersCosts, countCJKCharacters } from "$lib/cjk.svelte";
+import { apparentCharactersCosts, calculateCharactersCosts, countCJKCharacters } from "$lib/cjk.svelte";
 import { toast } from "../toast/useToast.svelte";
 import { _ } from "./editor.svelte";
 
@@ -39,6 +39,11 @@ function registerLineBreakInHeadingNodeListener(editor: LexicalEditor): () => vo
     },
     COMMAND_PRIORITY_NORMAL
   );
+}
+
+function registerHeadingPasteListener(editor: LexicalEditor): () => void {
+  //return editor.registerCommand(
+  return () => {};
 }
 
 let headingNodeCount = 0;
@@ -100,42 +105,53 @@ function registerHeadingNodeMutationListener(editor: LexicalEditor): () => void 
 function registerHeadingNodeEdit(editor: LexicalEditor): () => void {
   return editor.registerUpdateListener(() => {
     editor.update(() => {
-      limitHeadingNodeLength();
+      const maybeHeadingNode = getRoot().getFirstChild();
+      if (!isHeadingNode(maybeHeadingNode)) return;
+
+      keepNodeOne(maybeHeadingNode);
+
+      const maybeTextNode = maybeHeadingNode.getFirstChild();
+      if (!isTextNode(maybeTextNode)) return;
+      
+      limitTitle(maybeTextNode);
+
+      //limitHeadingNodeLength();
     });
   });
 }
 
-function limitHeadingNodeLength() {
-  const selection = getSelection();
-  if (isRangeSelection(selection)) {
-    const anchorNode = selection.anchor.getNode();
-    const headingNode = isHeadingNode(anchorNode) ? anchorNode : (isHeadingNode(anchorNode.getParent()) ? anchorNode.getParent() : null);
-    if (!headingNode) return;
+// 貼り付け想定：子ノードをテキストノード1つに保つ
+function keepNodeOne(node: HeadingNode) {
+  const children = node.getChildren();
+  if (children.length <= 1) return;
 
-    let textCount = 0;
-    for (var child of headingNode.getChildren()) {
-      if (!isTextNode(child)) continue;
+  for (var i = 1; i < children.length; i++) children[i].remove();
+  toast(_("failed-to-paste-title", { limit: apparentCharactersCosts(TITLE_COSTS_LIMIT) }));
+}
 
-      const text = child.getTextContent();
-      const count = text.length + countCJKCharacters(text);
-      if (textCount + count > TITLE_COSTS_LIMIT) {
-        for (var i = text.length - 1; i > 0; i--) {
-          const substr = text.slice(0, i);
-          const subcount = substr.length + countCJKCharacters(substr);
-          if (textCount + subcount <= TITLE_COSTS_LIMIT) {
-            child.setTextContent(substr);
+function limitTitle(node: TextNode) {
+  let text = node.getTextContent();
+  const cost = calculateCharactersCosts(text);
+  if (cost <= TITLE_COSTS_LIMIT) return;
 
-            const selection = createRangeSelection();
-            const offset = substr.length;
-            selection.anchor.set(child.getKey(), offset, "text");
-            selection.focus.set(child.getKey(), offset, "text");
-            setSelection(selection);
+  // タイトルは半角のみで記述されても最大48文字
+  if (text.length > TITLE_COSTS_LIMIT) {
+    text = text.slice(0, 48);
+  }
 
-            toast(_("failed-to-spell-title", { limit: apparentCharactersCosts(TITLE_COSTS_LIMIT) }));
-            break;
-          }
-        }
-      }
+  for (var i = text.length; i > 0; i--) {
+    const subtext = text.slice(0, i);
+    const subcost = calculateCharactersCosts(subtext);
+    if (subcost <= TITLE_COSTS_LIMIT) {
+      node.setTextContent(subtext);
+      const selection = createRangeSelection();
+      const offset = subtext.length;
+      selection.anchor.set(node.getKey(), offset, "text");
+      selection.focus.set(node.getKey(), offset, "text");
+      setSelection(selection);
+
+      toast(_("failed-to-spell-title", { limit: apparentCharactersCosts(TITLE_COSTS_LIMIT) }));
+      break;
     }
   }
 }
