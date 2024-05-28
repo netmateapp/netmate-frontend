@@ -31,6 +31,7 @@ import type { ComponentProps, SvelteComponent } from "svelte";
 import ImageSlide from "./ImageSlider.svelte";
 import { MAX_MEDIA_COUNT, MEDIA_COUNT } from "./ShareEditor.svelte";
 import { toast } from "../toast/useToast.svelte";
+import { _ } from "./editor.svelte";
 
 export interface ImagePayload {
   imagesPaths: string[];
@@ -362,7 +363,7 @@ function registerImageSliderMutationListener(editor: LexicalEditor): () => void 
           } else {
             MEDIA_COUNT.reactiveValue += imagesCount;
             node.remove();
-            toast("メディア数上限を超えていたため、貼り付けられた画像は削除されました。");
+            toast(_("failed-to-paste-image-slider", { limit: MAX_MEDIA_COUNT }));
           }
         });
       } else if (mutation === "destroyed") {
