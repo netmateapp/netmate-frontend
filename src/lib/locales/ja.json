@@ -68,7 +68,6 @@
       "add-youtube-video": "YouTube上の動画を追加",
       "add-soundcloud-audio": "SoundCloud上の音声を追加",
       "add-soundcloud-audio-annotation": "※埋め込みリンクに記載されているトラックIDを指定してください。",
-      "anonymous": "匿名",
       "share": "共有する",
       "complete-edit": "編集を完了する",
       "discard-edit-dialog-title": "本当に編集内容を破棄しますか？",
@@ -78,7 +77,14 @@
       "failed-to-add-media": "メディアは最大{limit}件まで含めることができます。",
       "failed-to-spell-title": "タイトルは最大{limit}文字まで含めることができます。",
       "failed-to-paste-image-slider": "含められるメディア数の上限{limit}を超えたため、画像の貼り付けに失敗しました。",
-      "failed-to-paste-title": "タイトルは最大文字数{limit}を超過した分だけ切り詰められました。"
+      "failed-to-paste-title": "タイトルは最大文字数{limit}を超過した分だけ切り詰められました。",
+      "anonymous": "匿名",
+      "edit": "編集",
+      "edit-handle": "名義を編集",
+      "shares-count": "{count}件の共有", 
+      "new-handle-input-placeholder": "名義を作成…",
+      "creation-limit-reached": "作成上限に達しました",
+      "see-more-button-tooltip": "もっと見る"
     }
   }
 }

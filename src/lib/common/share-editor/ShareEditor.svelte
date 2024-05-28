@@ -22,9 +22,10 @@
   import { _ } from "./editor.svelte";
   import { toast } from "../toast/useToast.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
-    import { apparentCharactersCosts } from "$lib/cjk.svelte";
-    import SoundCloudLinkDialog from "./SoundCloudLinkDialog.svelte";
-    import { tooltip } from "../tooltip/useTooltip.svelte";
+  import { apparentCharactersCosts } from "$lib/cjk.svelte";
+  import SoundCloudLinkDialog from "./SoundCloudLinkDialog.svelte";
+  import { hideTooltip, tooltip } from "../tooltip/useTooltip.svelte";
+  import HandlesMenu from "./HandlesMenu.svelte";
 
   $effect(() => {
     init();
@@ -155,6 +156,7 @@
       }
     } else {
       if (soundcloudLinkDialogData.buttonRef?.contains(element)) {
+        hideTooltip();
         soundcloudLinkDialogData.isVisible = true;
       }
     }
@@ -173,6 +175,7 @@
       }
     } else {
       if (youtubeLinkDialogData.buttonRef?.contains(element)) {
+        hideTooltip();
         youtubeLinkDialogData.isVisible = true;
       }
     }
@@ -182,7 +185,36 @@
     youtubeLinkDialogData.isVisible = false;
   }
 
-  [onClickAddYouTubeButton, onClickAddSoundCloudButton].forEach(registerInteractHandler);
+  [onClickAddYouTubeButton, onClickAddSoundCloudButton].forEach(
+    registerInteractHandler,
+  );
+
+  // 名義選択ボタン関連
+  let isHandleButtonToggled = $state(false);
+  let handleButtonRef: MaybeElement = $state(null);
+  let menu: MaybeComponent = $state(null);
+  let selectedHandleId = $state(lastUsedHandle());
+  function onClickHandleButton(event: InteractEvent) {
+    const element = event.target as Element;
+    if (isHandleButtonToggled) {
+      if (!menu.contains(element)) isHandleButtonToggled = false;
+    } else {
+      if (handleButtonRef?.contains(element)) {
+        hideTooltip();
+        isHandleButtonToggled = true;
+      }
+    }
+  }
+
+  function lastUsedHandle(): string {
+    return "はらむらのどか";
+  }
+
+  function onSelectHandle(handleId: string) {
+    selectedHandleId = handleId;
+    isHandleButtonToggled = false;
+  }
+  registerInteractHandler(onClickHandleButton);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -214,7 +246,8 @@
             class="icon-button"
             disabled={!canInsertTitle()}
             onclick={() => insertHeadingNode()}
-            use:tooltip={_("title")}>
+            use:tooltip={_("title")}
+          >
             <svg class="icon">
               <use href="/src/lib/assets/common/title.svg#title"></use>
             </svg>
@@ -223,7 +256,8 @@
             class="icon-button"
             disabled={!canAddMedia()}
             onclick={onClickAddImageButton}
-            use:tooltip={_("image")}>
+            use:tooltip={_("image")}
+          >
             <input
               bind:this={imageInputRef}
               type="file"
@@ -239,8 +273,10 @@
           <button
             bind:this={soundcloudLinkDialogData.buttonRef}
             class="icon-button"
+            class:icon-button-toggled={soundcloudLinkDialogData.isVisible}
             disabled={!canAddMedia()}
-            use:tooltip={_("audio")}>
+            use:tooltip={_("audio")}
+          >
             <svg class="icon">
               <use href="/src/lib/assets/common/music_note.svg#music_note"
               ></use>
@@ -256,8 +292,10 @@
           <button
             bind:this={youtubeLinkDialogData.buttonRef}
             class="icon-button"
+            class:icon-button-toggled={youtubeLinkDialogData.isVisible}
             disabled={!canAddMedia()}
-            use:tooltip={_("video")}>
+            use:tooltip={_("video")}
+          >
             <svg class="icon">
               <use href="/src/lib/assets/common/smart_display.svg#smart_display"
               ></use>
@@ -273,10 +311,32 @@
         </div>
         <div class="right-aligned-tools">
           <div class="characters-counter">
-            <span class="characters-count" class:limit-over={isCharactersCostsLimitOver()}
+            <span
+              class="characters-count"
+              class:limit-over={isCharactersCostsLimitOver()}
               >{apparentCharactersCount()}</span
             >
             <span class="characters-limit">/{apparentCharactersLimit()}</span>
+          </div>
+          <div
+            bind:this={handleButtonRef}
+            class="handle-button"
+            class:handle-button-toggled={isHandleButtonToggled}
+          >
+            <svg class="handle-button-icon">
+              {#if isHandleButtonToggled}
+                <use href="/src/lib/assets/common/person_FILL.svg#person_FILL"
+                ></use>
+              {:else}
+                <use href="/src/lib/assets/common/person.svg#person"></use>
+              {/if}
+            </svg>
+            <div class="centered-selected-handle">
+              <span class="selected-handle">{selectedHandleId}</span>
+            </div>
+          </div>
+          <div class="share-button">
+            <span class="share-button-label">{_("share")}</span>
           </div>
         </div>
       </div>
@@ -284,6 +344,14 @@
     <div class="padding"></div>
   </div>
 </div>
+
+{#if isHandleButtonToggled}
+  <HandlesMenu
+    bind:this={menu}
+    basePoint={handleButtonRef.getBoundingClientRect()}
+    {onSelectHandle}
+  />
+{/if}
 
 <div class="overlay"></div>
 
@@ -432,7 +500,8 @@
     cursor: default;
   }
 
-  .icon-button:not(:disabled):hover {
+  .icon-button:not(:disabled):hover,
+  .icon-button-toggled {
     background-color: var(--dominant-color-hover);
   }
 
@@ -466,6 +535,64 @@
   .characters-limit {
     color: var(--light-gray);
     font-family: Roboto;
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+  }
+
+  .handle-button {
+    border-radius: 100vmax;
+    display: flex;
+    padding: 0.375rem 0.5rem 0.375rem 0.25rem;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .handle-button:hover,
+  .handle-button-toggled {
+    background-color: var(--dominant-color-hover);
+  }
+
+  .handle-button-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .centered-selected-handle {
+    display: flex;
+    padding-top: 0.0625rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .selected-handle {
+    color: var(--secondary-color);
+    font-family: var(--primary-font);
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+  }
+
+  .share-button {
+    height: 2.25rem;
+    min-width: 4rem;
+    padding: 0.5rem 0.5rem 0.4375rem 0.5rem;
+    border-radius: 100vmax;
+    background-color: var(--secondary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .share-button:hover {
+    background-color: var(--secondary-color-hover);
+  }
+
+  .share-button-label {
+    color: var(--dominant-color);
+    font-family: var(--primary-font);
     font-size: 0.9375rem;
     line-height: 1.25rem;
   }
