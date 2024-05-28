@@ -24,6 +24,7 @@
   import { registerInteractHandler } from "$lib/utils.svelte";
     import { apparentCharactersCosts } from "$lib/cjk.svelte";
     import SoundCloudLinkDialog from "./SoundCloudLinkDialog.svelte";
+    import { tooltip } from "../tooltip/useTooltip.svelte";
 
   $effect(() => {
     init();
@@ -212,7 +213,8 @@
           <button
             class="icon-button"
             disabled={!canInsertTitle()}
-            onclick={() => insertHeadingNode()}>
+            onclick={() => insertHeadingNode()}
+            use:tooltip={_("title")}>
             <svg class="icon">
               <use href="/src/lib/assets/common/title.svg#title"></use>
             </svg>
@@ -221,7 +223,7 @@
             class="icon-button"
             disabled={!canAddMedia()}
             onclick={onClickAddImageButton}
-          >
+            use:tooltip={_("image")}>
             <input
               bind:this={imageInputRef}
               type="file"
@@ -237,7 +239,8 @@
           <button
             bind:this={soundcloudLinkDialogData.buttonRef}
             class="icon-button"
-            disabled={!canAddMedia()}>
+            disabled={!canAddMedia()}
+            use:tooltip={_("audio")}>
             <svg class="icon">
               <use href="/src/lib/assets/common/music_note.svg#music_note"
               ></use>
@@ -254,7 +257,7 @@
             bind:this={youtubeLinkDialogData.buttonRef}
             class="icon-button"
             disabled={!canAddMedia()}
-          >
+            use:tooltip={_("video")}>
             <svg class="icon">
               <use href="/src/lib/assets/common/smart_display.svg#smart_display"
               ></use>

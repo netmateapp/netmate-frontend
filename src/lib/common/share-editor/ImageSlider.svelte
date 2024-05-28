@@ -15,6 +15,7 @@
     import { _ } from "./editor.svelte";
     import { dispatchDeleteSlideCommand } from "./lexical-editor";
     import { IDENTITY_ATTRIBUTE, IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA } from "./image-slide-plugin.svelte";
+    import { tooltip } from "../tooltip/useTooltip.svelte";
 
     let { imagesPaths, nodeKey }: { imagesPaths: string[], nodeKey: string } = $props();
 
@@ -161,7 +162,8 @@
     <button
       class="edit-slider-button"
       onclick={onClickAddImageButton}
-      disabled={!canAddImage()}>
+      disabled={!canAddImage()}
+      use:tooltip={_("add-image")}>
       <svg class="edit-slider-button-icon">
         <use href="/src/lib/assets/common/add.svg#add"></use>
       </svg>
@@ -175,7 +177,8 @@
       onchange={onInputImageFiles} />
     <button
       class="edit-slider-button"
-      onclick={onClickRemoveImageButton}>
+      onclick={onClickRemoveImageButton}
+      use:tooltip={_("remove-image")}>
       <svg class="edit-slider-button-icon">
         <use href="/src/lib/assets/common/remove.svg#remove"></use>
       </svg>
