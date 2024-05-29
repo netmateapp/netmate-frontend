@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { apparentCharactersCosts, calculateCharactersCosts } from "$lib/cjk.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
     import { tooltip } from "../tooltip/useTooltip.svelte";
   import OperateHandleMenu from "./OperateHandleMenu.svelte";
@@ -119,10 +120,23 @@
   registerInteractHandler(handleInteractEvent);
 
   let newHandle = $state("");
-  const HANDLE_LENGTH_LIMIT = 100;
+  const HANDLE_CHARACTERS_COSTS_LIMIT = 100;
 
-  function currentCharactersCount() {
-    return (isEditingHandle ? inputValue : newHandle).length;
+  function currentHandleCharactersCosts(): number {
+    const handle = (isEditingHandle ? inputValue : newHandle)
+    return calculateCharactersCosts(handle);
+  }
+
+  function isHandleCharactersCostsLimitOver(): boolean {
+    return currentHandleCharactersCosts() > HANDLE_CHARACTERS_COSTS_LIMIT;
+  }
+
+  function apparentHandleCharactersCostsLimit(): number {
+    return apparentCharactersCosts(HANDLE_CHARACTERS_COSTS_LIMIT);
+  }
+
+  function apparentCurrentHandleCharactersCosts(): number {
+    return apparentCharactersCosts(currentHandleCharactersCosts());
   }
 
   function shouldDisplayCharactersCount(): boolean {
@@ -196,9 +210,8 @@
       <div class="bottomed-characters-counter">
         <span
           class="count"
-          class:limit-over={(isEditingHandle ? inputValue : newHandle).length >
-            HANDLE_LENGTH_LIMIT}>{currentCharactersCount()}</span>
-        <span class="limit">/{HANDLE_LENGTH_LIMIT}</span>
+          class:limit-over={isHandleCharactersCostsLimitOver()}>{apparentCurrentHandleCharactersCosts()}</span>
+        <span class="limit">/{apparentHandleCharactersCostsLimit()}</span>
       </div>
     {/if}
   </div>
