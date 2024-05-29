@@ -4,7 +4,7 @@ import type { LexicalEditor } from "lexical";
 
 let _canShowPlaceholder = $state(true);
 
-export function canShowPlaceholder(): boolean {
+export function canShowContentPlaceholder(): boolean {
   return _canShowPlaceholder;
 }
 
