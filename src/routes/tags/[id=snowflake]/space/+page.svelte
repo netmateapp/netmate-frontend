@@ -1,10 +1,10 @@
 <script lang="ts">
-  import Brand from "$lib/common/brand/Brand.svelte";
-  import Navigation from "$lib/common/navigation/Navigation.svelte";
-  import SearchBox from "$lib/common/search-box/SearchBox.svelte";
-    import OpenShareEditorButton from "$lib/common/share-editor/OpenShareEditorButton.svelte";
-  import ShareEditor from "$lib/common/share-editor/ShareEditor.svelte";
-    import { registerInteractHandler } from "$lib/utils.svelte";
+  import Brand from "$lib/components/common/brand/Brand.svelte";
+  import Navigation from "$lib/components/common/navigation/Navigation.svelte";
+  import SearchBox from "$lib/components/common/search-box/SearchBox.svelte";
+  import OpenShareEditorButton from "$lib/components/common/share-editor/OpenShareEditorButton.svelte";
+  import ShareEditor from "$lib/components/common/share-editor/ShareEditor.svelte";
+  import { registerInteractHandler } from "$lib/utils.svelte";
 
   let isShareEditorVisible = $state(true);
   let shareEditor: MaybeComponent = $state(null);
