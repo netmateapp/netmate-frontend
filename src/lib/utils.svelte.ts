@@ -1,6 +1,6 @@
-export function registerInteractHandler(handler: (event: InteractEvent) => void, useCapture: boolean = false) {
+export function registerInteractHandler(handler: (event: InteractEvent) => void) {
   $effect(() => {
-    document.addEventListener("click", handler, useCapture);
+    document.addEventListener("click", handler);
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       switch (event.key) {
         case "Space":
@@ -11,7 +11,7 @@ export function registerInteractHandler(handler: (event: InteractEvent) => void,
         default:
           break;
       }
-    }, useCapture);
+    });
   });
 }
 
