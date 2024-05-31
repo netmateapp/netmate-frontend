@@ -1,12 +1,12 @@
 <script lang="ts" context="module">
-  // メディア関連
+  // メディア関連定数
   export const MAX_MEDIA_COUNT = 4;
-  export const MEDIA_COUNT = new ReactiveStore(0);
+  export const TITLE_COSTS_LIMIT = 48;
 
+  // メディア関連リアクティブ変数
+  export const MEDIA_COUNT = new ReactiveStore(0);
   export const CURSOR_AT_FIRST_LINE_START = new ReactiveStore(true);
   export const HAS_TITLE = new ReactiveStore(false);
-
-  export const TITLE_COSTS_LIMIT = 48;
 </script>
 
 <script src="lexical-editor.ts" lang="ts">
@@ -35,6 +35,13 @@
   });
 
   let { closeEditor }: { closeEditor: () => void } = $props();
+
+  function closeShareEditor() {
+    closeEditor();
+    MEDIA_COUNT.reactiveValue = 0;
+    CURSOR_AT_FIRST_LINE_START.reactiveValue = true;
+    HAS_TITLE.reactiveValue = false;
+  }
 
   let shareEditorRef: MaybeHTMLElement = $state(null);
   export function getShareEditorRef(): MaybeHTMLElement {
@@ -221,7 +228,7 @@
       || youtubeLinkDialogData.dialog?.contains(element)
       || soundcloudLinkDialogData.dialog?.contains(element)
       || handlesMenu?.contains(element)
-      || !isEditorEmpty();
+      || !isEditorEmpty(); // isEditorEmpty()はisConfirmDialogVisibleの代わり
   }
 
   function isEditorEmpty(): boolean {
@@ -232,18 +239,19 @@
   let confirmDialog: MaybeComponent = $state(null);
   function handleInteractEvent(event: InteractEvent) {
     const target = event.target as Element;
-    console.log("editor");
     if (isConfirmDialogVisible) {
       if (!confirmDialog?.dialogRef()?.contains(target)) {
         closeConfirmDialog();
       }
     } else {
-      if (!shareEditorRef?.contains(target)) {
+      if (!(shareEditorRef?.contains(target)
+      || youtubeLinkDialogData.dialog?.contains(target)
+      || soundcloudLinkDialogData.dialog?.contains(target)
+      || handlesMenu?.contains(target))) {
         if (!isEditorEmpty()) isConfirmDialogVisible = true;
       }
     }
   }
-  //registerInteractHandler(handleInteractEvent);
 
   interactHandlersEffect(
     onClickAddYouTubeButton,
@@ -394,7 +402,7 @@
 {/if}
 
 {#if isConfirmDialogVisible}
-  <ConfirmDialog bind:this={confirmDialog} title={_("discard-edit-dialog-title")} description={_("discard-edit-dialog-message")} actionName={_("discard")} action={closeEditor} close={closeConfirmDialog} />
+  <ConfirmDialog bind:this={confirmDialog} title={_("discard-edit-dialog-title")} description={_("discard-edit-dialog-message")} actionName={_("discard")} action={closeShareEditor} close={closeConfirmDialog} />
 {/if}
 
 <style>

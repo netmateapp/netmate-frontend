@@ -137,12 +137,13 @@
   }
 
   // 画像削除ボタン関連
-  function onClickRemoveImageButton() {
+  function onClickRemoveImageButton(event: InteractEvent) {
     console.log("remove");
     const imagesCount = imagesPaths.length;
     if (imagesCount == 1) {
       const key = sliderEditorRef?.parentElement?.getAttribute(IDENTITY_ATTRIBUTE);
       if (key) dispatchDeleteSlideCommand(key);
+      event.stopPropagation();
     } else {
       if (currentIndex == (imagesCount - 1)) {
         currentIndex--;

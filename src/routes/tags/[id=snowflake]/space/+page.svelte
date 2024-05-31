@@ -11,7 +11,6 @@
   let openShareEditorButton: MaybeComponent = $state(null);
   function handleInteractEvent(event: InteractEvent) {
     const target = event.target as Element;
-    console.log("page");
     if (isShareEditorVisible) {
       if (!shareEditor?.contains(target)) isShareEditorVisible = false;
     } else {
