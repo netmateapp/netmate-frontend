@@ -1,14 +1,12 @@
 <script lang="ts">
-  import { hideTooltip, tooltip } from "$lib/common/tooltip/useTooltip.svelte";
-  import { createTranslator } from "../../i18n.svelte";
+  import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
     import { registerInteractHandler } from "$lib/utils.svelte";
     import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
+    import { _ } from "./nav.svelte";
 
   function hasUnreadAnnouncements(): boolean {
     return true;
   }
-
-  const _ = createTranslator("common", "navigation");
 
   let isToggled: boolean = $state(false);
   let buttonRef: MaybeElement = $state(null);

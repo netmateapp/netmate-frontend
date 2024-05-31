@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { hideTooltip, tooltip } from "$lib/common/tooltip/useTooltip.svelte";
+  import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
   import MainMenu from "./MainMenu.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
-  import { createTranslator } from "$lib/i18n.svelte";
-
-  const _ = createTranslator("common", "navigation");
+    import { _ } from "./nav.svelte";
 
   let isToggled = $state(false);
 

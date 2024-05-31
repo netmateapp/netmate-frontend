@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { createTranslator } from "../../i18n.svelte";
-  import { calculateMenuPosition } from "./nav.svelte";
+  import { _, calculateMenuPosition } from "./nav.svelte";
   import LanguageMenu from "./LanguageMenu.svelte";
   import LocationMenu from "./LocationMenu.svelte";
     import { registerInteractHandler } from "$lib/utils.svelte";
     import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
-
-  const _ = createTranslator("common", "navigation");
 
   let mainMenuRef: MaybeElement = $state(null);
   let { basePoint }: { basePoint: DOMRect} = $props();

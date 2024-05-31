@@ -1,7 +1,7 @@
 <script lang="ts">
   import { _, calculateMenuPosition } from "../editor.svelte";
 
-    // タグ関連
+  // タグ関連
   class Tag {
     constructor(
       public id: string,

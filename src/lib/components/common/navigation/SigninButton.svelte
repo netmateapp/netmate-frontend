@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { createTranslator } from "../../i18n.svelte";
-
-  const _ = createTranslator("common", "navigation");
+  import { _ } from "./nav.svelte";
 </script>
 
 <a href="https://netmate.app/signin" class="button">

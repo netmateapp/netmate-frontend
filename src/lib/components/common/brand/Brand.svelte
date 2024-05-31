@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createTranslator } from "../../i18n.svelte";
+  import { createTranslator } from "$lib/i18n.svelte";
 
   export let x: number, y: number;
 

@@ -1,8 +1,5 @@
 <script lang="ts">
-  import { createTranslator } from "../../i18n.svelte";
-  import { calculateMenuPosition } from "./nav.svelte";
-
-  const _ = createTranslator("common", "navigation");
+  import { _, calculateMenuPosition } from "./nav.svelte";
 
   const LOCATIONS = ["japan", "korea", "taiwan", "united-states"];
 
