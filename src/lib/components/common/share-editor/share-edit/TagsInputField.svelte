@@ -46,7 +46,7 @@
     clearInterval(debounceTimer);
     if (inputValue.includes("　")) {
       //confirmTagInput(event, input);
-      console.log("zenkaku");
+      //console.log("zenkaku");
       return;
     }
 
@@ -85,8 +85,6 @@
 
     // fetch(search?query=...)
     // then(data => displaySuggestions(data))
-    canDisplayTagSuggestions = true;
-
     suggestionFor = input;
     suggestedTags = [
       new Tag("aaa", query + "aaaa"),
@@ -124,10 +122,9 @@
     closeTagSuggestions();
     runWithoutBlurEvent(() => input.getRef().blur());
     if (!isInputEmpty(input)) {
-      if (!isTagLimitReached()) {
-        if (isLastInputEmpty()) {
+      if (isLastInputEmpty()) {
           lastInput().getRef().focus();
-        } else {
+        } else if (!isTagLimitReached()) {
           const newInput = appendNewTagInput();
           if (cause !== "click") {
             setSuggestionsFor(newInput);
@@ -137,7 +134,6 @@
             }, 100);
           }
         }
-      }
     } else {
       if (!isLastInput(input)) {
         const shouldAppendNewInput = !isLastInputEmpty();
