@@ -54,6 +54,9 @@
       "go-to-space": "スペースへ",
       "go-to-detabase": "データベースへ"
     },
+    "confirm-dialog": {
+      "cancel": "キャンセル"
+    },
     "share-editor": {
       "to-tag": "タグをつける…",
       "to-share-something": "なにかを共有する…",
