@@ -34,6 +34,7 @@
   const TAG_CHARACTERS_COSTS_LIMIT = 100;
   let tagInputs: TagInput[] = $state([new TagInput()]);
 
+  // リアクティブである必要
   function shouldDisplayTagPlaceholder(): boolean {
     return tagInputs.length < 2 && tagInputs[0].value === "";
   }
@@ -43,8 +44,9 @@
   function onInputTag(event: InputEvent, input: TagInput) {
     const inputValue = (event.target as HTMLInputElement).value;
     clearInterval(debounceTimer);
-    if (inputValue.charAt(inputValue.length - 1) === "　") {
+    if (inputValue.includes("　")) {
       //confirmTagInput(event, input);
+      console.log("zenkaku");
       return;
     }
 
@@ -62,7 +64,7 @@
     tempSpan.style.fontSize = getComputedStyle(input).fontSize;
     tempSpan.style.fontFamily = getComputedStyle(input).fontFamily;
     tempSpan.style.fontWeight = getComputedStyle(input).fontWeight;
-    tempSpan.textContent = input.value || input.placeholder;
+    tempSpan.textContent = input.value;
 
     document.body.appendChild(tempSpan);
 
@@ -110,11 +112,14 @@
   }
 
   function onBlurTagInput(input: TagInput) {
-    canDisplayTagSuggestions = false;
+    if (shouldIgnoreBlurEvent) return;
+    //canDisplayTagSuggestions = false;
+    confirmInput(input, "click");
   }
 
   type ConfirmCause = "enter" | "space" | "click";
 
+  // タグ入力を快適に行えるようにするための処理
   function confirmInput(input: TagInput, cause: ConfirmCause) {
     closeTagSuggestions();
     runWithoutBlurEvent(() => input.getRef().blur());
@@ -208,7 +213,7 @@
   {#if shouldDisplayTagPlaceholder()}
     <div class="placeholder">{_("to-tag")}</div>
   {/if}
-  {#each tagInputs as tagInput}
+  {#each tagInputs as tagInput (tagInput)}
     <input
       bind:this={tagInput.ref}
       class="tag"

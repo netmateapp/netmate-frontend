@@ -19,14 +19,14 @@
   import { canShowContentPlaceholder } from "./placeholder-plugin.svelte";
   import { ReactiveStore } from "$lib/stores.svelte";
   import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
-  import { _, calculateMenuPosition } from "./editor.svelte";
+  import { _ } from "./editor.svelte";
   import { toast } from "../toast/useToast.svelte";
   import { registerInteractHandler } from "$lib/utils.svelte";
   import { apparentCharactersCosts } from "$lib/cjk.svelte";
   import SoundCloudLinkDialog from "./SoundCloudLinkDialog.svelte";
   import { hideTooltip, tooltip } from "../tooltip/useTooltip.svelte";
   import HandlesMenu from "./HandlesMenu.svelte";
-    import TagsInputField from "./share-edit/TagsInputField.svelte";
+  import TagsInputField from "./share-edit/TagsInputField.svelte";
 
   $effect(() => {
     init();
