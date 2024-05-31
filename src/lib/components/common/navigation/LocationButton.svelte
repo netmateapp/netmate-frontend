@@ -1,6 +1,6 @@
 <script lang="ts">
     import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
-  import { registerInteractHandler } from "$lib/utils.svelte";
+  import { interactHandlersEffect, registerIntHandler } from "$lib/utils.svelte";
   import LocationMenu from "./LocationMenu.svelte";
     import { _ } from "./nav.svelte";
 
@@ -25,7 +25,7 @@
     }
   }
 
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 </script>
 
 <button

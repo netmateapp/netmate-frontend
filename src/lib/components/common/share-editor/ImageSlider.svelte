@@ -138,6 +138,7 @@
 
   // 画像削除ボタン関連
   function onClickRemoveImageButton() {
+    console.log("remove");
     const imagesCount = imagesPaths.length;
     if (imagesCount == 1) {
       const key = sliderEditorRef?.parentElement?.getAttribute(IDENTITY_ATTRIBUTE);

@@ -1,8 +1,11 @@
 <script lang="ts">
-  import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
-    import { registerInteractHandler } from "$lib/utils.svelte";
-    import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
-    import { _ } from "./nav.svelte";
+  import {
+    hideTooltip,
+    tooltip,
+  } from "$lib/components/common/tooltip/useTooltip.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
+  import { _ } from "./nav.svelte";
 
   function hasUnreadAnnouncements(): boolean {
     return true;
@@ -22,14 +25,15 @@
       }
     }
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 </script>
 
 <button
   bind:this={buttonRef}
   class="button"
   class:toggle={isToggled}
-  use:tooltip={_("announcements-button-tooltip")}>
+  use:tooltip={_("announcements-button-tooltip")}
+>
   <svg class="icon" class:unread={hasUnreadAnnouncements()}>
     {#if isToggled}
       <use href="/src/lib/assets/common/info_FILL.svg#info_FILL"></use>
@@ -40,7 +44,10 @@
 </button>
 
 {#if isToggled}
-  <AnnouncementsMenu bind:this={menu} basePoint={buttonRef.getBoundingClientRect()} />
+  <AnnouncementsMenu
+    bind:this={menu}
+    basePoint={buttonRef.getBoundingClientRect()}
+  />
 {/if}
 
 <style>
@@ -56,7 +63,8 @@
     cursor: pointer;
   }
 
-  .button:hover, .toggle {
+  .button:hover,
+  .toggle {
     background-color: var(--dominant-color-hover);
   }
 

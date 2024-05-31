@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { registerInteractHandler } from "$lib/utils.svelte";
-    import DeleteHandleDialog from "./DeleteHandleDialog.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import DeleteHandleDialog from "./DeleteHandleDialog.svelte";
   import { _, calculateMenuPosition } from "./nav.svelte";
 
   let { basePoint, handleId, onEdit }: { basePoint: DOMRect, handleId: string, onEdit: () => void } = $props();
@@ -39,7 +39,7 @@
       }*/
     }
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 
   function closeDeleteHandleDialog() {
     isToggled = false;

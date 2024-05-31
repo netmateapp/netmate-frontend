@@ -21,16 +21,20 @@
   import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
   import { _ } from "./editor.svelte";
   import { toast } from "../toast/useToast.svelte";
-  import { registerInteractHandler } from "$lib/utils.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
   import { apparentCharactersCosts } from "$lib/cjk.svelte";
   import SoundCloudLinkDialog from "./SoundCloudLinkDialog.svelte";
   import { hideTooltip, tooltip } from "../tooltip/useTooltip.svelte";
   import HandlesMenu from "./HandlesMenu.svelte";
   import TagsInputField from "./share-edit/TagsInputField.svelte";
+    import Overlay from "../confirm-dialog/Overlay.svelte";
+    import ConfirmDialog from "../confirm-dialog/ConfirmDialog.svelte";
 
   $effect(() => {
     init();
   });
+
+  let { closeEditor }: { closeEditor: () => void } = $props();
 
   let shareEditorRef: MaybeHTMLElement = $state(null);
   export function getShareEditorRef(): MaybeHTMLElement {
@@ -186,19 +190,15 @@
     youtubeLinkDialogData.isVisible = false;
   }
 
-  [onClickAddYouTubeButton, onClickAddSoundCloudButton].forEach(
-    registerInteractHandler,
-  );
-
   // 名義選択ボタン関連
   let isHandleButtonToggled = $state(false);
   let handleButtonRef: MaybeElement = $state(null);
-  let menu: MaybeComponent = $state(null);
+  let handlesMenu: MaybeComponent = $state(null);
   let selectedHandleId = $state(lastUsedHandle());
   function onClickHandleButton(event: InteractEvent) {
     const element = event.target as Element;
     if (isHandleButtonToggled) {
-      if (!menu.contains(element)) isHandleButtonToggled = false;
+      if (!handlesMenu?.contains(element)) isHandleButtonToggled = false;
     } else {
       if (handleButtonRef?.contains(element)) {
         hideTooltip();
@@ -215,8 +215,49 @@
     selectedHandleId = handleId;
     isHandleButtonToggled = false;
   }
-  registerInteractHandler(onClickHandleButton);
+
+  export function contains(element: Element): boolean {
+    return shareEditorRef?.contains(element)
+      || youtubeLinkDialogData.dialog?.contains(element)
+      || soundcloudLinkDialogData.dialog?.contains(element)
+      || handlesMenu?.contains(element)
+      || !isEditorEmpty();
+  }
+
+  function isEditorEmpty(): boolean {
+    return currentCharactersCosts() === 0 && MEDIA_COUNT.reactiveValue === 0;
+  }
+
+  let isConfirmDialogVisible = $state(false);
+  let confirmDialog: MaybeComponent = $state(null);
+  function handleInteractEvent(event: InteractEvent) {
+    const target = event.target as Element;
+    console.log("editor");
+    if (isConfirmDialogVisible) {
+      if (!confirmDialog?.dialogRef()?.contains(target)) {
+        closeConfirmDialog();
+      }
+    } else {
+      if (!shareEditorRef?.contains(target)) {
+        if (!isEditorEmpty()) isConfirmDialogVisible = true;
+      }
+    }
+  }
+  //registerInteractHandler(handleInteractEvent);
+
+  interactHandlersEffect(
+    onClickAddYouTubeButton,
+    onClickAddSoundCloudButton,
+    onClickHandleButton,
+    handleInteractEvent
+  )();
+  
+  function closeConfirmDialog() {
+    isConfirmDialogVisible = false;
+  }
 </script>
+
+<Overlay />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
@@ -346,25 +387,17 @@
 
 {#if isHandleButtonToggled}
   <HandlesMenu
-    bind:this={menu}
+    bind:this={handlesMenu}
     basePoint={handleButtonRef.getBoundingClientRect()}
     {onSelectHandle}
   />
 {/if}
 
-<div class="overlay"></div>
+{#if isConfirmDialogVisible}
+  <ConfirmDialog bind:this={confirmDialog} title={_("discard-edit-dialog-title")} description={_("discard-edit-dialog-message")} actionName={_("discard")} action={closeEditor} close={closeConfirmDialog} />
+{/if}
 
 <style>
-  .overlay {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.1);
-    z-index: 1;
-  }
-
   :global(a) {
     color: var(--accent-color);
   }
@@ -397,7 +430,7 @@
     width: 1px;
     flex: 1 0 0;
     min-height: 1rem;
-    max-height: 35vh;
+    max-height: 37vh;
   }
 
   .padding {

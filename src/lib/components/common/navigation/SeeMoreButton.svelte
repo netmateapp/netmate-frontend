@@ -1,8 +1,8 @@
 <script lang="ts">
   import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
   import MainMenu from "./MainMenu.svelte";
-  import { registerInteractHandler } from "$lib/utils.svelte";
-    import { _ } from "./nav.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import { _ } from "./nav.svelte";
 
   let isToggled = $state(false);
 
@@ -21,7 +21,7 @@
     }
   }
 
-  registerInteractHandler(handleInteract);
+  interactHandlersEffect(handleInteract);
 </script>
 
 <button

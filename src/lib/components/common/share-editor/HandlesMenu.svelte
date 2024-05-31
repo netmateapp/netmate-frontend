@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { apparentCharactersCosts, calculateCharactersCosts } from "$lib/cjk.svelte";
-  import { registerInteractHandler } from "$lib/utils.svelte";
+  import { apparentCharactersCosts, calculateCharactersCosts } from "$lib/cjk.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
   import { hideTooltip, tooltip } from "../tooltip/useTooltip.svelte";
   import OperateHandleMenu from "./OperateHandleMenu.svelte";
   import { _, calculateMenuPosition } from "./editor.svelte";
@@ -123,7 +123,7 @@
       }
     }
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 
   let newHandle = $state("");
   const HANDLE_CHARACTERS_COSTS_LIMIT = 100;

@@ -1,7 +1,10 @@
 <script lang="ts">
-    import { apparentCharactersCosts, calculateCharactersCosts } from "$lib/cjk.svelte";
-  import { registerInteractHandler } from "$lib/utils.svelte";
-    import { tooltip } from "../tooltip/useTooltip.svelte";
+  import {
+    apparentCharactersCosts,
+    calculateCharactersCosts,
+  } from "$lib/cjk.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import { tooltip } from "../tooltip/useTooltip.svelte";
   import OperateHandleMenu from "./OperateHandleMenu.svelte";
   import { _, calculateMenuPosition } from "./nav.svelte";
 
@@ -117,13 +120,13 @@
       }
     }
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 
   let newHandle = $state("");
   const HANDLE_CHARACTERS_COSTS_LIMIT = 100;
 
   function currentHandleCharactersCosts(): number {
-    const handle = (isEditingHandle ? inputValue : newHandle)
+    const handle = isEditingHandle ? inputValue : newHandle;
     return calculateCharactersCosts(handle);
   }
 
@@ -144,7 +147,9 @@
   }
 
   function newHandleInputPlaceholder(): string {
-    return canCreateNewHandle() ? "new-handle-input-placeholder" : "creation-limit-reached";
+    return canCreateNewHandle()
+      ? "new-handle-input-placeholder"
+      : "creation-limit-reached";
   }
 </script>
 
@@ -200,17 +205,19 @@
   <div class="new-handle-input">
     <div class="centered-input">
       <input
-      class="input"
-      placeholder={_(newHandleInputPlaceholder())}
-      bind:value={newHandle}
-      disabled={!canCreateNewHandle()}
-    />
+        class="input"
+        placeholder={_(newHandleInputPlaceholder())}
+        bind:value={newHandle}
+        disabled={!canCreateNewHandle()}
+      />
     </div>
     {#if shouldDisplayCharactersCount()}
       <div class="bottomed-characters-counter">
         <span
           class="count"
-          class:limit-over={isHandleCharactersCostsLimitOver()}>{apparentCurrentHandleCharactersCosts()}</span>
+          class:limit-over={isHandleCharactersCostsLimitOver()}
+          >{apparentCurrentHandleCharactersCosts()}</span
+        >
         <span class="limit">/{apparentHandleCharactersCostsLimit()}</span>
       </div>
     {/if}

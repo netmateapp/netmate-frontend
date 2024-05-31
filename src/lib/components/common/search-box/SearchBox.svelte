@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-  import { registerInteractHandler } from "$lib/utils.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
 
   const _ = createTranslator("common", "search-box");
 
@@ -50,7 +50,7 @@
       if (!isInteractInsideSearchBox(element)) isActive = false;
     }
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 </script>
 
 <div

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { registerInteractHandler } from "$lib/utils.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import Overlay from "../confirm-dialog/Overlay.svelte";
   import { _ } from "./nav.svelte";
 
   let { handleId, closeDialog }: { handleId: string, closeDialog: () => void } = $props();
@@ -22,7 +23,7 @@
   function handleInteractEvent(event: InteractEvent) {
     if (cancelButton?.contains(event.target as Element)) closeDialog();
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 
   let inputStr = $state("");
   function isInputSatisfied(): boolean {
@@ -32,7 +33,7 @@
   let cancelButton: MaybeElement = $state(null);
 </script>
 
-<div class="overlay"></div>
+<Overlay />
 
 <div bind:this={dialog} class="dialog">
   <div class="texts">
@@ -56,16 +57,6 @@
 </div>
 
 <style>
-  .overlay {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.1);
-    z-index: 1;
-  }
-
   .dialog {
     position: fixed;
     top: 50%;

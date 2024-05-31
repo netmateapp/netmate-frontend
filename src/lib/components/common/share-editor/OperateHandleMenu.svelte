@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { registerInteractHandler } from "$lib/utils.svelte";
-    import { _, calculateMenuPosition } from "./editor.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import { _, calculateMenuPosition } from "./editor.svelte";
 
   let { basePoint, onEdit }: { basePoint: DOMRect, handleId: string, onEdit: () => void } = $props();
 
@@ -23,7 +23,7 @@
       }
     }
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 </script>
 
 <div bind:this={menuRef} class="menu" style={calculateMenuPosition(basePoint, menuRef)}>

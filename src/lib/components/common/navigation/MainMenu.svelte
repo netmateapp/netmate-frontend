@@ -2,17 +2,19 @@
   import { _, calculateMenuPosition } from "./nav.svelte";
   import LanguageMenu from "./LanguageMenu.svelte";
   import LocationMenu from "./LocationMenu.svelte";
-    import { registerInteractHandler } from "$lib/utils.svelte";
-    import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
 
   let mainMenuRef: MaybeElement = $state(null);
-  let { basePoint }: { basePoint: DOMRect} = $props();
+  let { basePoint }: { basePoint: DOMRect } = $props();
 
   export function contains(element: Element): boolean {
-    return (mainMenuRef?.contains(element) ?? false)
-    || (languageMenu.menu?.contains(element) ?? false)
-    || (locationMenu.menu?.contains(element) ?? false)
-    || (announcementMenu.menu?.contains(element) ?? false);
+    return (
+      (mainMenuRef?.contains(element) ?? false) ||
+      (languageMenu.menu?.contains(element) ?? false) ||
+      (locationMenu.menu?.contains(element) ?? false) ||
+      (announcementMenu.menu?.contains(element) ?? false)
+    );
   }
 
   function isSignedIn(): boolean {
@@ -35,26 +37,29 @@
   let announcementMenu = new ChildMenuData();
 
   function handleInteractEvent(event: InteractEvent) {
-    [languageMenu, locationMenu, announcementMenu].forEach(menuData => {
-      if (menuData.itemRef?.contains(event.target as Element)) menuData.openMenu();
+    [languageMenu, locationMenu, announcementMenu].forEach((menuData) => {
+      if (menuData.itemRef?.contains(event.target as Element))
+        menuData.openMenu();
     });
   }
-  registerInteractHandler(handleInteractEvent);
+  interactHandlersEffect(handleInteractEvent)();
 </script>
 
 <div
   bind:this={mainMenuRef}
   class="menu"
-  style={calculateMenuPosition(basePoint, mainMenuRef)}>
+  style={calculateMenuPosition(basePoint, mainMenuRef)}
+>
   {#if isSignedIn()}
     <button class="item" bind:this={languageMenu.itemRef}>
-        <svg class="icon">
-          <use href="/src/lib/assets/common/translate.svg#translate"></use>
-        </svg>
+      <svg class="icon">
+        <use href="/src/lib/assets/common/translate.svg#translate"></use>
+      </svg>
       <span class="label">{_("language-item-label")}</span>
       <span class="spacer"></span>
       <svg class="icon">
-        <use href="/src/lib/assets/common/chevron_right.svg#chevron_right"></use>
+        <use href="/src/lib/assets/common/chevron_right.svg#chevron_right"
+        ></use>
       </svg>
     </button>
     <button class="item" bind:this={locationMenu.itemRef}>
@@ -64,7 +69,8 @@
       <span class="label">{_("location-item-label")}</span>
       <span class="spacer"></span>
       <svg class="icon">
-        <use href="/src/lib/assets/common/chevron_right.svg#chevron_right"></use>
+        <use href="/src/lib/assets/common/chevron_right.svg#chevron_right"
+        ></use>
       </svg>
     </button>
     <a href="https://netmate.app/settings" class="item">
@@ -89,21 +95,23 @@
   {/if}
   <div class="links">
     {#each ["terms", "privacy", "contact"] as itemName}
-      <a href="https://netmate.app/{itemName}" class="link">{_(itemName + "-link-label")}</a>
+      <a href="https://netmate.app/{itemName}" class="link"
+        >{_(itemName + "-link-label")}</a
+      >
     {/each}
   </div>
 </div>
 
 {#if languageMenu.isVisible}
-  <LanguageMenu bind:this={languageMenu.menu} basePoint={basePoint} />
+  <LanguageMenu bind:this={languageMenu.menu} {basePoint} />
 {/if}
 
 {#if locationMenu.isVisible}
-  <LocationMenu bind:this={locationMenu.menu} basePoint={basePoint} />
+  <LocationMenu bind:this={locationMenu.menu} {basePoint} />
 {/if}
 
 {#if announcementMenu.isVisible}
-  <AnnouncementsMenu bind:this={announcementMenu.menu} basePoint={basePoint} />
+  <AnnouncementsMenu bind:this={announcementMenu.menu} {basePoint} />
 {/if}
 
 <style>

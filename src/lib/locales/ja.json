@@ -76,7 +76,6 @@
       "discard-edit-dialog-title": "本当に編集内容を破棄しますか？",
       "discard-edit-dialog-message": "この操作は取り消せません。",
       "discard": "破棄",
-      "cancel": "キャンセル",
       "failed-to-add-media": "メディアは最大{limit}件まで含めることができます。",
       "failed-to-spell-title": "タイトルは最大{limit}文字まで含めることができます。",
       "failed-to-paste-image-slider": "含められるメディア数の上限{limit}を超えたため、画像の貼り付けに失敗しました。",
