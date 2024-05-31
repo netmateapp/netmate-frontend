@@ -234,7 +234,7 @@
     box-shadow: var(--soft-shadow);
     display: flex;
     width: 15rem;
-    padding: 0.5rem 0rem;
+    padding: 0.5rem 0rem 0.25rem 0rem;
     flex-direction: column;
     align-items: flex-start;
     z-index: 1;
@@ -293,10 +293,12 @@
   }
 
   .new-handle-input {
+    width: 100%;
     display: flex;
     padding: 0.375rem 0.75rem;
     align-items: flex-start;
     align-self: stretch;
+    justify-content: space-between;
   }
 
   .centered-input {
@@ -310,6 +312,7 @@
   }
 
   .input {
+    width: 100%;
     color: var(--secondary-color);
     font-family: var(--primary-font);
     font-size: 0.875rem;

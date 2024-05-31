@@ -36,9 +36,7 @@
   let menu: MaybeElement = $state(null);
   let operateHandleMenu: MaybeComponent = $state(null);
   export function contains(element: Element): boolean {
-    return (
-      (menu?.contains(element) ?? false) || operateHandleMenu?.contains(element)
-    );
+    return (menu?.contains(element) ?? false) || operateHandleMenu?.contains(element);
   }
 
   let isOperateHandleButtonToggled = $state(false);
@@ -243,7 +241,7 @@
     box-shadow: var(--soft-shadow);
     display: flex;
     width: 15rem;
-    padding: 0.5rem 0rem;
+    padding: 0.5rem 0rem 0.25rem 0rem;
     flex-direction: column;
     align-items: flex-start;
     z-index: 2;
@@ -305,6 +303,7 @@
   .new-handle-input {
     display: flex;
     padding: 0.375rem 0.75rem;
+    justify-content: space-between;
     align-items: flex-start;
     align-self: stretch;
   }
@@ -320,6 +319,7 @@
   }
 
   .input {
+    width: 100%;
     color: var(--secondary-color);
     font-family: var(--primary-font);
     font-size: 0.875rem;
