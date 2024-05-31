@@ -1,8 +1,11 @@
 <script lang="ts">
-    import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
-  import { interactHandlersEffect, registerIntHandler } from "$lib/utils.svelte";
+  import {
+    hideTooltip,
+    tooltip,
+  } from "$lib/components/common/tooltip/useTooltip.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
   import LocationMenu from "./LocationMenu.svelte";
-    import { _ } from "./nav.svelte";
+  import { _ } from "./nav.svelte";
 
   function selectedLocation() {
     return "JA";
@@ -32,7 +35,8 @@
   bind:this={buttonRef}
   class="button"
   class:toggle={isToggled}
-  use:tooltip={_("location-button-tooltip")}>
+  use:tooltip={_("location-button-tooltip")}
+>
   <svg class="icon">
     <use href="/src/lib/assets/common/public.svg#public"></use>
   </svg>
@@ -40,7 +44,10 @@
 </button>
 
 {#if isToggled}
-  <LocationMenu bind:this={menuRef} basePoint={buttonRef.getBoundingClientRect()} />
+  <LocationMenu
+    bind:this={menuRef}
+    basePoint={buttonRef.getBoundingClientRect()}
+  />
 {/if}
 
 <style>
@@ -55,7 +62,8 @@
     cursor: pointer;
   }
 
-  .button:hover, .toggle {
+  .button:hover,
+  .toggle {
     background-color: var(--dominant-color-hover);
   }
 

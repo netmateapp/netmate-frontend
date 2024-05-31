@@ -434,9 +434,9 @@
   }
 
   .padding {
-    height: 1rem;
+    height: 100%;
     width: 1px;
-    flex-shrink: 0;
+    flex: 1 0 0;
   }
 
   .share-editor {

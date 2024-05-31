@@ -31,22 +31,6 @@ export function interactHandlersEffect(...handlers: ((event: InteractEvent) => v
   };
 }
 
-export function unregisterInteractHandler(handler: (event: InteractEvent) => void) {
-  document.removeEventListener("click", handler);
-  /*document.removeEventListener("keydown", (event: KeyboardEvent) => {
-    console.log("key");
-    switch (event.key) {
-      case "Space":
-        event.preventDefault();
-      case "Enter":
-        handler(event);
-        break;
-      default:
-        break;
-    }
-  });*/
-}
-
 /*export function registerCloseHandler(handler: () => void) {
   $effect(() => {
     document.addEventListener("keydown", (event: KeyboardEvent) => {
