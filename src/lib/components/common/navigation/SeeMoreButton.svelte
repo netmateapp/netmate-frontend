@@ -21,7 +21,7 @@
     }
   }
 
-  interactHandlersEffect(handleInteract);
+  interactHandlersEffect(handleInteract)();
 </script>
 
 <button
