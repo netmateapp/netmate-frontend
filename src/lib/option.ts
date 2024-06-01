@@ -1,6 +1,8 @@
 export interface Option<Value> {
   flatMap<MappedValue>(map: (value: Value) => Option<MappedValue>): Option<MappedValue>;
   map<MappedValue>(map: (value: Value) => MappedValue): Option<MappedValue>;
+  isSome(): this is Some<Value>;
+  isNone(): this is None<Value>;
 }
 
 export abstract class AbstractOption<Value> implements Option<Value> {
@@ -8,6 +10,14 @@ export abstract class AbstractOption<Value> implements Option<Value> {
   
   map<MappedValue>(map: (value: Value) => MappedValue): Option<MappedValue> {
     return this.flatMap(value => some(map(value)));
+  }
+
+  isSome(): this is Some<Value> {
+    return this instanceof Some;
+  }
+
+  isNone(): this is None<Value> {
+    return this instanceof None;
   }
 }
 
@@ -37,12 +47,4 @@ export function some<Value>(value: Value): Some<Value> {
 
 export function none<Value>(): None<Value> {
   return new None();
-}
-
-export function isSome<Value>(option: Option<Value>): option is Some<Value> {
-  return option instanceof Some;
-}
-
-export function isNone<Value>(option: Option<Value>): option is None<Value> {
-  return option instanceof None;
 }

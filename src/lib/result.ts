@@ -1,6 +1,8 @@
 export interface Result<Error, Value> {
   flatMap<MappedValue>(map: (value: Value) => Result<Error, MappedValue>): Result<Error, MappedValue>;
   map<MappedValue>(map: (value: Value) => MappedValue): Result<Error, MappedValue>;
+  isOk(): this is Ok<Error, Value>;
+  isErr(): this is Err<Error, Value>;
 }
 
 export abstract class AbstractResult<Error, Value> implements Result<Error, Value> {
@@ -8,6 +10,14 @@ export abstract class AbstractResult<Error, Value> implements Result<Error, Valu
 
   map<MappedValue>(map: (value: Value) => MappedValue): Result<Error, MappedValue> {
     return this.flatMap(value => ok(map(value)));
+  }
+
+  isOk(): this is Ok<Error, Value> {
+    return this instanceof Ok;
+  }
+
+  isErr(): this is Err<Error, Value> {
+    return this instanceof Err;
   }
 }
 
@@ -37,12 +47,4 @@ export function ok<Error, Value>(value: Value): Ok<Error, Value> {
 
 export function err<Error, Value>(error: Error): Err<Error, Value> {
   return new Err(error);
-}
-
-export function isOk<Error, Value>(result: Result<Error, Value>): result is Ok<Error, Value> {
-  return result instanceof Ok;
-}
-
-export function isErr<Error, Value>(result: Result<Error, Value>): result is Err<Error, Value> {
-  return result instanceof Err;
 }
