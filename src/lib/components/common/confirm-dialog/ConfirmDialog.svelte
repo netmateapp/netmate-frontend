@@ -17,11 +17,6 @@
     close: () => void;
   } = $props();
 
-  /*$effect(() => {
-    document.getElementsByClassName("description")[0].innerHTML =
-      description.replaceAll("\n", "<br>");
-  });*/
-
   const _ = createTranslator("common", "confirm-dialog");
 
   let dialog: MaybeHTMLElement = $state(null);

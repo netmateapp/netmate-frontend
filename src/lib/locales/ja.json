@@ -19,7 +19,7 @@
       "new-handle-input-placeholder": "名義を作成…",
       "creation-limit-reached": "作成上限に達しました",
       "announcements-button-tooltip": "お知らせ",
-      "elapsed-time-since-announcement": "{ unit, select, minutes {{t}分前} hours {{t}時間前} days {{t}日前} other {{t}週前} }",
+      "elapsed-time-since-announcement": "{ unit, select, minutes {{t}分前} hours {{t}時間前} days {{t}日前} weeks {{t}週前} other {不明} }",
       "see-more-button-tooltip": "もっと見る",
       "language-item-label": "言語",
       "location-item-label": "場所",
@@ -74,7 +74,7 @@
       "share": "共有する",
       "complete-edit": "編集を完了する",
       "discard-edit-dialog-title": "本当に編集内容を破棄しますか？",
-      "discard-edit-dialog-message": "この操作は取り消せません。",
+      "discard-edit-dialog-message": "この操作は取り消せません。\n内容を確認してください。",
       "discard": "破棄",
       "failed-to-add-media": "メディアは最大{limit}件まで含めることができます。",
       "failed-to-spell-title": "タイトルは最大{limit}文字まで含めることができます。",
@@ -87,6 +87,11 @@
       "new-handle-input-placeholder": "名義を作成…",
       "creation-limit-reached": "作成上限に達しました",
       "see-more-button-tooltip": "もっと見る"
+    },
+    "share": {
+      "conversations-count": "会話件数 {count} 件",
+      "timestamp": "{ unit, select, minutes {{t}分前} hours {{t}時間前} days {{t}日前} thisYear {{month}/{day} {hours}:{minutes}} other {{year}/{month}/{day} {hours}:{minutes}} }",
+      "more-button-tooltip": "もっと見る"
     }
   }
 }
