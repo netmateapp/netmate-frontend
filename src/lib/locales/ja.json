@@ -93,5 +93,13 @@
       "timestamp": "{ unit, select, minutes {{t}分前} hours {{t}時間前} days {{t}日前} thisYear {{month}/{day} {hours}:{minutes}} other {{year}/{month}/{day} {hours}:{minutes}} }",
       "more-button-tooltip": "もっと見る"
     }
+  },
+  "tag": {
+    "menu": {
+      "super-tags": "親タグ",
+      "equivalent-tags": "ペアタグ",
+      "sub-tags": "子タグ",
+      "search-and-add-tags": "タグを検索して追加"
+    }
   }
 }
