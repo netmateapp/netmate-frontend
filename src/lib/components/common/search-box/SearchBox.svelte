@@ -64,7 +64,6 @@
     </svg>
     <input
       class="query-input"
-      onfocus={() => (isActive = true)}
       bind:value={query}
     />
   </div>
