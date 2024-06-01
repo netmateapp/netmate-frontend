@@ -14,12 +14,6 @@
     return true;
   }
 
-  $effect(() => {
-    document.getElementsByClassName("message")[0].innerHTML = _(
-      "delete-dialog-message",
-    ).replaceAll("\n", "<br>");
-  });
-
   function handleInteractEvent(event: InteractEvent) {
     if (cancelButton?.contains(event.target as Element)) closeDialog();
   }
@@ -38,7 +32,7 @@
 <div bind:this={dialog} class="dialog">
   <div class="texts">
     <span class="title">{_("delete-dialog-title")}</span>
-    <div class="message"></div>
+    <div class="message">{_("delete-dialog-message")}</div>
     <input
       class="input"
       type="text"
@@ -47,7 +41,7 @@
     />
   </div>
   <div class="buttons">
-    <button class="action-button" class:active={isInputSatisfied()}>
+    <button class="action-button" disabled={!isInputSatisfied()}>
       <span class="action-button-label">{_("delete")}</span>
     </button>
     <button bind:this={cancelButton} class="cancel-button">
@@ -70,7 +64,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    z-index: 1;
+    z-index: 2;
   }
 
   .texts {
@@ -95,6 +89,7 @@
     font-family: font(--primary-font);
     font-size: 0.875rem;
     max-width: 17.5rem;
+    white-space: pre-wrap;
   }
 
   .input {
@@ -111,9 +106,16 @@
     color: var(--light-gray);
   }
 
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .action-button {
     border-radius: 100vmax;
-    background-color: var(--light-gray);
+    background-color: var(--warning-color);
     display: flex;
     height: 2.25rem;
     min-width: 7.5rem;
@@ -121,13 +123,15 @@
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
   }
 
-  .active {
-    background-color: var(--warning-color);
+  .action-button:disabled { 
+    background-color: var(--light-gray);
+    cursor: default;
   }
 
-  .active:hover {
+  .action-button:not(:disabled):hover {
     background-color: var(--warning-color-hover);
   }
 
@@ -135,13 +139,6 @@
     color: var(--dominant-color);
     font-family: var(--primary-font);
     font-size: 0.875rem;
-  }
-
-  .buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
   }
 
   .cancel-button {
@@ -154,6 +151,7 @@
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
   }
 
   .cancel-button:hover {

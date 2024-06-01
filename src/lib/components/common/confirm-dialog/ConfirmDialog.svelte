@@ -17,10 +17,10 @@
     close: () => void;
   } = $props();
 
-  $effect(() => {
+  /*$effect(() => {
     document.getElementsByClassName("description")[0].innerHTML =
       description.replaceAll("\n", "<br>");
-  });
+  });*/
 
   const _ = createTranslator("common", "confirm-dialog");
 
@@ -98,6 +98,7 @@
     color: var(--dark-gray);
     font-family: var(--primary-font);
     font-size: 0.875rem;
+    white-space: pre-wrap;
   }
 
   .buttons {
