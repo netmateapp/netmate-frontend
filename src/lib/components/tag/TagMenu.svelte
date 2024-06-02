@@ -1,14 +1,13 @@
 <script lang="ts">
-    import { calculateCharactersCosts } from "$lib/cjk.svelte";
-    import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
-    import { createTranslator } from "$lib/i18n.svelte";
-    import { Some, none, some, type Option } from "$lib/option";
-    import { Ok, err, ok, type Result } from "$lib/result";
-    import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
-    import { interactHandlersEffect } from "$lib/utils.svelte";
-    import { Uuid4 } from "$lib/uuid";
-
-  const _ = createTranslator("tag", "menu");
+  import { calculateCharactersCosts } from "$lib/cjk.svelte";
+  import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
+  import { Some, none, some, type Option } from "$lib/option";
+  import { Ok, err, ok, type Result } from "$lib/result";
+  import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import { Uuid4 } from "$lib/uuid";
+    import Guidelines from "./Guidelines.svelte";
+  import { _ } from "./tag.svelte";
 
   type TagRelation = "super" | "equivalent" | "sub";
 
@@ -91,7 +90,7 @@
   }
 
   function randomlyGenItemTagData4Test(): ItemTagData[] {
-    const tagsNames = ["早瀬ユウカ", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "夏の特殊作戦！RABBIT小隊と消えたエビの謎"];
+    const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
     const items = tagsNames
       .map(name => DisplayName.from(name))
       .filter(res => res.isOk())
@@ -203,6 +202,8 @@
   </div>
 </div>
 
+<Guidelines />
+
 <style>
   .menu {
     position: fixed;
@@ -284,6 +285,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+    overflow-y: scroll;
   }
 
   .tag-item {
