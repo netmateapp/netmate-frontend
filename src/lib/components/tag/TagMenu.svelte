@@ -2,7 +2,7 @@
     import { calculateCharactersCosts } from "$lib/cjk.svelte";
     import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
     import { createTranslator } from "$lib/i18n.svelte";
-    import { Some, none, type Option } from "$lib/option";
+    import { Some, none, some, type Option } from "$lib/option";
     import { Ok, err, ok, type Result } from "$lib/result";
     import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
     import { interactHandlersEffect } from "$lib/utils.svelte";
@@ -62,12 +62,15 @@
   type Vote = "agree" | "agree-little" | "disagree";
 
   class ItemTagData {
+    public vote: Option<Vote> = $state(none());
     constructor(
       public readonly tag: Tag,
       public progress: Progress,
       public isMeProposer: boolean = false,
-      public vote: Option<Vote> = none()
-    ) {}
+      vote: Option<Vote> = none()
+    ) {
+      if (vote.isSome()) this.vote = vote;
+    }
 
     hasVote(vote: Vote): boolean {
       return this.vote.isSome() ? this.vote.value === vote : false;
@@ -98,7 +101,9 @@
         displayName
       )).map(tag => new ItemTagData(
         tag,
-        getRandomInt(2) === 1 ? "suggested" : "related"
+        getRandomInt(2) === 1 ? "suggested" : "related",
+        false,
+        some("agree")
       ));
     return items;
   }
@@ -117,6 +122,17 @@
   let searchResult: ItemTagData[] = [];
 
   interactHandlersEffect(handleInteractToTagTab)();
+
+  const RATING_BUTTONS_DATA: [Vote, string][] = [
+    ["agree", "exposure_plus_1"],
+    ["agree-little", "exposure_zero"],
+    ["disagree", "exposure_neg_1"]
+  ];
+
+  function handleInteractToRatingButton(item: ItemTagData, vote: Vote) {
+    if (item.hasVote(vote)) item.vote = none();
+    else item.vote = some(vote);
+  }
 </script>
 
 <div class="menu">
@@ -167,21 +183,17 @@
                   </svg>
                 </div>
               {:else}
-                <div class="tag-button" class:toggled={item.hasVote("agree")}>
-                  <svg class="tag-button-icon">
-                    <use href="/src/lib/assets/tag/exposure_plus_1.svg#exposure_plus_1"></use>
-                  </svg>
-                </div>
-                <div class="tag-button" class:toggled={item.hasVote("agree-little")}>
-                  <svg class="tag-button-icon">
-                    <use href="/src/lib/assets/tag/exposure_zero.svg#exposure_zero"></use>
-                  </svg>
-                </div>
-                <div class="tag-button" class:toggled={item.hasVote("disagree")}>
-                  <svg class="tag-button-icon">
-                    <use href="/src/lib/assets/tag/exposure_neg_1.svg#exposure_neg_1"></use>
-                  </svg>
-                </div>
+                {#each RATING_BUTTONS_DATA as ratingButtonData}
+                  <div
+                    class="tag-button"
+                    class:toggled={item.hasVote(ratingButtonData[0])}
+                    onclick={() => handleInteractToRatingButton(item, ratingButtonData[0])}
+                    onfocus={() => handleInteractToRatingButton(item, ratingButtonData[0])}>
+                    <svg class="tag-button-icon">
+                      <use href="/src/lib/assets/tag/{ratingButtonData[1]}.svg#{ratingButtonData[1]}"></use>
+                    </svg>
+                  </div>
+                {/each}
               {/if}
             {/if}
           </div>
@@ -276,6 +288,9 @@
 
   .tag-item {
     max-width: 12.25rem;
+    display: flex;
+    padding: 0.25rem 0.5rem 0.125rem 0.5rem;
+    align-items: flex-start;
   }
 
   .tag-item:not(.related):hover {
@@ -342,10 +357,6 @@
     background-color: rgba(22, 122, 198, 0.10);
   }
 
-  .tag-button.toggled {
-    fill: var(--accent-color);
-  }
-
   .tag-withdraw-button:hover {
     background-color: rgba(198, 22, 22, 0.10);
   }
@@ -357,6 +368,10 @@
   }
 
   .tag-button:hover .tag-button-icon {
+    fill: var(--accent-color);
+  }
+
+  .tag-button.toggled .tag-button-icon {
     fill: var(--accent-color);
   }
 
