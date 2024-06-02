@@ -126,5 +126,13 @@
       "add": "追加する",
       "withdraw": "撤回する"
     }
+  },
+  "database": {
+    "share-list": {
+      "total-hits": "全 {count} 件",
+      "history": "ヒストリー",
+      "newest": "新しい順",
+      "oldest": "古い順"
+    }
   }
 }
