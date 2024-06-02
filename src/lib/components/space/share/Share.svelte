@@ -63,7 +63,7 @@
 
     if (weeks > 0) {
       // 1週間以上の場合は絶対表記
-      const date = new Date(timestamp * 1000);
+      const date = new Date(timestamp);
 
       const month: number = date.getMonth() + 1; // 月は0始まりなので1を足す
       const day: number = date.getDate();
