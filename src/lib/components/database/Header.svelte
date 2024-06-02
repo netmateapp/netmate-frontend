@@ -1,12 +1,12 @@
 <script lang="ts" context="module">
-  type Sort = "history" | "newest" | "oldest";
+  export type Sort = "history" | "newest" | "oldest";
 </script>
 
 <script lang="ts">
   import { makeKeydownHandler } from "$lib/utils.svelte";
-    import { _ } from "./database.svelte";
+  import { _ } from "./database.svelte";
 
-  let { resultCount, initialSort }: { resultCount: number; initialSort: Sort } =
+  let { resultsCount, initialSort }: { resultsCount: number; initialSort: Sort } =
     $props();
 
   const SORTS: Sort[] = ["history", "newest", "oldest"];
@@ -22,7 +22,7 @@
 </script>
 
 <div class="header">
-  <span class="total-hits">{_("total-hits", { count: resultCount })}</span>
+  <span class="total-hits">{_("total-hits", { count: resultsCount })}</span>
   <div class="buttons">
     {#each SORTS as sort}
       <button
@@ -58,17 +58,27 @@
   }
 
   .button {
+    border-radius: 100vmax;
     display: flex;
     height: 2.25rem;
-    padding: 0.5rem;
+    padding: 0.5625rem 0.5rem 0.375rem 0.5rem;
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: var(--dominant-color-hover);
   }
 
   .label {
-    color: var(--dark-gray);
+    color: var(--light-gray);
     font-family: var(--primary-font);
     font-size: 0.875rem;
+  }
+
+  .button.selected .label {
+    color: var(--dark-gray);
   }
 </style>
