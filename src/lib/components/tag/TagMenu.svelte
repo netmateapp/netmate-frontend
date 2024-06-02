@@ -2,7 +2,7 @@
     import { calculateCharactersCosts } from "$lib/cjk.svelte";
     import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
     import { createTranslator } from "$lib/i18n.svelte";
-    import { none, type Option } from "$lib/option";
+    import { Some, none, type Option } from "$lib/option";
     import { Ok, err, ok, type Result } from "$lib/result";
     import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
     import { interactHandlersEffect } from "$lib/utils.svelte";
@@ -68,10 +68,14 @@
       public isMeProposer: boolean = false,
       public vote: Option<Vote> = none()
     ) {}
+
+    hasVote(vote: Vote): boolean {
+      return this.vote.isSome() ? this.vote.value === vote : false;
+    }
   }
 
   function genUuid44Test(): Uuid4 {
-    let maybeUuid = Uuid4.from("018fd2cc-7e27-7dfa-8424-87f58f98bfcc");
+    let maybeUuid = Uuid4.from("5ca36600-53dc-402b-8bee-0c6f1680b6fd");
     let testUuid: Uuid4;
     if (maybeUuid.isOk()) {
       testUuid = maybeUuid.value;
@@ -135,11 +139,53 @@
   </div>
   <div class="tags">
     {#each currentItemTagData() as item}
-      <div class="tag">
-        <a
-          href="https://netmate.app/tags/{item.tag.id.asHexadecimalRepresentation()}/space"
-          class="tag-name"
-        >{item.tag.displayName}</a>
+      <div class="tag-item" class:related={item.progress === "related"}>
+        <div class="tag">
+          <a
+            href="https://netmate.app/tags/{item.tag.id.asHexadecimalRepresentation()}/space"
+            class="tag-name"
+            class:unrelated={item.progress === "unrelated"}
+            class:suggested={item.progress === "suggested"}
+          >{item.tag.displayName.value}</a>
+          {#if item.tag.hasDisambiguation()}
+            <span class="disambiguation">{(item.tag.disambiguation as Some<DisplayName>).value.value}</span>
+          {/if}
+        </div>
+        {#if item.progress !== "related"}
+          <div class="centered-buttons">
+            {#if item.progress === "unrelated"}
+              <div class="tag-button">
+                <svg class="tag-button-icon">
+                  <use href="/src/lib/assets/tag/add.svg#add"></use>
+                </svg>
+              </div>
+            {:else}
+              {#if item.isMeProposer}
+                <div class="tag-button tag-withdraw-button">
+                  <svg class="tag-button-icon">
+                    <use href="/src/lib/assets/tag/remove.svg#remove"></use>
+                  </svg>
+                </div>
+              {:else}
+                <div class="tag-button" class:toggled={item.hasVote("agree")}>
+                  <svg class="tag-button-icon">
+                    <use href="/src/lib/assets/tag/exposure_plus_1.svg#exposure_plus_1"></use>
+                  </svg>
+                </div>
+                <div class="tag-button" class:toggled={item.hasVote("agree-little")}>
+                  <svg class="tag-button-icon">
+                    <use href="/src/lib/assets/tag/exposure_zero.svg#exposure_zero"></use>
+                  </svg>
+                </div>
+                <div class="tag-button" class:toggled={item.hasVote("disagree")}>
+                  <svg class="tag-button-icon">
+                    <use href="/src/lib/assets/tag/exposure_neg_1.svg#exposure_neg_1"></use>
+                  </svg>
+                </div>
+              {/if}
+            {/if}
+          </div>
+        {/if}
       </div>
     {/each}
   </div>
@@ -219,5 +265,102 @@
     color: var(--light-gray);
     font-family: var(--primary-font);
     font-size: 0.875rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .tag-item {
+    max-width: 12.25rem;
+  }
+
+  .tag-item:not(.related):hover {
+    border-radius: 1rem;
+    background: var(--dominant-color);
+    box-shadow: var(--soft-shadow);
+    display: flex;
+    padding: 0.75rem 0.5rem 0.125rem 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tag-name {
+    color: var(--secondary-color);
+    font-family: var(--primary-font);
+    font-size: 0.9375rem;
+    line-height: 0.9375rem;
+    align-self: stretch;
+  }
+
+  .tag-name.unrelated {
+    color: var(--light-gray);
+  }
+
+  .tag-name.suggested {
+    color: var(--light-gray);
+    font-weight: 700;
+  }
+
+  .tag-item.related:hover .tag-name {
+    color: var(--accent-color);
+  }
+
+  .disambiguation {
+    color: var(--light-gray);
+    font-family: var(--primary-font);
+    font-size: 0.75rem;
+    line-height: 1.25rem;
+  }
+
+  .centered-buttons {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: stretch;
+  }
+
+  .tag-item:hover .centered-buttons {
+    display: flex;
+  }
+
+  .tag-button {
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .tag-button:hover {
+    background-color: rgba(22, 122, 198, 0.10);
+  }
+
+  .tag-button.toggled {
+    fill: var(--accent-color);
+  }
+
+  .tag-withdraw-button:hover {
+    background-color: rgba(198, 22, 22, 0.10);
+  }
+
+  .tag-button-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--light-gray);
+  }
+
+  .tag-button:hover .tag-button-icon {
+    fill: var(--accent-color);
+  }
+
+  .tag-withdraw-button:hover .tag-button-icon {
+    fill: var(--warning-color);
   }
 </style>
