@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
   import { Uuid7 } from "$lib/uuid";
-  import { tooltip } from "../tooltip/useTooltip.svelte";
+  import { tooltip } from "../../common/tooltip/useTooltip.svelte";
 
   let {
     id,

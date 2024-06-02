@@ -4,7 +4,7 @@
 
 <script lang="ts">
   import { makeKeydownHandler } from "$lib/utils.svelte";
-  import { _ } from "./database.svelte";
+  import { _ } from "../database.svelte";
 
   let { resultsCount, initialSort }: { resultsCount: number; initialSort: Sort } =
     $props();

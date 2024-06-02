@@ -1,7 +1,7 @@
 <script lang="ts">
   import { makeKeydownHandler } from "$lib/utils.svelte";
-  import { tooltip } from "../common/tooltip/useTooltip.svelte";
-  import { _ } from "./database.svelte";
+  import { tooltip } from "../../common/tooltip/useTooltip.svelte";
+  import { _ } from "../database.svelte";
 
   let { resultsCount }: { resultsCount: number } = $props();
 

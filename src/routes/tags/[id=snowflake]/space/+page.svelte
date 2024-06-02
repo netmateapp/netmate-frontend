@@ -4,7 +4,7 @@
   import SearchBox from "$lib/components/common/search-box/SearchBox.svelte";
   import OpenShareEditorButton from "$lib/components/common/share-editor/OpenShareEditorButton.svelte";
   import ShareEditor from "$lib/components/common/share-editor/ShareEditor.svelte";
-  import Share from "$lib/components/common/share/Share.svelte";
+  import Share from "$lib/components/database/share/Share.svelte";
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
   import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
@@ -50,5 +50,11 @@
 {#if isShareEditorVisible}
   <ShareEditor bind:this={shareEditor} closeEditor={closeShareEditor} />
 {/if}
-<Share id={genTestUuid7()} title={"おもしれー女"} text={"描いたﾖ\nかわわ"} firstImageUrl={"https://pbs.twimg.com/media/GO7IK9yagAEq4bw?format=jpg&name=4096x4096"} conversationsCount={212} timestamp={1717209513416} />
+<Share
+  id={genTestUuid7()}
+  title={"おもしれー女"}
+  text={"描いたﾖ\nかわわ"}
+  firstImageUrl={"https://pbs.twimg.com/media/GO7IK9yagAEq4bw?format=jpg&name=4096x4096"}
+  conversationsCount={212}
+  timestamp={1717209513416} />
 <TagMenu />
