@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { makeKeydownHandler } from "$lib/utils.svelte";
-    import { tooltip } from "../common/tooltip/useTooltip.svelte";
-    import { _ } from "./database.svelte";
+  import { makeKeydownHandler } from "$lib/utils.svelte";
+  import { tooltip } from "../common/tooltip/useTooltip.svelte";
+  import { _ } from "./database.svelte";
 
   let { resultsCount }: { resultsCount: number } = $props();
 
@@ -66,12 +66,12 @@
 
 <div class="pager">
   <button
-    class="page-button"
+    class="page-move-button"
+    class:disable={isFirstPage(currentPageNumber)}
     onclick={tryGoBackToPreviousPage}
     onkeydown={makeKeydownHandler(tryGoBackToPreviousPage)}
-    disabled={isFirstPage(currentPageNumber)}
     use:tooltip={_("previous")}>
-    <svg class="search-icon">
+    <svg class="page-move-button-icon">
       <use href="/src/lib/assets/database/chevron_left.svg#chevron_left"></use>
     </svg>
   </button>
@@ -88,12 +88,12 @@
     </button>
   {/each}
   <button
-    class="page-button"
+    class="page-move-button"
+    class:disable={isLastPage(currentPageNumber)}
     onclick={tryGoToNextPage}
     onkeydown={makeKeydownHandler(tryGoToNextPage)}
-    disabled={isLastPage(currentPageNumber)}
     use:tooltip={_("next")}>
-    <svg class="search-icon">
+    <svg class="page-move-button-icon">
       <use href="/src/lib/assets/database/chevron_right.svg#chevron_right"></use>
     </svg>
   </button>
@@ -106,7 +106,7 @@
     gap: 0.125rem;
   }
 
-  .page-button {
+  .page-move-button {
     width: 2.125rem;
     height: 2.125rem;
     border-radius: 50%;
@@ -115,14 +115,39 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .page-move-button:hover {
+    background-color: var(--dominant-color-hover);
+  }
+
+  .page-move-button.disable {
+    visibility: hidden;
+  }
+
+  .page-move-button-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    fill: var(--dark-gray);
+  }
+
+  .page-button {
+    width: 2.125rem;
+    height: 2.125rem;
+    border-radius: 50%;
+    padding: 0.5625rem 0.5rem 0.375rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
     cursor: pointer;
   }
 
   .page-button:hover {
-    background-color: var(--dominant-color-hover);
-  }
-
-  .page-button:disabled {
     background-color: var(--dominant-color-hover);
   }
 
