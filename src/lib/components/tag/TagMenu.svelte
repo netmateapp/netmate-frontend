@@ -4,8 +4,11 @@
   import { Some, none, some, type Option } from "$lib/option";
   import { Ok, err, ok, type Result } from "$lib/result";
   import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
-  import { interactHandlersEffect } from "$lib/utils.svelte";
+  import { interactHandlersEffect, makeKeydownHandler } from "$lib/utils.svelte";
   import { Uuid4 } from "$lib/uuid";
+    import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
+    import { toast } from "../common/toast/useToast.svelte";
+    import { tooltip } from "../common/tooltip/useTooltip.svelte";
     import Guidelines from "./Guidelines.svelte";
   import { _ } from "./tag.svelte";
 
@@ -61,13 +64,17 @@
   type Vote = "agree" | "agree-little" | "disagree";
 
   class ItemTagData {
+    public progress: Progress = $state("unrelated");
+    public isMeProposer: boolean = $state(false);
     public vote: Option<Vote> = $state(none());
     constructor(
       public readonly tag: Tag,
-      public progress: Progress,
-      public isMeProposer: boolean = false,
+      progress: Progress,
+      isMeProposer: boolean = false,
       vote: Option<Vote> = none()
     ) {
+      this.progress = progress;
+      if (isMeProposer) this.isMeProposer = isMeProposer;
       if (vote.isSome()) this.vote = vote;
     }
 
@@ -122,6 +129,12 @@
 
   interactHandlersEffect(handleInteractToTagTab)();
 
+  function handleInteractToSuggestTagButton(item: ItemTagData) {
+    item.progress = "suggested";
+    item.isMeProposer = true;
+    toast(_("add-new-relation", { tagName: item.tag.displayName.value, xxxTags: _(`${selectedTagRelation}-tags`) }));
+  }
+
   const RATING_BUTTONS_DATA: [Vote, string][] = [
     ["agree", "exposure_plus_1"],
     ["agree-little", "exposure_zero"],
@@ -131,6 +144,20 @@
   function handleInteractToRatingButton(item: ItemTagData, vote: Vote) {
     if (item.hasVote(vote)) item.vote = none();
     else item.vote = some(vote);
+  }
+
+  let isConfirmDialogVisible = $state(false);
+  function handleInteractToWithdrawButton(event: InteractEvent) {
+    isConfirmDialogVisible = true;
+  }
+
+  function withdrawTagRelationSuggestion(item: ItemTagData) {
+    item.progress = "unrelated";
+    toast(_("withdraw-new-relation"));
+  }
+
+  function closeConfirmDialog() {
+    isConfirmDialogVisible = false;
   }
 </script>
 
@@ -169,29 +196,41 @@
         {#if item.progress !== "related"}
           <div class="centered-buttons">
             {#if item.progress === "unrelated"}
-              <div class="tag-button">
+              <button
+                class="tag-button"
+                onclick={() => handleInteractToSuggestTagButton(item)}
+                onkeydown={makeKeydownHandler(() => handleInteractToSuggestTagButton(item))}
+                use:tooltip={_("add")}>
                 <svg class="tag-button-icon">
                   <use href="/src/lib/assets/tag/add.svg#add"></use>
                 </svg>
-              </div>
+              </button>
             {:else}
               {#if item.isMeProposer}
-                <div class="tag-button tag-withdraw-button">
+                <button
+                  class="tag-button tag-withdraw-button"
+                  onclick={handleInteractToWithdrawButton}
+                  onkeydown={makeKeydownHandler(handleInteractToWithdrawButton)}
+                  use:tooltip={_("withdraw")}>
                   <svg class="tag-button-icon">
                     <use href="/src/lib/assets/tag/remove.svg#remove"></use>
                   </svg>
-                </div>
+                </button>
+                {#if isConfirmDialogVisible}
+                  <ConfirmDialog title={_("withdraw-dialog-title")} description={_("withdraw-dialog-description")} actionName={_("withdraw-dialog-action-name")} action={() => withdrawTagRelationSuggestion(item)} close={closeConfirmDialog} />
+                {/if}
               {:else}
                 {#each RATING_BUTTONS_DATA as ratingButtonData}
-                  <div
+                  <button
                     class="tag-button"
                     class:toggled={item.hasVote(ratingButtonData[0])}
                     onclick={() => handleInteractToRatingButton(item, ratingButtonData[0])}
-                    onfocus={() => handleInteractToRatingButton(item, ratingButtonData[0])}>
+                    onkeydown={makeKeydownHandler(() => handleInteractToRatingButton(item, ratingButtonData[0]))}
+                    use:tooltip={_(ratingButtonData[0])}>
                     <svg class="tag-button-icon">
                       <use href="/src/lib/assets/tag/{ratingButtonData[1]}.svg#{ratingButtonData[1]}"></use>
                     </svg>
-                  </div>
+                  </button>
                 {/each}
               {/if}
             {/if}
@@ -199,10 +238,11 @@
         {/if}
       </div>
     {/each}
+    <div class="guidelines">
+      <Guidelines />
+    </div>
   </div>
 </div>
-
-<Guidelines />
 
 <style>
   .menu {
@@ -285,7 +325,6 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
-    overflow-y: scroll;
   }
 
   .tag-item {
@@ -379,5 +418,13 @@
 
   .tag-withdraw-button:hover .tag-button-icon {
     fill: var(--warning-color);
+  }
+
+  .guidelines {
+    display: none;
+  }
+
+  .tags:hover .guidelines {
+    display: inline;
   }
 </style>

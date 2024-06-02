@@ -1,21 +1,15 @@
-export function interactHandlersEffect(...handlers: ((event: InteractEvent) => void)[]): () => void {
+import type { InteractEvent } from "./types";
+
+type InteractEventHandler = (event: InteractEvent) => void;
+
+export function interactHandlersEffect(...handlers: InteractEventHandler[]): () => void {
   return () => {
     $effect(() => {
       const keydownHandlers: ((event: KeyboardEvent) => void)[] = [];
       for (var [index, handler] of handlers.entries()) {
         document.addEventListener("click", handler);
 
-        const keydownHandler = (event: KeyboardEvent) => {
-          switch (event.key) {
-            case "Space":
-              event.preventDefault();
-            case "Enter":
-              handler(event);
-              break;
-            default:
-              break;
-          }
-        };
+        const keydownHandler = makeKeydownHandler(handler);
         keydownHandlers[index] = keydownHandler;
 
         document.addEventListener("keydown", keydownHandler);
@@ -28,6 +22,20 @@ export function interactHandlersEffect(...handlers: ((event: InteractEvent) => v
         }
       };
     });
+  };
+}
+
+export function makeKeydownHandler(handler: InteractEventHandler): (event: KeyboardEvent) => void {
+  return (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Space":
+        event.preventDefault();
+      case "Enter":
+        handler(event);
+        break;
+      default:
+        break;
+    }
   };
 }
 

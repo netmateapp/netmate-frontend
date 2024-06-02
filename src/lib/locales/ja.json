@@ -114,7 +114,17 @@
       "heading3": "3. ペアタグの定義",
       "item3": "表記が異なるが同じ意味を持つタグは、スペースの表示内容を共有させることができます：",
       "correct3": "〇 パーソナルコンピューター = パソコン",
-      "wrong3": "✕ パソコン = キーボード　※異なる意味を持つタグ"
+      "wrong3": "✕ パソコン = キーボード　※異なる意味を持つタグ",
+      "withdraw-dialog-title": "本当にタグの追加を撤回しますか？",
+      "withdraw-dialog-description": "この操作は取り消せません。",
+      "withdraw-dialog-action-name": "撤回",
+      "add-new-relation": "「{tagName}」を{xxxTags}として追加しました。",
+      "withdraw-new-relation": "タグの追加を撤回しました。",
+      "agree": "賛成する",
+      "agree-little": "少し賛成する",
+      "disagree": "反対する",
+      "add": "追加する",
+      "withdraw": "撤回する"
     }
   }
 }
