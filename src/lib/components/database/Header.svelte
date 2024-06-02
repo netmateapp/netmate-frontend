@@ -3,10 +3,8 @@
 </script>
 
 <script lang="ts">
-  import { createTranslator } from "$lib/i18n.svelte";
   import { makeKeydownHandler } from "$lib/utils.svelte";
-
-  const _ = createTranslator("database", "share-list");
+    import { _ } from "./database.svelte";
 
   let { resultCount, initialSort }: { resultCount: number; initialSort: Sort } =
     $props();

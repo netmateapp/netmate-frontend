@@ -132,7 +132,9 @@
       "total-hits": "全 {count} 件",
       "history": "ヒストリー",
       "newest": "新しい順",
-      "oldest": "古い順"
+      "oldest": "古い順",
+      "next": "次へ",
+      "previous": "前へ"
     }
   }
 }

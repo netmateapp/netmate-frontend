@@ -1,5 +1,7 @@
 <script lang="ts">
     import { makeKeydownHandler } from "$lib/utils.svelte";
+    import { tooltip } from "../common/tooltip/useTooltip.svelte";
+    import { _ } from "./database.svelte";
 
   let { resultsCount }: { resultsCount: number } = $props();
 
@@ -67,7 +69,8 @@
     class="page-button"
     onclick={tryGoBackToPreviousPage}
     onkeydown={makeKeydownHandler(tryGoBackToPreviousPage)}
-    disabled={isFirstPage(currentPageNumber)}>
+    disabled={isFirstPage(currentPageNumber)}
+    use:tooltip={_("previous")}>
     <svg class="search-icon">
       <use href="/src/lib/assets/database/chevron_left.svg#chevron_left"></use>
     </svg>
@@ -88,7 +91,8 @@
     class="page-button"
     onclick={tryGoToNextPage}
     onkeydown={makeKeydownHandler(tryGoToNextPage)}
-    disabled={isLastPage(currentPageNumber)}>
+    disabled={isLastPage(currentPageNumber)}
+    use:tooltip={_("next")}>
     <svg class="search-icon">
       <use href="/src/lib/assets/database/chevron_right.svg#chevron_right"></use>
     </svg>
