@@ -1,21 +1,20 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-  import type { Option } from "$lib/option";
   import { Uuid7 } from "$lib/uuid";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
 
   let {
     id,
-    title,
-    text,
-    firstImageUrl,
+    title = undefined,
+    text = undefined,
+    firstImageUrl = undefined,
     conversationsCount,
     timestamp,
   }: {
     id: Uuid7
-    title: Option<string>;
-    text: Option<string>;
-    firstImageUrl: Option<string>;
+    title: string | undefined;
+    text: string | undefined;
+    firstImageUrl: string | undefined;
     conversationsCount: number;
     timestamp: number;
   } = $props();
@@ -64,7 +63,7 @@
 
     if (weeks > 0) {
       // 1週間以上の場合は絶対表記
-      const date = new Date(timestamp);
+      const date = new Date(timestamp * 1000);
 
       const month: number = date.getMonth() + 1; // 月は0始まりなので1を足す
       const day: number = date.getDate();
@@ -108,7 +107,7 @@
         <span class="title">{title}</span>
       {/if}
       {#if hasText()}
-        <div class="text">{text}</div>
+        <div class="text">{text!}</div>
       {/if}
     </div>
     {#if hasFirstImage()}
@@ -136,6 +135,9 @@
 
 <style>
   .share {
+    position: fixed;
+    top: 10%;
+    left: 15%;
     width: 29.25rem;
     max-height: 29.25rem;
     padding: 1rem 1rem 0.125rem 1rem;
