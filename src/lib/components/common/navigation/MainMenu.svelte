@@ -4,8 +4,9 @@
   import LocationMenu from "./LocationMenu.svelte";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import AnnouncementsMenu from "./AnnouncementsMenu.svelte";
+  import type { MaybeHTMLElement, MaybeComponent, InteractEvent } from "$lib/types";
 
-  let mainMenuRef: MaybeElement = $state(null);
+  let mainMenuRef: MaybeHTMLElement = $state(null);
   let { basePoint }: { basePoint: DOMRect } = $props();
 
   export function contains(element: Element): boolean {
@@ -22,7 +23,7 @@
   }
 
   class ChildMenuData {
-    itemRef: MaybeElement = $state(null);
+    itemRef: MaybeHTMLElement = $state(null);
     menu: MaybeComponent = $state(null);
     isVisible: boolean = $state(false);
 

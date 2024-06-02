@@ -1,11 +1,12 @@
 <script lang="ts">
   import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
+  import type { InteractEvent, MaybeHTMLElement, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import HandlesMenu from "./HandlesMenu.svelte";
-    import { _ } from "./nav.svelte";
+  import { _ } from "./nav.svelte";
 
   let isToggled: boolean = $state(false);
-  let buttonRef: MaybeElement = $state(null);
+  let buttonRef: MaybeHTMLElement = $state(null);
   let menu: MaybeComponent = $state(null);
   function handleInteractEvent(event: InteractEvent) {
     const element = event.target as Element;

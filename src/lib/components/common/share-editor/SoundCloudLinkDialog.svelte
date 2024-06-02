@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { MEDIA_COUNT } from "./ShareEditor.svelte";
+  import type { MaybeHTMLElement } from "$lib/types";
   import { _, calculateMenuPosition } from "./editor.svelte";
   import { dispatchInsertSoundCloudCommand } from "./lexical-editor";
 

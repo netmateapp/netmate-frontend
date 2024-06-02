@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { MaybeHTMLElement } from "$lib/types";
   import { _, calculateMenuPosition } from "./nav.svelte";
 
   const LANGUAGES = ["japanese", "korean", "traditional-chinese", "us-english"];
@@ -9,7 +10,7 @@
 
   let { basePoint }: { basePoint:DOMRect } = $props();
 
-  let menuRef: MaybeElement = $state(null);
+  let menuRef: MaybeHTMLElement = $state(null);
 
   export function contains(element: Element): boolean {
     return menuRef?.contains(element) ?? false;

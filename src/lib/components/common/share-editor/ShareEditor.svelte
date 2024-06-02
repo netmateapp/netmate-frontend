@@ -27,8 +27,9 @@
   import { hideTooltip, tooltip } from "../tooltip/useTooltip.svelte";
   import HandlesMenu from "./HandlesMenu.svelte";
   import TagsInputField from "./share-edit/TagsInputField.svelte";
-    import Overlay from "../confirm-dialog/Overlay.svelte";
-    import ConfirmDialog from "../confirm-dialog/ConfirmDialog.svelte";
+  import Overlay from "../confirm-dialog/Overlay.svelte";
+  import ConfirmDialog from "../confirm-dialog/ConfirmDialog.svelte";
+  import type { MaybeHTMLElement, InteractEvent, MaybeComponent } from "$lib/types";
 
   $effect(() => {
     init();
@@ -147,7 +148,7 @@
 
   // メディアリンクダイアログ関連
   class MediaLinkDialogData {
-    buttonRef: MaybeElement = $state(null);
+    buttonRef: MaybeHTMLElement = $state(null);
     dialog: MaybeComponent = $state(null);
     isVisible: boolean = $state(false);
 
@@ -199,7 +200,7 @@
 
   // 名義選択ボタン関連
   let isHandleButtonToggled = $state(false);
-  let handleButtonRef: MaybeElement = $state(null);
+  let handleButtonRef: MaybeHTMLElement = $state(null);
   let handlesMenu: MaybeComponent = $state(null);
   let selectedHandleId = $state(lastUsedHandle());
   function onClickHandleButton(event: InteractEvent) {

@@ -1,11 +1,12 @@
 <script lang="ts">
+  import type { InteractEvent, MaybeComponent, MaybeHTMLElement } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import DeleteHandleDialog from "./DeleteHandleDialog.svelte";
   import { _, calculateMenuPosition } from "./nav.svelte";
 
   let { basePoint, handleId, onEdit }: { basePoint: DOMRect, handleId: string, onEdit: () => void } = $props();
 
-  let menuRef: MaybeElement = $state(null);
+  let menuRef: MaybeHTMLElement = $state(null);
   export function contains(element: Element): boolean {
     return (menuRef?.contains(element) ?? false) || deleteHandleDialog?.contains(element);
   }
@@ -13,8 +14,8 @@
   let deleteHandleDialog: MaybeComponent = $state(null);
 
   let isToggled = $state(false);
-  let editButton: MaybeElement = $state(null);
-  let deleteButton: MaybeElement = $state(null);
+  let editButton: MaybeHTMLElement = $state(null);
+  let deleteButton: MaybeHTMLElement = $state(null);
   let currentIndex = $state(0);
   function isButtonToggled(index: number) {
     return isToggled && index == currentIndex;

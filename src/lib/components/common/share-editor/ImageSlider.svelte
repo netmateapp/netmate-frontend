@@ -16,6 +16,7 @@
     import { dispatchDeleteSlideCommand } from "./lexical-editor";
     import { IDENTITY_ATTRIBUTE, IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA } from "./image-slide-plugin.svelte";
     import { tooltip } from "../tooltip/useTooltip.svelte";
+    import type { MaybeHTMLElement, MaybeHTMLInputElement, InteractEvent } from "$lib/types";
 
     let { imagesPaths, nodeKey }: { imagesPaths: string[], nodeKey: string } = $props();
 

@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { _, calculateMenuPosition, elapsedTime } from "./nav.svelte";
+  import type { MaybeHTMLElement } from "$lib/types";
+  import { _, calculateMenuPosition, elapsedTime } from "./nav.svelte";
 
   class Announcement {
     id: number;
@@ -30,7 +31,7 @@
 
   let { basePoint }: { basePoint: DOMRect } = $props();
 
-  let menuRef: MaybeElement = $state(null);
+  let menuRef: MaybeHTMLElement = $state(null);
 
   export function contains(element: Element): boolean {
     return menuRef?.contains(element) ?? false;

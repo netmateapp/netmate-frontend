@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
+  import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import Overlay from "./Overlay.svelte";
 

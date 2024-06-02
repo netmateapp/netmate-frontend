@@ -3,10 +3,11 @@
   import MainMenu from "./MainMenu.svelte";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import { _ } from "./nav.svelte";
+  import type { InteractEvent, MaybeHTMLElement, MaybeComponent } from "$lib/types";
 
   let isToggled = $state(false);
 
-  let seeMoreButtonRef: MaybeElement = $state(null);
+  let seeMoreButtonRef: MaybeHTMLElement = $state(null);
   let mainMenu: MaybeComponent = $state(null);
 
   function handleInteract(event: InteractEvent) {

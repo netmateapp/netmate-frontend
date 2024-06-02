@@ -1,10 +1,12 @@
 <script lang="ts">
     import { calculateCharactersCosts } from "$lib/cjk.svelte";
-  import { createTranslator } from "$lib/i18n.svelte";
+    import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
+    import { createTranslator } from "$lib/i18n.svelte";
     import { none, type Option } from "$lib/option";
-    import { err, ok, type Result } from "$lib/result";
+    import { Ok, err, ok, type Result } from "$lib/result";
+    import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
     import { interactHandlersEffect } from "$lib/utils.svelte";
-    import type { Uuid4, Uuid7 } from "$lib/uuid";
+    import { Uuid4 } from "$lib/uuid";
 
   const _ = createTranslator("tag", "menu");
 
@@ -21,7 +23,7 @@
   }
 
   let tabsRefs: MaybeHTMLElement[] = [];
-  function handleInteractToTab(event: InteractEvent) {
+  function handleInteractToTagTab(event: InteractEvent) {
     const target = event.target as Element;
     for (var [index, tabRef] of tabsRefs.entries()) {
       if (tabRef?.contains(target)) {
@@ -35,8 +37,6 @@
     }
   }
 
-  type Vote = "agree" | "agree-little" | "disagree";
-
   class DisplayName {
     private constructor(public readonly value: string) {}
 
@@ -48,7 +48,7 @@
 
   class Tag {
     constructor(
-      public readonly id: Uuid7,
+      public readonly id: Uuid4,
       public readonly displayName: DisplayName,
       public readonly disambiguation: Option<DisplayName> = none()
     ) {}
@@ -58,7 +58,61 @@
     }
   }
 
-  interactHandlersEffect(handleInteractToTab)();
+  type Progress = "unrelated" | "suggested" | "related";
+  type Vote = "agree" | "agree-little" | "disagree";
+
+  class ItemTagData {
+    constructor(
+      public readonly tag: Tag,
+      public progress: Progress,
+      public isMeProposer: boolean = false,
+      public vote: Option<Vote> = none()
+    ) {}
+  }
+
+  function genUuid44Test(): Uuid4 {
+    let maybeUuid = Uuid4.from("018fd2cc-7e27-7dfa-8424-87f58f98bfcc");
+    let testUuid: Uuid4;
+    if (maybeUuid.isOk()) {
+      testUuid = maybeUuid.value;
+    }
+    return testUuid!;
+  }
+
+  function getRandomInt(max: number): number {
+    return Math.floor(Math.random() * max);
+  }
+
+  function randomlyGenItemTagData4Test(): ItemTagData[] {
+    const tagsNames = ["早瀬ユウカ", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "夏の特殊作戦！RABBIT小隊と消えたエビの謎"];
+    const items = tagsNames
+      .map(name => DisplayName.from(name))
+      .filter(res => res.isOk())
+      .map(res => (res as Ok<{}, DisplayName>).value)
+      .map(displayName => new Tag(
+        genUuid44Test(),
+        displayName
+      )).map(tag => new ItemTagData(
+        tag,
+        getRandomInt(2) === 1 ? "suggested" : "related"
+      ));
+    return items;
+  }
+
+  const relationsToItemTagData = new Map<TagRelation, ItemTagData[]>([
+    ["super", []],
+    ["equivalent", []],
+    ["sub", randomlyGenItemTagData4Test()]
+  ]);
+
+  function currentItemTagData(): ItemTagData[] {
+    return isSearchResultVisible ? searchResult : relationsToItemTagData.get(selectedTagRelation)!;
+  }
+
+  let isSearchResultVisible = $state(false);
+  let searchResult: ItemTagData[] = [];
+
+  interactHandlersEffect(handleInteractToTagTab)();
 </script>
 
 <div class="menu">
@@ -79,7 +133,16 @@
     </svg>
     <input class="search-input" placeholder={_("search-and-add-tags")} />
   </div>
-  <div class="tags"></div>
+  <div class="tags">
+    {#each currentItemTagData() as item}
+      <div class="tag">
+        <a
+          href="https://netmate.app/tags/{item.tag.id.asHexadecimalRepresentation()}/space"
+          class="tag-name"
+        >{item.tag.displayName}</a>
+      </div>
+    {/each}
+  </div>
 </div>
 
 <style>

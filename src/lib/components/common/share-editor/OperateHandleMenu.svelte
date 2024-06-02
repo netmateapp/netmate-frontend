@@ -1,16 +1,17 @@
 <script lang="ts">
+  import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import { _, calculateMenuPosition } from "./editor.svelte";
 
   let { basePoint, onEdit }: { basePoint: DOMRect, handleId: string, onEdit: () => void } = $props();
 
-  let menuRef: MaybeElement = $state(null);
+  let menuRef: MaybeHTMLElement = $state(null);
   export function contains(element: Element): boolean {
     return menuRef?.contains(element) ?? false;
   }
 
   let isToggled = $state(false);
-  let editButton: MaybeElement = $state(null);
+  let editButton: MaybeHTMLElement = $state(null);
   let currentIndex = $state(0);
   function isButtonToggled(index: number) {
     return isToggled && index == currentIndex;

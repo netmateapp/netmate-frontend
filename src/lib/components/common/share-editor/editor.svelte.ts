@@ -1,9 +1,10 @@
 import { createTranslator } from "$lib/i18n.svelte";
+import type { MaybeHTMLElement } from "$lib/types";
 
 export const _ = createTranslator("common", "share-editor");
 
 // エディタのスクロールの都合上、ビューポートでなくfloatingを参照する
-export function calculateMenuPosition(buttonRect: DOMRect, menuRef: MaybeElement): string {
+export function calculateMenuPosition(buttonRect: DOMRect, menuRef: MaybeHTMLElement): string {
   if (menuRef == null) return `top: 0px; left: 0px;`;
 
   const menuRect = menuRef.getBoundingClientRect();

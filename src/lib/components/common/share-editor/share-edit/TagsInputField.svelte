@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { MaybeHTMLInputElement, MaybeHTMLElement } from "$lib/types";
   import { _, calculateMenuPosition } from "../editor.svelte";
 
   // タグ関連

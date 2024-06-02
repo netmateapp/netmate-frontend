@@ -3,6 +3,7 @@
     hideTooltip,
     tooltip,
   } from "$lib/components/common/tooltip/useTooltip.svelte";
+  import type { InteractEvent, MaybeComponent, MaybeHTMLElement } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import LocationMenu from "./LocationMenu.svelte";
   import { _ } from "./nav.svelte";
@@ -11,7 +12,7 @@
     return "JA";
   }
 
-  let buttonRef: MaybeElement = $state(null);
+  let buttonRef: MaybeHTMLElement = $state(null);
   let isToggled: boolean = $state(false);
 
   let menuRef: MaybeComponent = $state(null);

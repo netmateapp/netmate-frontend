@@ -1,10 +1,11 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
+  import type { InteractEvent, MaybeHTMLElement } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
 
   const _ = createTranslator("common", "search-box");
 
-  let searchBox: MaybeElement = $state(null);
+  let searchBox: MaybeHTMLElement = $state(null);
 
   let isActive = $state(false);
   let query = $state("");

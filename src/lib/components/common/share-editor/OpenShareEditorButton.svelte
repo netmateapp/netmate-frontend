@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { MaybeHTMLElement } from "$lib/types";
+
   let buttonRef: MaybeHTMLElement = $state(null);
 
   export function contains(element: Element): boolean {

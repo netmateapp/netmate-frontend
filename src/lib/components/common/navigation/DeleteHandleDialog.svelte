@@ -1,12 +1,13 @@
 <script lang="ts">
+  import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import Overlay from "../confirm-dialog/Overlay.svelte";
   import { _ } from "./nav.svelte";
 
   let { handleId, closeDialog }: { handleId: string, closeDialog: () => void } = $props();
 
-  let dialog: MaybeElement = $state(null);
-  export function dialogRef(): MaybeElement {
+  let dialog: MaybeHTMLElement = $state(null);
+  export function dialogRef(): MaybeHTMLElement {
     return dialog;
   }
 
@@ -24,7 +25,7 @@
     return inputStr == "delete this handle";
   }
 
-  let cancelButton: MaybeElement = $state(null);
+  let cancelButton: MaybeHTMLElement = $state(null);
 </script>
 
 <Overlay />

@@ -3,6 +3,7 @@
     apparentCharactersCosts,
     calculateCharactersCosts,
   } from "$lib/cjk.svelte";
+  import type { InteractEvent, MaybeComponent, MaybeHTMLElement } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import { tooltip } from "../tooltip/useTooltip.svelte";
   import OperateHandleMenu from "./OperateHandleMenu.svelte";
@@ -36,7 +37,7 @@
 
   let { basePoint }: { basePoint: DOMRect } = $props();
 
-  let menu: MaybeElement = $state(null);
+  let menu: MaybeHTMLElement = $state(null);
   let operateHandleMenu: MaybeComponent = $state(null);
   export function contains(element: Element): boolean {
     return (
@@ -64,7 +65,7 @@
   }
 
   // ハンドル編集時のinput関連
-  let activeRenameInput: MaybeElement = $state(null);
+  let activeRenameInput: MaybeHTMLElement = $state(null);
   let inputValue = $state("");
   function autoFocusRenameInput() {
     $effect(() => {
