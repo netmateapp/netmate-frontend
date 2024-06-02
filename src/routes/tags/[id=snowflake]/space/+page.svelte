@@ -6,6 +6,7 @@
   import ShareEditor from "$lib/components/common/share-editor/ShareEditor.svelte";
   import Share from "$lib/components/common/share/Share.svelte";
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
+  import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import { Uuid7 } from "$lib/uuid";
 
