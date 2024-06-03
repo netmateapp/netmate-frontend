@@ -11,7 +11,7 @@
   const FIRST_PAGE_NUMBER = 1;
 
   let currentPageNumber = $state(1);
-  let currentVisiblePagesArray: number[] = $state(calculateVisiblePagesArray());
+  let currentVisiblePagesArray: number[] = $derived(calculateVisiblePagesArray(currentPageNumber));
 
   function isCurrentPage(pageNumber: number): boolean {
     return currentPageNumber === pageNumber;
@@ -25,8 +25,8 @@
     return pageNumber === LAST_PAGE_NUMBER;
   }
 
-  function calculateVisiblePagesArray(): number[] {
-    const range = calculateVisiblePagesRange(currentPageNumber);
+  function calculateVisiblePagesArray(basePageNumber: number): number[] {
+    const range = calculateVisiblePagesRange(basePageNumber);
     return inclusiveRange(range[0], range[1]);
   }
 
@@ -38,8 +38,10 @@
     let end = basePageNumber + (MAX_PAGE_NUMBER_BUTTONS_COUNT / 2);
     if (start < FIRST_PAGE_NUMBER) {
       end += FIRST_PAGE_NUMBER - start;
+      start = FIRST_PAGE_NUMBER;
     } else if (end > LAST_PAGE_NUMBER) {
       start -= end - LAST_PAGE_NUMBER;
+      end = LAST_PAGE_NUMBER;
     }
 
     return [start, end];
