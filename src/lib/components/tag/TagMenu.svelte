@@ -1,15 +1,15 @@
 <script lang="ts">
   import { calculateCharactersCosts } from "$lib/cjk.svelte";
   import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
-  import { Some, none, some, type Option } from "$lib/option";
+  import { Some, none, some, type Optional } from "$lib/option";
   import { Ok, err, ok, type Result } from "$lib/result";
   import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
   import { interactHandlersEffect, makeKeydownHandler } from "$lib/utils.svelte";
   import { Uuid4 } from "$lib/uuid";
-    import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
-    import { toast } from "../common/toast/useToast.svelte";
-    import { tooltip } from "../common/tooltip/useTooltip.svelte";
-    import Guidelines from "./Guidelines.svelte";
+  import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
+  import { toast } from "../common/toast/useToast.svelte";
+  import { tooltip } from "../common/tooltip/useTooltip.svelte";
+  import Guidelines from "./Guidelines.svelte";
   import { _ } from "./tag.svelte";
 
   type TagRelation = "super" | "equivalent" | "sub";
@@ -52,7 +52,7 @@
     constructor(
       public readonly id: Uuid4,
       public readonly displayName: DisplayName,
-      public readonly disambiguation: Option<DisplayName> = none()
+      public readonly disambiguation: Optional<DisplayName> = none()
     ) {}
 
     hasDisambiguation(): boolean {
@@ -66,12 +66,12 @@
   class ItemTagData {
     public progress: Progress = $state("unrelated");
     public isMeProposer: boolean = $state(false);
-    public vote: Option<Vote> = $state(none());
+    public vote: Optional<Vote> = $state(none());
     constructor(
       public readonly tag: Tag,
       progress: Progress,
       isMeProposer: boolean = false,
-      vote: Option<Vote> = none()
+      vote: Optional<Vote> = none()
     ) {
       this.progress = progress;
       if (isMeProposer) this.isMeProposer = isMeProposer;
