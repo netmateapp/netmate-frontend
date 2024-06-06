@@ -107,7 +107,7 @@
         displayName
       )).map(tag => new ItemTagData(
         tag,
-        getRandomInt(2) === 1 ? "suggested" : "related",
+        getRandomInt(9) === 1 ? "suggested" : "related",
         false,
         some("agree")
       ));
@@ -422,9 +422,5 @@
 
   .guidelines {
     display: none;
-  }
-
-  .tags:hover .guidelines {
-    display: inline;
   }
 </style>

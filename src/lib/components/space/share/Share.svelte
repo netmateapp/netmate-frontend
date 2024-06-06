@@ -19,6 +19,9 @@
   import type { Option } from "$lib/option";
   import { Uuid7 } from "$lib/uuid";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
+  import { getCurrentX, getCurrentY } from "../space.svelte";
+
+  const _ = createTranslator("common", "share");
 
   let {
     id,
@@ -36,8 +39,10 @@
     timestamp: number;
   } = $props();
 
-
-  const _ = createTranslator("common", "share");
+  let x = 0;
+  let y = 0;
+  let apparentX: number = $derived(x + getCurrentX());
+  let apparentY: number = $derived(y + getCurrentY());
 
   function hasTitle(): boolean {
     return title !== undefined;
@@ -142,7 +147,7 @@
   }
 </script>
 
-<a href="https://netmate.app/shares/{id.asHexadecimalRepresentation()}" class="share">
+<a href="https://netmate.app/shares/{id.asHexadecimalRepresentation()}" class="share" style="top: {apparentY}px; left: {apparentX}px;">
   <div class="content">
     <div class="texts">
       {#if hasTitle()}
@@ -197,8 +202,6 @@
 <style>
   .share {
     position: fixed;
-    top: 10%;
-    left: 15%;
     width: 29.25rem;
     max-height: 29.25rem;
     padding: 1rem 1rem 0.125rem 1rem;

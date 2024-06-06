@@ -5,6 +5,7 @@
   import OpenShareEditorButton from "$lib/components/common/share-editor/OpenShareEditorButton.svelte";
   import ShareEditor from "$lib/components/common/share-editor/ShareEditor.svelte";
   import Share, { ImageUrl } from "$lib/components/space/share/Share.svelte";
+    import { initializeSpace } from "$lib/components/space/space.svelte";
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
   import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
@@ -39,6 +40,8 @@
     }
     return testUuid!;
   }
+
+  initializeSpace();
 </script>
 
 <title>タグスペース</title>
