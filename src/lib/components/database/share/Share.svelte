@@ -1,3 +1,20 @@
+<script lang="ts" context="module">
+  export class ImageUrl {
+    constructor(public readonly url: string) {}
+  }
+
+  export class YouTubeId {
+    constructor(public readonly videoId: string) {}
+  }
+
+  export class SoundCloudId {
+    constructor(public readonly trackId: string) {}
+  }
+
+  export type MediaKey = ImageUrl | YouTubeId | SoundCloudId;
+</script>
+
+
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
   import type { Option } from "$lib/option";
@@ -8,14 +25,14 @@
     id,
     title,
     text,
-    firstImageUrl,
+    mediaKey,
     conversationsCount,
     timestamp,
   }: {
     id: Uuid7
     title: Option<string>;
     text: Option<string>;
-    firstImageUrl: Option<string>;
+    mediaKey: Option<MediaKey>;
     conversationsCount: number;
     timestamp: number;
   } = $props();
@@ -30,8 +47,32 @@
     return text !== undefined;
   }
 
-  function hasFirstImage(): boolean {
-    return firstImageUrl !== undefined;
+  function hasMedia(): boolean {
+    return mediaKey !== undefined;
+  }
+
+  function hasImage(key: Option<MediaKey> = mediaKey): key is ImageUrl {
+    return key instanceof ImageUrl;
+  }
+
+  function imageUrl(): string {
+    return hasImage(mediaKey) ? mediaKey.url : "";
+  }
+
+  function hasSoundCloudAudio(key: Option<MediaKey> = mediaKey): key is SoundCloudId {
+    return key instanceof SoundCloudId;
+  }
+
+  function soundCloudId(): string {
+    return hasSoundCloudAudio(mediaKey) ? mediaKey.trackId : "";
+  }
+
+  function hasYouTubeVideo(key: Option<MediaKey> = mediaKey): key is YouTubeId {
+    return key instanceof YouTubeId;
+  }
+
+  function youtubeVideoId(): string {
+    return hasYouTubeVideo(mediaKey) ? mediaKey.videoId : "";
   }
 
   type WithinOneWeek = { unit: string; t: number };
@@ -111,9 +152,28 @@
         <div class="text">{text}</div>
       {/if}
     </div>
-    {#if hasFirstImage()}
-      <div class="first-image">
-        <img src={firstImageUrl} />
+    {#if hasMedia()}
+      <div class="media">
+        {#if hasImage()}
+          <img src={imageUrl()} />
+        {:else if hasSoundCloudAudio()}
+          <iframe
+            title="SoundCloud audio player"
+            scrolling="no"
+            frameborder="no"
+            allow="autoplay"
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{soundCloudId()}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true">
+          </iframe>
+        {:else if hasYouTubeVideo()}
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/{youtubeVideoId()}"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen>
+          </iframe>
+        {/if}
       </div>
     {/if}
   </div>
@@ -145,6 +205,10 @@
     display: flex;
     gap: 0.125rem;
     flex-direction: column;
+  }
+
+  .share:hover {
+    background-color: #f9f9f9;
   }
 
   .content {
@@ -179,15 +243,21 @@
     white-space: pre-wrap;
   }
 
-  .first-image {
+  .media {
     width: 100%;
     height: 100%;
     min-height: 15.625rem;
     text-align: center;
   }
 
-  .first-image img {
+  .media img {
     max-width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+  }
+
+  .media iframe {
+    width: 100%;
     height: 100%;
     border-radius: 1rem;
   }
