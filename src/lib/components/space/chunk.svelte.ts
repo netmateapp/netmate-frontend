@@ -1,7 +1,11 @@
+import type { Option } from "$lib/option";
+
 const CHUNK_SCALE = 10;
 
 export type ChunksFetcher = (requiredChunkIndexes: Set<number>) => Chunk[];
-export type ChunksContentsRenderer = (currentPositionX: number, currentPositionY: number, loader: ChunkLoader) => void;
+export type ChunkMap = (chunkX: number, chunkY: number) => Option<Chunk>;
+export type RenderedChunksUpdater = (chunks: Chunk[]) => void;
+export type ChunksContentsRenderer = (reactivePositionX: number, reactivePositionY: number, map: ChunkMap) => void;
 
 const PREFETCH_RADIUS = 1;
 const DIRECTIONAL_PREFETCH_RADIUS = 5;
@@ -21,7 +25,7 @@ export class DynamicChunkLoader {
     this.chunkLoader.loadChunksAround(chunkX, chunkY);
     this.previousChunkX = chunkX;
     this.previousChunkY = chunkY;
-    this.chunksContentsRenderer(initialPositionX, initialPositionY, this.chunkLoader);
+    this.chunksContentsRenderer(initialPositionX, initialPositionY, this.chunkLoader.getChunk);
   }
 
   onPositionUpdate(x: number, y: number) {
@@ -31,7 +35,7 @@ export class DynamicChunkLoader {
       this.chunkLoader.loadChunksDirectionally(chunkX, chunkY, this.previousChunkX, this.previousChunkY);
       this.previousChunkX = chunkX;
       this.previousChunkY = chunkY;
-      this.chunksContentsRenderer(x, y, this.chunkLoader);
+      this.chunksContentsRenderer(x, y, this.chunkLoader.getChunk);
     }
   }
 
@@ -42,8 +46,6 @@ export class DynamicChunkLoader {
 
 export class ChunkLoader {
   private readonly keysToChunks = new Map<string, Chunk>();
-
-  private visibleChunks: Chunk[] = $state([]);
 
   constructor(
     private readonly chunksFetcher: ChunksFetcher,
@@ -70,17 +72,8 @@ export class ChunkLoader {
     }
   }
 
-  pchunksAround(x: number, y: number, radius: number): Chunk[] {
-    const chunkX = toChunkX(x);
-    const chunkY = toChunkY(y);
-    const chunks: Chunk[] = [];
-    for (var cx = chunkX - radius; cx <= chunkX + radius; cx++) {
-      for (var cy = chunkY - radius; cy <= chunkY + radius; cy++) {
-        const chunk = this.keysToChunks.get(toChunkKey(cx, cy));
-        if (chunk) chunks.push(chunk);
-      }
-    }
-    return chunks;
+  getChunk(chunkX: number, chunkY: number): Option<Chunk> {
+    return this.keysToChunks.get(toChunkKey(chunkX, chunkY));
   }
 
   loadChunksAround(chunkX: number, chunkY: number) {
@@ -140,11 +133,11 @@ export class SpaceCoreChunk implements Chunk {
   }
 }
 
-function toChunkX(x: number): number {
+export function toChunkX(x: number): number {
   return x >> CHUNK_SCALE;
 }
 
-function toChunkY(y: number): number {
+export function toChunkY(y: number): number {
   return y >> CHUNK_SCALE;
 }
 
