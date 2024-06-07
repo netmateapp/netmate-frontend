@@ -25,7 +25,7 @@ export class DynamicChunkLoader {
     this.loader.loadChunksAround(chunkX, chunkY);
     this.previousChunkX = chunkX;
     this.previousChunkY = chunkY;
-    this.updater(initialPositionX, initialPositionY, this.loader.getChunk);
+    this.updater(initialPositionX, initialPositionY, (x, y) => this.loader.getChunk(x, y));
   }
 
   onPositionUpdate(x: number, y: number) {
@@ -35,7 +35,7 @@ export class DynamicChunkLoader {
       this.loader.loadChunksDirectionally(chunkX, chunkY, this.previousChunkX, this.previousChunkY);
       this.previousChunkX = chunkX;
       this.previousChunkY = chunkY;
-      this.updater(x, y, this.loader.getChunk);
+      this.updater(x, y, (x, y) => this.loader.getChunk(x, y));
     }
   }
 
@@ -169,7 +169,7 @@ function toChunkIndex(chunkX: number, chunkY: number): number {
     offset = chunkY + distanceFromOrigin;
   }
 
-  let chunkGroupLongSideLength = 1 + chunkGroupId / 2;
+  let chunkGroupLongSideLength = 1 + Math.floor(chunkGroupId / 2);
 
   // チャンクグループ内の最初のチャンクのインデックスを計算
   let chunkGroupStartIndex = chunkGroupLongSideLength * chunkGroupLongSideLength + (chunkGroupId % 2 === 0 ? -chunkGroupLongSideLength : 0);
