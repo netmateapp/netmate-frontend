@@ -29,6 +29,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    z-index: 1;
   }
 
   .open-share-editor-button:hover {
