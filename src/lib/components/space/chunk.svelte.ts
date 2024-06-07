@@ -5,7 +5,7 @@ const CHUNK_SCALE = 10;
 export type ChunksFetcher = (requiredChunkIndexes: Set<number>) => Chunk[];
 export type ChunkMap = (chunkX: number, chunkY: number) => Option<Chunk>;
 export type RenderedChunksUpdater = (chunks: Chunk[]) => void;
-export type ChunksContentsRenderer = (reactivePositionX: number, reactivePositionY: number, map: ChunkMap) => void;
+export type RenderChunksUpdater = (currentPositionX: number, currentPositionY: number, map: ChunkMap) => void;
 
 const PREFETCH_RADIUS = 1;
 const DIRECTIONAL_PREFETCH_RADIUS = 5;
@@ -15,27 +15,27 @@ export class DynamicChunkLoader {
   private previousChunkY: number = 0;
 
   constructor(
-    private readonly chunkLoader: ChunkLoader,
-    private readonly chunksContentsRenderer: ChunksContentsRenderer
+    private readonly loader: ChunkLoader,
+    private readonly updater: RenderChunksUpdater
   ) {}
 
   initialLoad(initialPositionX: number, initialPositionY: number) {
     const chunkX = toChunkX(initialPositionX);
     const chunkY = toChunkY(initialPositionY);
-    this.chunkLoader.loadChunksAround(chunkX, chunkY);
+    this.loader.loadChunksAround(chunkX, chunkY);
     this.previousChunkX = chunkX;
     this.previousChunkY = chunkY;
-    this.chunksContentsRenderer(initialPositionX, initialPositionY, this.chunkLoader.getChunk);
+    this.updater(initialPositionX, initialPositionY, this.loader.getChunk);
   }
 
   onPositionUpdate(x: number, y: number) {
     const chunkX = toChunkX(x);
     const chunkY = toChunkY(y);
     if (this.isCrossChunks(chunkX, chunkY)) {
-      this.chunkLoader.loadChunksDirectionally(chunkX, chunkY, this.previousChunkX, this.previousChunkY);
+      this.loader.loadChunksDirectionally(chunkX, chunkY, this.previousChunkX, this.previousChunkY);
       this.previousChunkX = chunkX;
       this.previousChunkY = chunkY;
-      this.chunksContentsRenderer(x, y, this.chunkLoader.getChunk);
+      this.updater(x, y, this.loader.getChunk);
     }
   }
 

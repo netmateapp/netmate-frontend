@@ -9,9 +9,9 @@
   import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import { Uuid4, Uuid7 } from "$lib/uuid";
-  import { ChunkLoader, DynamicChunkLoader, SharesChunk, type Chunk, type ChunkMap, type ChunksContentsRenderer } from "$lib/components/space/chunk.svelte";
+  import { ChunkLoader, DynamicChunkLoader, SharesChunk } from "$lib/components/space/chunk.svelte";
   import { Position } from "$lib/components/space/move.svelte";
-    import { getChunksAround } from "./tagSpace";
+  import { RenderChunks, fetchChunks } from "./tagSpace";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -54,15 +54,25 @@
 
   const position = new Position(0, 0);
 
+  const renderChunks = new RenderChunks();
+  const chunkLoader = new DynamicChunkLoader(
+    new ChunkLoader(fetchChunks),
+    renderChunks.updateChunks
+  );
+
+  let isInitialized = false;
+  
   $effect(() => {
     position.init();
+    chunkLoader.initialLoad(0, 0);
+    isInitialized = true;
+    console.log("initialized");
   });
 
-  let renderedChunks: Chunk[] = $state([]);
-
-  const tagSpaceRenderer: ChunksContentsRenderer = (reactivePositionX: number, reactivePositionY: number, map: ChunkMap) => {
-    renderedChunks = getChunksAround(reactivePositionX, reactivePositionY, map);
-  };
+  $effect(() => {
+    console.log("update");
+    if (isInitialized) chunkLoader.onPositionUpdate(position.reactiveX(), position.reactiveY());
+  });
 
 </script>
 
@@ -75,7 +85,7 @@
 {#if isShareEditorVisible}
   <ShareEditor bind:this={shareEditor} closeEditor={closeShareEditor} />
 {/if}
-{#each chunkSystem.getVisibleChunks() as chunk}
+{#each renderChunks.getRenderChunks() as chunk}
   {#if chunk instanceof SharesChunk}
     {#each (chunk as SharesChunk).getShares() as share}
       <Share

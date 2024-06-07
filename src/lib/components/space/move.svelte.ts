@@ -21,11 +21,11 @@ export class Position {
     this.y = $state(initialY);
   }
 
-  getX(): number {
+  reactiveX(): number {
     return this.x;
   }
 
-  getY(): number {
+  reactiveY(): number {
     return this.y;
   }
 

@@ -19,7 +19,7 @@
   import type { Option } from "$lib/option";
   import { Uuid7 } from "$lib/uuid";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
-  import { getCurrentX, getCurrentY } from "../coordinateSystem.svelte";
+  import { getCurrentX, getCurrentY } from "../move.svelte";
 
   const _ = createTranslator("common", "share");
 

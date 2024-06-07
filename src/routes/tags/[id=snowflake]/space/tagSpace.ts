@@ -1,13 +1,24 @@
-import { toChunkX, toChunkY, type Chunk, type ChunksContentsRenderer, type ChunksFetcher, type ChunkMap } from "$lib/components/space/chunk.svelte";
+import { toChunkX, toChunkY, type Chunk, type RenderChunksUpdater, type ChunksFetcher, type ChunkMap } from "$lib/components/space/chunk.svelte";
 
-const fetch: ChunksFetcher = (requiredChunkIndexes: Set<number>) => {
-  const chunks: Chunk[] = [];
-  return chunks;
-};
+export class RenderChunks {
+  chunks: Chunk[] = $state([]);
+
+  updateChunks(currentPositionX: number, currentPositionY: number, map: ChunkMap) {
+    this.chunks = getChunksAround(currentPositionX, currentPositionY, map);
+  }
+
+  getRenderChunks(): Chunk[] {
+    return this.chunks;
+  }
+}
+
+export function fetchChunks(requiredChunkIndexes: Set<number>): Chunk[] {
+  return [];
+}
 
 const RENDER_RADIUS = 1;
 
-export function getChunksAround(x: number, y: number, map: ChunkMap) {
+function getChunksAround(x: number, y: number, map: ChunkMap) {
   const chunkX = toChunkX(x);
   const chunkY = toChunkY(y);
   const chunks: Chunk[] = [];
