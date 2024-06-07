@@ -5,8 +5,8 @@ function isMouseEvent(event: InteractionEvent): event is MouseEvent {
 }
 
 export class Position {
-  private x: number;
-  private y: number;
+  private x: number = $state(0);
+  private y: number = $state(0);
 
   private isDragging = false;
   private previousX: number = 0;
@@ -17,8 +17,8 @@ export class Position {
   private isCoordinateUpdated = false;
 
   constructor(initialX: number, initialY: number) {
-    this.x = $state(initialX);
-    this.y = $state(initialY);
+    this.x = initialX;
+    this.y = initialY;
   }
 
   reactiveX(): number {
@@ -80,6 +80,25 @@ export class Position {
     document.body.style.userSelect = '';
   }
 
+  applyInertia() {
+    const friction = 0.95;
+    const minVelocity = 0.5;
+  
+    const step = () =>  {
+      if (Math.abs(this.velocityX) > minVelocity || Math.abs(this.velocityY) > minVelocity) {
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+  
+        this.velocityX *= friction;
+        this.velocityY *= friction;
+  
+        this.animationFrameId = requestAnimationFrame(step);
+      }
+    };
+  
+    step();
+  }
+
   interactMove(event: InteractionEvent) {
     if (this.isDragging) {
       if (!this.isCoordinateUpdated) this.isCoordinateUpdated = true;
@@ -124,37 +143,18 @@ export class Position {
     }
   }
   
-  applyInertia() {
-    const friction = 0.95;
-    const minVelocity = 0.5;
-  
-    const step = () =>  {
-      if (Math.abs(this.velocityX) > minVelocity || Math.abs(this.velocityY) > minVelocity) {
-        this.x += this.velocityX;
-        this.y += this.velocityY;
-  
-        this.velocityX *= friction;
-        this.velocityY *= friction;
-  
-        this.animationFrameId = requestAnimationFrame(step);
-      }
-    };
-  
-    step();
-  }
-
   init() {
-    document.addEventListener("touchstart", this.interactStart);
-    document.addEventListener("touchmove", this.interactMove);
-    document.addEventListener("touchend", this.interactEnd);
+    document.addEventListener("touchstart", (event) => this.interactStart(event));
+    document.addEventListener("touchmove", (event) => this.interactMove(event));
+    document.addEventListener("touchend", (event) => this.interactEnd(event));
 
-    document.addEventListener("mousedown", this.interactStart);
-    document.addEventListener("mousemove", this.interactMove);
-    document.addEventListener("mouseleave", this.interactEnd);
-    document.addEventListener("mouseup", this.interactEnd);
+    document.addEventListener("mousedown", (event) => this.interactStart(event));
+    document.addEventListener("mousemove", (event) => this.interactMove(event));
+    document.addEventListener("mouseleave", (event) => this.interactEnd(event));
+    document.addEventListener("mouseup", (event) => this.interactEnd(event));
 
-    document.addEventListener("click", this.cancelDefaultBehaviorWhenMoving);
+    document.addEventListener("click", (event) => this.cancelDefaultBehaviorWhenMoving(event));
 
-    document.addEventListener("dragstart", this.disableDrag);
+    document.addEventListener("dragstart", (event) => this.disableDrag(event));
   }
 }
