@@ -19,11 +19,13 @@
   import type { Option } from "$lib/option";
   import { Uuid7 } from "$lib/uuid";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
-  import { getCurrentX, getCurrentY } from "../space.svelte";
+  import { getCurrentX, getCurrentY } from "../coordinateSystem.svelte";
 
   const _ = createTranslator("common", "share");
 
   let {
+    absoluteX,
+    absoluteY,
     id,
     title,
     text,
@@ -31,7 +33,9 @@
     conversationsCount,
     timestamp,
   }: {
-    id: Uuid7
+    absoluteX: number;
+    absoluteY: number;
+    id: Uuid7;
     title: Option<string>;
     text: Option<string>;
     mediaKey: Option<MediaKey>;
@@ -39,10 +43,8 @@
     timestamp: number;
   } = $props();
 
-  let x = 0;
-  let y = 0;
-  let apparentX: number = $derived(x + getCurrentX());
-  let apparentY: number = $derived(y + getCurrentY());
+  let apparentX: number = $derived(absoluteX + getCurrentX());
+  let apparentY: number = $derived(absoluteY + getCurrentY());
 
   function hasTitle(): boolean {
     return title !== undefined;

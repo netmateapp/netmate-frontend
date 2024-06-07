@@ -5,7 +5,7 @@
   import OpenShareEditorButton from "$lib/components/common/share-editor/OpenShareEditorButton.svelte";
   import ShareEditor from "$lib/components/common/share-editor/ShareEditor.svelte";
   import Share, { ImageUrl } from "$lib/components/space/share/Share.svelte";
-    import { initializeSpace } from "$lib/components/space/space.svelte";
+  import { initializeSpace } from "$lib/components/space/coordinateSystem.svelte";
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
   import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
@@ -54,10 +54,12 @@
   <ShareEditor bind:this={shareEditor} closeEditor={closeShareEditor} />
 {/if}
 <Share
+  absoluteX={0}
+  absoluteY={0}
   id={genTestUuid7()}
-  title={"おもしれー女"}
+  title={"ネットメイドちゃん"}
   text={"描いたﾖ\nかわわ"}
-  mediaKey={new ImageUrl("https://pbs.twimg.com/media/GO7IK9yagAEq4bw?format=jpg&name=4096x4096")}
+  mediaKey={new ImageUrl("/src/lib/assets/logo-temp.png")}
   conversationsCount={212}
   timestamp={1717209513416} />
 <TagMenu />
