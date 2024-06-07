@@ -1,4 +1,4 @@
-import { toChunkX, toChunkY, type Chunk, type RenderChunksUpdater, type ChunksFetcher, type ChunkMap } from "$lib/components/space/chunk.svelte";
+import { toChunkX, toChunkY, type Chunk, type RenderChunksUpdater, type ChunksFetcher, type ChunkMap, SharesChunk, toChunkXY } from "$lib/components/space/chunk.svelte";
 
 export class RenderChunks {
   chunks: Chunk[] = $state([]);
@@ -13,7 +13,13 @@ export class RenderChunks {
 }
 
 export function fetchChunks(requiredChunkIndexes: Set<number>): Chunk[] {
-  return [];
+  const chunks: Chunk[] = [];
+  for (var index of requiredChunkIndexes) {
+    const xy = toChunkXY(index);
+    console.log(index);
+    chunks.push(new SharesChunk(xy[0], xy[1]));
+  }
+  return chunks;
 }
 
 const RENDER_RADIUS = 1;
