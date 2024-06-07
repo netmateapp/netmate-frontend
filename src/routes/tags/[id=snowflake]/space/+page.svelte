@@ -11,7 +11,7 @@
   import { Uuid4, Uuid7 } from "$lib/uuid";
   import { ChunkLoader, DynamicChunkLoader, SharesChunk } from "$lib/components/space/chunk.svelte";
   import { Position } from "$lib/components/space/move.svelte";
-  import { RenderChunks, fetchChunks } from "./tagSpace";
+  import { RenderChunks, fetchChunks } from "./tagSpace.svelte";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -57,7 +57,7 @@
   const renderChunks = new RenderChunks();
   const chunkLoader = new DynamicChunkLoader(
     new ChunkLoader(fetchChunks),
-    renderChunks.updateChunks
+    (x, y, map) => renderChunks.updateChunks(x, y, map)
   );
 
   let isInitialized = false;
@@ -66,12 +66,12 @@
     position.init();
     chunkLoader.initialLoad(0, 0);
     isInitialized = true;
-    console.log("initialized");
   });
 
   $effect(() => {
-    console.log("update");
-    if (isInitialized) chunkLoader.onPositionUpdate(position.reactiveX(), position.reactiveY());
+    if (isInitialized) {
+      chunkLoader.onPositionUpdate(-position.reactiveX(), -position.reactiveY());
+    }
   });
 
 </script>
@@ -89,8 +89,8 @@
   {#if chunk instanceof SharesChunk}
     {#each (chunk as SharesChunk).getShares() as share}
       <Share
-        absoluteX={(chunk.chunkX * 1024) + share[0]}
-        absoluteY={(chunk.chunkY * 1024) + share[1]}
+        apparentX={(chunk.chunkX * 1024) + share[0] + position.reactiveX()}
+        apparentY={(chunk.chunkY * 1024) + share[1] + position.reactiveY()}
         id={genTestUuid7()}
         title={"ネットメイドちゃん"}
         text={"描いたﾖ\nかわわ"}
