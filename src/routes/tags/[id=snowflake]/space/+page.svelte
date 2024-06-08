@@ -5,13 +5,16 @@
   import OpenShareEditorButton from "$lib/components/common/share-editor/OpenShareEditorButton.svelte";
   import ShareEditor from "$lib/components/common/share-editor/ShareEditor.svelte";
   import Share, { ImageUrl } from "$lib/components/space/share/Share.svelte";
+  import SpaceCore from "$lib/components/space/core/SpaceCore.svelte";
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
   import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import { Uuid4, Uuid7 } from "$lib/uuid";
-  import { ChunkLoader, DynamicChunkLoader, SharesChunk } from "$lib/components/space/chunk.svelte";
-  import { Position } from "$lib/components/space/move.svelte";
+  import { ChunkLoader, DynamicChunkLoader, SharesChunk, SpaceCoreChunk } from "$lib/components/space/chunkLoader.svelte";
+  import { Position } from "$lib/components/space/movement.svelte";
   import { RenderChunks, fetchChunks } from "./tagSpace.svelte";
+  import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "$lib/components/space/coordinate-mapper";
+  import Chunk from "$lib/components/space/Chunk.svelte";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -52,7 +55,7 @@
     return testUuid!;
   }
 
-  const position = new Position(0, 0);
+  const position = new Position(512, 512);
 
   const renderChunks = new RenderChunks();
   const chunkLoader = new DynamicChunkLoader(
@@ -61,19 +64,47 @@
   );
 
   let isInitialized = false;
+
+  let innerWidth = $state(0);
+  let innerHeight = $state(0);
+
+  function onResize() {
+    innerWidth = window.innerWidth;
+    innerHeight = window.innerHeight;
+  }
   
   $effect(() => {
     position.init();
     chunkLoader.initialLoad(0, 0);
     isInitialized = true;
+    innerWidth = window.innerWidth;
+    innerHeight = window.innerHeight;
+    window.addEventListener("resize", onResize);
   });
 
   $effect(() => {
     if (isInitialized) {
-      chunkLoader.onPositionUpdate(-position.reactiveX(), -position.reactiveY());
+      chunkLoader.onPositionUpdate(position.reactiveX(), position.reactiveY());
     }
   });
 
+  function mapToHtmlX(chunkX: number): number {
+    return toHtmlX(
+      chunkX * 1024,
+      diffX(position.reactiveX(), centerHtmlX(innerWidth))
+    );
+  }
+
+  function mapToHtmlY(chunkY: number): number {
+    return toHtmlY(
+      chunkY * 1024,
+      diffY(position.reactiveY(), centerHtmlY(innerHeight))
+    );
+  }
+
+/**
+ * 通常の共有データを流し込む際は、eachで共有のIDをkeyに指定する必要がある
+*/
 </script>
 
 <title>タグスペース</title>
@@ -87,17 +118,41 @@
 {/if}
 {#each renderChunks.getRenderChunks() as chunk}
   {#if chunk instanceof SharesChunk}
-    {#each (chunk as SharesChunk).getShares() as share}
-      <Share
-        apparentX={(chunk.chunkX * 1024) + share[0] + position.reactiveX()}
-        apparentY={(chunk.chunkY * 1024) + share[1] + position.reactiveY()}
-        id={genTestUuid7()}
-        title={"ネットメイドちゃん"}
-        text={"描いたﾖ\nかわわ"}
-        mediaKey={new ImageUrl("/src/lib/assets/logo-temp.png")}
-        conversationsCount={212}
-        timestamp={1717209513416} />
-    {/each}
+    <Chunk apparentX={mapToHtmlX(chunk.chunkX)} apparentY={mapToHtmlY(chunk.chunkY)} >
+      {#each (chunk as SharesChunk).getShares() as share}
+        <Share
+          apparentX={share[0]}
+          apparentY={share[1]}
+          id={genTestUuid7()}
+          title={"ネットメイドちゃん"}
+          text={"描いたﾖ\nかわわ"}
+          mediaKey={new ImageUrl("/src/lib/assets/logo-temp.png")}
+          conversationsCount={212}
+          timestamp={1717209513416} />
+      {/each}
+    </Chunk>
+  {:else}
+    <Chunk apparentX={mapToHtmlX(chunk.chunkX)} apparentY={mapToHtmlY(chunk.chunkY)} >
+      <SpaceCore apparentX={24} apparentY={24} >
+        {#each (chunk as SpaceCoreChunk).getShares() as share}
+          <Share
+          apparentX={share[0]}
+          apparentY={share[1]}
+          id={genTestUuid7()}
+          title={"ネットメイドちゃん"}
+          text={"描いたﾖ\nかわわ"}
+          mediaKey={new ImageUrl("/src/lib/assets/logo-temp.png")}
+          conversationsCount={212}
+          timestamp={1717209513416} />
+        {/each}
+      </SpaceCore>
+    </Chunk>
   {/if}
 {/each}
 <TagMenu />
+
+<style>
+  :global(body) {
+    overflow: hidden;
+  }
+</style>

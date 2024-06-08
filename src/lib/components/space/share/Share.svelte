@@ -199,7 +199,7 @@
 
 <style>
   .share {
-    position: fixed;
+    position: absolute;
     width: 29.25rem;
     max-height: 29.25rem;
     padding: 1rem 1rem 0.125rem 1rem;
@@ -209,6 +209,10 @@
     display: flex;
     gap: 0.125rem;
     flex-direction: column;
+  }
+
+  .share:hover {
+    background-color: #f9f9f9;
   }
 
   .content {

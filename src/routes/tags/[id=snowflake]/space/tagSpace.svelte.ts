@@ -1,10 +1,10 @@
-import { toChunkX, toChunkY, type Chunk, type RenderChunksUpdater, type ChunksFetcher, type ChunkMap, SharesChunk, toChunkXY } from "$lib/components/space/chunk.svelte";
+import { toChunkX, toChunkY, type Chunk, type ChunkMap, SharesChunk, toChunkXY, SpaceCoreChunk } from "$lib/components/space/chunkLoader.svelte";
 
 export class RenderChunks {
   chunks: Chunk[] = $state([]);
 
-  updateChunks(currentPositionX: number, currentPositionY: number, map: ChunkMap) {
-    this.chunks = getChunksAround(currentPositionX, currentPositionY, map);
+  updateChunks(currentX: number, currentY: number, map: ChunkMap) {
+    this.chunks = getChunksAround(currentX, currentY, map);
   }
 
   getRenderChunks(): Chunk[] {
@@ -16,13 +16,18 @@ export function fetchChunks(requiredChunkIndexes: Set<number>): Chunk[] {
   const chunks: Chunk[] = [];
   for (var index of requiredChunkIndexes) {
     const xy = toChunkXY(index);
-    console.log(index);
-    chunks.push(new SharesChunk(xy[0], xy[1]));
+    if (xy[0] === 0 && xy[1] === 0) {
+      chunks.push(new SpaceCoreChunk(xy[0], xy[1]));
+    } else if (xy[0] === 1 && xy[1] === 1) {
+      chunks.push(new SpaceCoreChunk(xy[0], xy[1]));
+    } else {
+      chunks.push(new SharesChunk(xy[0], xy[1]));
+    }
   }
   return chunks;
 }
 
-const RENDER_RADIUS = 1;
+const RENDER_RADIUS = 2;
 
 function getChunksAround(x: number, y: number, map: ChunkMap) {
   const chunkX = toChunkX(x);
