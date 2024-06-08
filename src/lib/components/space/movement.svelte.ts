@@ -4,13 +4,15 @@ function isMouseEvent(event: InteractionEvent): event is MouseEvent {
   return event instanceof MouseEvent;
 }
 
+// 直交座標系の座標は修飾子無し、HTML座標系の座標は`HTML`修飾子を変数名等に付する
+
 export class Position {
   private x: number = $state(0);
   private y: number = $state(0);
 
   private isDragging = false;
-  private previousX: number = 0;
-  private previousY: number = 0;
+  private previousHtmlX: number = 0;
+  private previousHtmlY: number = 0;
   private velocityX: number = 0;
   private velocityY: number = 0;
   private animationFrameId: number = 0;
@@ -33,11 +35,11 @@ export class Position {
     this.isDragging = true;
 
     if (isMouseEvent(event)) {
-      this.previousX = event.clientX;
-      this.previousY = event.clientY;
+      this.previousHtmlX = event.clientX;
+      this.previousHtmlY = event.clientY;
     } else {
-      this.previousX = event.touches[0].clientX;
-      this.previousY = event.touches[0].clientY;
+      this.previousHtmlX = event.touches[0].clientX;
+      this.previousHtmlY = event.touches[0].clientY;
     }
 
     cancelAnimationFrame(this.animationFrameId);
@@ -103,18 +105,19 @@ export class Position {
     if (this.isDragging) {
       if (!this.isCoordinateUpdated) this.isCoordinateUpdated = true;
   
-      let clientX: number, clientY: number, movementX: number, movementY: number;
+      let htmlX: number, htmlY: number, movementX: number, movementY: number;
   
       if (isMouseEvent(event)) {
-        clientX = event.clientX;
-        clientY = event.clientY;
+        htmlX = event.clientX;
+        htmlY = event.clientY;
       } else {
-        clientX = event.touches[0].clientX;
-        clientY = event.touches[0].clientY;
+        htmlX = event.touches[0].clientX;
+        htmlY = event.touches[0].clientY;
       }
   
-      movementX = clientX - this.previousX;
-      movementY = clientY - this.previousY;
+      movementX = -(htmlX - this.previousHtmlX);
+      const movementHtmlY = -(htmlY - this.previousHtmlY);
+      movementY = -movementHtmlY;
   
       this.x += movementX;
       this.y += movementY;
@@ -124,8 +127,8 @@ export class Position {
       this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, movementX));
       this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, movementY));
   
-      this.previousX = clientX;
-      this.previousY = clientY;
+      this.previousHtmlX = htmlX;
+      this.previousHtmlY = htmlY;
     }
   }
   
