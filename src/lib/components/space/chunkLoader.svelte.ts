@@ -119,7 +119,7 @@ export class SharesChunk implements Chunk {
   }
 
   getShares(): [number, number][] {
-    return [[0, 0], [528, 0], [0, 528], [528, 528]];
+    return [[528, 0], [0, 528], [528, 528]];
   }
 }
 
@@ -130,6 +130,10 @@ export class SpaceCoreChunk implements Chunk {
   constructor(chunkX: number, chunkY: number) {
     this.chunkX = chunkX;
     this.chunkY = chunkY;
+  }
+
+  getShares(): [number, number][] {
+    return [[0, 0], [528, 528]];
   }
 }
 
