@@ -83,6 +83,10 @@
     innerWidth = window.innerWidth;
     innerHeight = window.innerHeight;
     window.addEventListener("resize", onResize);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/") console.log(`x: ${position.reactiveX()}, y: ${position.reactiveY()}`);
+    });
   });
 
   $effect(() => {

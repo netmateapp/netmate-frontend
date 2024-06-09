@@ -2,10 +2,11 @@ import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "./coor
 import type { Position } from "./movement.svelte";
 
 const MAX_SCALE = 1.0;
+const DEFAULT_SCALE = 1.0;
 const MIN_SCALE = 0.5;
 
 export class Scaler {
-  __scale: number = $state(MAX_SCALE);
+  __scale: number = $state(DEFAULT_SCALE);
   
   constructor(private readonly position: Position) {}
 
@@ -17,10 +18,12 @@ export class Scaler {
     if (this.__scale + 0.1 <= MAX_SCALE) {
       this.__scale += 0.1;
 
-      const dx = diffX(512, centerHtmlX(innerWidth)) / 5;
-      const dy = diffY(512, centerHtmlY(innerHeight)) / 5;
+      const unitx = diffX(512, centerHtmlX(innerWidth)) / 15;
+      const xs = [unitx, unitx * 2, unitx * 3, unitx * 4, unitx * 5];
+      const unity = diffY(512, centerHtmlY(innerHeight)) / 15;
+      const ys = [unity, unity * 2, unity * 3, unity * 4, unity * 5];
 
-      this.position.add(-dx, -dy);
+      this.position.add(-xs[10 - Math.round(this.__scale * 10)], -ys[10 - Math.round(this.__scale * 10)]);
     }
   }
 
@@ -28,11 +31,12 @@ export class Scaler {
     if (this.__scale - 0.1 >= MIN_SCALE) {
       this.__scale -= 0.1;
 
-      const diffx = diffX(512, centerHtmlX(innerWidth)) / 5;
+      const unitx = diffX(512, centerHtmlX(innerWidth)) / 15;
+      const xs = [unitx, unitx * 2, unitx * 3, unitx * 4, unitx * 5];
+      const unity = diffY(512, centerHtmlY(innerHeight)) / 15;
+      const ys = [unity, unity * 2, unity * 3, unity * 4, unity * 5];
 
-      const diffy = diffY(512, centerHtmlY(innerHeight)) / 5;
-
-      this.position.add(diffx, diffy);
+      this.position.add(xs[10 - Math.round(this.__scale * 10) - 1], ys[10 - Math.round(this.__scale * 10) - 1]);
     }
   }
 
