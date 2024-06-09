@@ -14,7 +14,8 @@
   import { Position } from "$lib/components/space/movement.svelte";
   import { RenderChunks, fetchChunks } from "./tagSpace.svelte";
   import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "$lib/components/space/coordinate-mapper";
-  import Chunk from "$lib/components/space/Chunk.svelte";
+  import Chunk from "$lib/components/space/chunk/Chunk.svelte";
+    import { Scaler } from "$lib/components/space/scale.svelte";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -56,13 +57,13 @@
   }
 
   const position = new Position(512, 512);
+  const scaler = new Scaler(position);
 
   const renderChunks = new RenderChunks();
   const chunkLoader = new DynamicChunkLoader(
     new ChunkLoader(fetchChunks),
     (x, y, map) => renderChunks.updateChunks(x, y, map)
   );
-
   let isInitialized = false;
 
   let innerWidth = $state(0);
@@ -76,7 +77,9 @@
   $effect(() => {
     position.init();
     chunkLoader.initialLoad(0, 0);
+    scaler.initScaler();
     isInitialized = true;
+
     innerWidth = window.innerWidth;
     innerHeight = window.innerHeight;
     window.addEventListener("resize", onResize);
@@ -102,6 +105,13 @@
     );
   }
 
+  function makeScalableX(htmlX: number): number {
+    return htmlX * scaler.scale();
+  }
+
+  function makeScalableY(htmlY: number): number {
+    return htmlY * scaler.scale();
+  }
 /**
  * 通常の共有データを流し込む際は、eachで共有のIDをkeyに指定する必要がある
 */
@@ -118,7 +128,7 @@
 {/if}
 {#each renderChunks.getRenderChunks() as chunk}
   {#if chunk instanceof SharesChunk}
-    <Chunk apparentX={mapToHtmlX(chunk.chunkX)} apparentY={mapToHtmlY(chunk.chunkY)} >
+    <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
       {#each (chunk as SharesChunk).getShares() as share}
         <Share
           apparentX={share[0]}
@@ -132,7 +142,7 @@
       {/each}
     </Chunk>
   {:else}
-    <Chunk apparentX={mapToHtmlX(chunk.chunkX)} apparentY={mapToHtmlY(chunk.chunkY)} >
+    <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
       <SpaceCore apparentX={24} apparentY={24} >
         {#each (chunk as SpaceCoreChunk).getShares() as share}
           <Share

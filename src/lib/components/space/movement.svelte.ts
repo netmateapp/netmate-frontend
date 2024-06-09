@@ -1,3 +1,5 @@
+import type { Scaler } from "./scale.svelte";
+
 type InteractionEvent = MouseEvent | TouchEvent;
 
 function isMouseEvent(event: InteractionEvent): event is MouseEvent {
@@ -17,10 +19,20 @@ export class Position {
   private velocityY: number = 0;
   private animationFrameId: number = 0;
   private isCoordinateUpdated = false;
-
+  
   constructor(initialX: number, initialY: number) {
     this.x = initialX;
     this.y = initialY;
+  }
+
+  add(ax: number, ay: number) {
+    this.x += ax;
+    this.y += ay;
+  }
+
+  set(sx: number, sy: number) {
+    this.x = sx;
+    this.y = sy;
   }
 
   reactiveX(): number {
@@ -122,8 +134,8 @@ export class Position {
       this.x += movementX;
       this.y += movementY;
 
-      const maxVelocity = 50;
-  
+      const maxVelocity = 60;
+
       this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, movementX));
       this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, movementY));
   
