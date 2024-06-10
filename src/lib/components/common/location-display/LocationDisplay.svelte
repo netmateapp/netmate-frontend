@@ -16,9 +16,11 @@
     <div class="spacer"></div>
     <span class="location-name">{locationName}</span>
   </div>
-  <button class="button">
-    <span class="label">{_(buttonLabelTranslationKey())}</span>
-  </button>
+  <div class="centered-button">
+    <button class="button">
+      <span class="label">{_(buttonLabelTranslationKey())}</span>
+    </button>
+  </div>
 </div>
 
 <style>
@@ -48,9 +50,17 @@
     line-height: 1.875rem;
   }
 
+  .centered-button {
+    display: flex;
+    height: 2.0625rem;
+    padding: 0rem 0.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
   .button {
     border-radius: 100vmax;
-    background-color: var(--dominant-color);
     border: 1px solid var(--light-gray);
     display: flex;
     width: 11.375rem;

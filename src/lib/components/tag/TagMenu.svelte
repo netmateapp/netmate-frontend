@@ -171,6 +171,9 @@
           >{_(`${relation}-tags`)}</span
         >
       </div>
+      {#if index < 2}
+        <div class="tab-spacer"></div>
+      {/if}
     {/each}
   </div>
   <div class="search-box">
@@ -261,7 +264,6 @@
 
   .tab {
     border-radius: 0.5rem;
-    background-color: var(--dominant-color);
     display: flex;
     height: 2rem;
     min-width: 3.625rem;
@@ -286,10 +288,16 @@
     color: var(--secondary-color);
   }
 
+  .tab-spacer {
+    max-width: 0.5rem;
+    flex: 1 0 0;
+    align-self: stretch;
+  }
+
   .search-box {
     border-radius: 0.5rem;
-    background: var(--dominant-color);
     display: flex;
+    max-width: 11.875rem;
     padding: 0.25rem;
     align-items: center;
   }
