@@ -4,19 +4,23 @@
   import SearchBox from "$lib/components/common/search-box/SearchBox.svelte";
   import OpenShareEditorButton from "$lib/components/common/share-editor/OpenShareEditorButton.svelte";
   import ShareEditor from "$lib/components/common/share-editor/ShareEditor.svelte";
-  import Share, { ImageUrl } from "$lib/components/space/share/Share.svelte";
+  import Share from "$lib/components/space/share/Share.svelte";
   import SpaceCore from "$lib/components/space/core/SpaceCore.svelte";
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
   import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
-  import { genTestUuid7 } from "$lib/uuid";
   import { ChunkLoader, DynamicChunkLoader, SharesChunk, SpaceCoreChunk } from "$lib/components/space/chunkLoader.svelte";
   import { Position } from "$lib/components/space/movement.svelte";
   import { RenderChunks, fetchChunks } from "./tagSpace.svelte";
-  import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "$lib/components/space/coordinate-mapper";
+  import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "$lib/components/space/coordinateMapper";
   import Chunk from "$lib/components/space/chunk/Chunk.svelte";
   import { Scaler } from "$lib/components/space/scale.svelte";
-    import Location from "$lib/components/space/location/Location.svelte";
+  import Location from "$lib/components/space/location/Location.svelte";
+  import type { PageServerData } from "./$types";
+  import { Uuid4 } from "$lib/uuid";
+   import type { Ok } from "$lib/result";
+
+  let { data }: { data: PageServerData } = $props(); 
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -39,7 +43,7 @@
     isShareEditorVisible = false;
   }
 
-  const position = new Position(512, 512);
+  const position = new Position(512, 512 + 256);
   const scaler = new Scaler(position);
 
   const renderChunks = new RenderChunks();
@@ -49,12 +53,12 @@
   );
   let isInitialized = false;
 
-  let innerWidth = $state(0);
-  let innerHeight = $state(0);
+  let viewportWidth = $state(0);
+  let viewportHeight = $state(0);
 
   function onResize() {
-    innerWidth = window.innerWidth;
-    innerHeight = window.innerHeight;
+    viewportWidth = window.innerWidth;
+    viewportHeight = window.innerHeight;
   }
   
   $effect(() => {
@@ -63,8 +67,8 @@
     scaler.initScaler();
     isInitialized = true;
 
-    innerWidth = window.innerWidth;
-    innerHeight = window.innerHeight;
+    viewportWidth = window.innerWidth;
+    viewportHeight = window.innerHeight;
     window.addEventListener("resize", onResize);
   });
 
@@ -77,14 +81,14 @@
   function mapToHtmlX(chunkX: number): number {
     return toHtmlX(
       chunkX * 1024,
-      diffX(position.reactiveX(), centerHtmlX(innerWidth))
+      diffX(position.reactiveX(), centerHtmlX(viewportWidth))
     );
   }
 
   function mapToHtmlY(chunkY: number): number {
     return toHtmlY(
       chunkY * 1024,
-      diffY(position.reactiveY(), centerHtmlY(innerHeight))
+      diffY(position.reactiveY(), centerHtmlY(viewportHeight))
     );
   }
 
@@ -95,12 +99,32 @@
   function makeScalableY(htmlY: number): number {
     return htmlY * scaler.scale();
   }
-/**
- * 通常の共有データを流し込む際は、eachで共有のIDをkeyに指定する必要がある
-*/
+
+  function isCenterChunk(chunkX: number, chunkY: number): boolean {
+    return chunkX === 0 && chunkY === 0;
+  }
+
+  function calculateSharePositionX(indexInChunk: number, chunkX: number, chunkY: number): number {
+    if (isCenterChunk(chunkX, chunkY)) return indexInChunk === 0 ? 22 : 534;
+    else return indexInChunk === 0 ? 22 : 534;
+  }
+
+  let pageLocationRef: MaybeComponent = $state(null);
+  function calculateSharePositionY(indexInChunk: number, chunkX: number, chunkY: number): number {
+    if (isCenterChunk(chunkX, chunkY)) return 40 + (pageLocationRef?.getHeight() ?? 42) + 16;
+    else return indexInChunk === 0 ? 22 : 534;
+  }
+
+  function tagName(): string {
+    return data.tag.name;
+  }
+
+  function tagId(): Uuid4 {
+    return (Uuid4.from(data.tag.id) as Ok<{}, Uuid4>).value;
+  }
 </script>
 
-<title>タグスペース</title>
+<title>{tagName()}</title>
 
 <Brand x={16} y={8} />
 <SearchBox />
@@ -112,10 +136,13 @@
 {#each renderChunks.getRenderChunks() as chunk (chunk.getKey())}
   {#if chunk instanceof SharesChunk}
     <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
+      {#if isCenterChunk(chunk.chunkX, chunk.chunkY)}
+        <Location bind:this={pageLocationRef} locationName={tagName()} isTag={true} id={tagId()} apparentX={512} apparentY={40} />
+      {/if}
       {#each (chunk as SharesChunk).getShareDataInOrder() as share, index}
         <Share
-          apparentX={index === 0 ? 22 : 534}
-          apparentY={index === 0 ? 22 : 534}
+          apparentX={calculateSharePositionX(index, chunk.chunkX, chunk.chunkY)}
+          apparentY={calculateSharePositionY(index, chunk.chunkX, chunk.chunkY)}
           id={share.id}
           title={share.title}
           text={share.text}
@@ -127,7 +154,7 @@
   {:else}
     <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
       <SpaceCore tagId={(chunk as SpaceCoreChunk).subtagId} apparentX={24} apparentY={24} >
-        <Location locationName={(chunk as SpaceCoreChunk).subtagName} apparentX={488} apparentY={160} />
+        <Location locationName={(chunk as SpaceCoreChunk).subtagName} isTag={true} id={(chunk as SpaceCoreChunk).subtagId} apparentX={488} apparentY={160} />
         {#each (chunk as SpaceCoreChunk).getShareDataInOrder() as share, index}
         <Share
           apparentX={index === 0 ? -2 : 510}

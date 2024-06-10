@@ -1,4 +1,4 @@
-import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "./coordinate-mapper";
+import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "./coordinateMapper";
 import type { Position } from "./movement.svelte";
 
 const MAX_SCALE = 1.0;
