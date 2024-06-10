@@ -13,15 +13,23 @@ export class RenderChunks {
 }
 
 export function fetchChunks(requiredChunkIndexes: Set<number>): Chunk[] {
+  return fetchTestChunks(requiredChunkIndexes);
+}
+
+function fetchTestChunks(requiredChunkIndexes: Set<number>): Chunk[] {
   const chunks: Chunk[] = [];
   for (var index of requiredChunkIndexes) {
     const xy = toChunkXY(index);
     if (xy[0] === 0 && xy[1] === 0) {
-      chunks.push(new SpaceCoreChunk(xy[0], xy[1]));
-    } else if (xy[0] === 1 && xy[1] === 1) {
-      chunks.push(new SpaceCoreChunk(xy[0], xy[1]));
-    } else {
       chunks.push(new SharesChunk(xy[0], xy[1]));
+    } else {
+      const max = 12;
+      const rand = Math.floor(Math.random() * max);
+      if (rand < max - 1) {
+        chunks.push(new SharesChunk(xy[0], xy[1]));
+      } else {
+        chunks.push(new SpaceCoreChunk(xy[0], xy[1]));
+      }
     }
   }
   return chunks;
