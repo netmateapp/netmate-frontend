@@ -1,4 +1,5 @@
 import type { Option } from "$lib/option";
+import { genTestShareData, TestShareData } from "./shareData";
 
 const CHUNK_SCALE = 10;
 
@@ -104,36 +105,34 @@ export class ChunkLoader {
   }
 }
 
-export interface Chunk {
-  readonly chunkX: number;
-  readonly chunkY: number;
-}
+export abstract class Chunk {
+  constructor(
+    readonly chunkX: number,
+    readonly chunkY: number
+  ) {}
 
-export class SharesChunk implements Chunk {
-  readonly chunkX: number;
-  readonly chunkY: number;
-  
-  constructor(chunkX: number, chunkY: number) {
-    this.chunkX = chunkX;
-    this.chunkY = chunkY;
-  }
-
-  getShares(): [number, number][] {
-    return [[528, 0], [0, 528], [528, 528]];
+  getKey(): string {
+    return toChunkKey(this.chunkX, this.chunkY);
   }
 }
 
-export class SpaceCoreChunk implements Chunk {
-  readonly chunkX: number;
-  readonly chunkY: number;
-  
+export class SharesChunk extends Chunk {
   constructor(chunkX: number, chunkY: number) {
-    this.chunkX = chunkX;
-    this.chunkY = chunkY;
+    super(chunkX, chunkY);
   }
 
-  getShares(): [number, number][] {
-    return [[0, 0], [528, 528]];
+  getShareDataInOrder(): TestShareData[] {
+    return [genTestShareData(), genTestShareData()];
+  }
+}
+
+export class SpaceCoreChunk extends Chunk {
+  constructor(chunkX: number, chunkY: number) {
+    super(chunkX, chunkY);
+  }
+
+  getShareDataInOrder(): TestShareData[] {
+    return [genTestShareData(), genTestShareData()];
   }
 }
 

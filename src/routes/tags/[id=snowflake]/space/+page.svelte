@@ -9,13 +9,13 @@
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
   import type { InteractEvent, MaybeComponent } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
-  import { Uuid4, Uuid7 } from "$lib/uuid";
+  import { genTestUuid7 } from "$lib/uuid";
   import { ChunkLoader, DynamicChunkLoader, SharesChunk, SpaceCoreChunk } from "$lib/components/space/chunkLoader.svelte";
   import { Position } from "$lib/components/space/movement.svelte";
   import { RenderChunks, fetchChunks } from "./tagSpace.svelte";
   import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "$lib/components/space/coordinate-mapper";
   import Chunk from "$lib/components/space/chunk/Chunk.svelte";
-    import { Scaler } from "$lib/components/space/scale.svelte";
+  import { Scaler } from "$lib/components/space/scale.svelte";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -36,24 +36,6 @@
 
   function closeShareEditor() {
     isShareEditorVisible = false;
-  }
-
-  function genTestUuid7(): Uuid7 {
-    let maybeUuid = Uuid7.from("018fd2cc-7e27-7dfa-8424-87f58f98bfcc");
-    let testUuid: Uuid7;
-    if (maybeUuid.isOk()) {
-      testUuid = maybeUuid.value;
-    }
-    return testUuid!;
-  }
-
-  function genTestUuid4(): Uuid4 {
-    let maybeUuid = Uuid4.from("b220a9f0-be9a-4b32-b65f-f9e1c21cabff");
-    let testUuid: Uuid4;
-    if (maybeUuid.isOk()) {
-      testUuid = maybeUuid.value;
-    }
-    return testUuid!;
   }
 
   const position = new Position(512, 512);
@@ -83,10 +65,6 @@
     innerWidth = window.innerWidth;
     innerHeight = window.innerHeight;
     window.addEventListener("resize", onResize);
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "/") console.log(`x: ${position.reactiveX()}, y: ${position.reactiveY()}`);
-    });
   });
 
   $effect(() => {
@@ -130,34 +108,34 @@
 {#if isShareEditorVisible}
   <ShareEditor bind:this={shareEditor} closeEditor={closeShareEditor} />
 {/if}
-{#each renderChunks.getRenderChunks() as chunk}
+{#each renderChunks.getRenderChunks() as chunk (chunk.getKey())}
   {#if chunk instanceof SharesChunk}
     <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
-      {#each (chunk as SharesChunk).getShares() as share}
+      {#each (chunk as SharesChunk).getShareDataInOrder() as share, index}
         <Share
-          apparentX={share[0]}
-          apparentY={share[1]}
-          id={genTestUuid7()}
-          title={"ネットメイドちゃん"}
-          text={"描いたﾖ\nかわわ"}
-          mediaKey={new ImageUrl("/src/lib/assets/logo-temp.png")}
-          conversationsCount={212}
-          timestamp={1717209513416} />
+          apparentX={index === 0 ? 22 : 534}
+          apparentY={index === 0 ? 22 : 534}
+          id={share.id}
+          title={share.title}
+          text={share.text}
+          mediaKey={share.mediaKey}
+          conversationsCount={share.conversationsCount}
+          timestamp={share.timestamp} />
       {/each}
     </Chunk>
   {:else}
     <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
       <SpaceCore apparentX={24} apparentY={24} >
-        {#each (chunk as SpaceCoreChunk).getShares() as share}
-          <Share
-          apparentX={share[0]}
-          apparentY={share[1]}
-          id={genTestUuid7()}
-          title={"ネットメイドちゃん"}
-          text={"描いたﾖ\nかわわ"}
-          mediaKey={new ImageUrl("/src/lib/assets/logo-temp.png")}
-          conversationsCount={212}
-          timestamp={1717209513416} />
+        {#each (chunk as SpaceCoreChunk).getShareDataInOrder() as share, index}
+        <Share
+          apparentX={index === 0 ? 22 : 534}
+          apparentY={index === 0 ? 22 : 534}
+          id={share.id}
+          title={share.title}
+          text={share.text}
+          mediaKey={share.mediaKey}
+          conversationsCount={share.conversationsCount}
+          timestamp={share.timestamp} />
         {/each}
       </SpaceCore>
     </Chunk>
