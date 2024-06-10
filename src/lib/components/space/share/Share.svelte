@@ -145,7 +145,8 @@
   }
 </script>
 
-<a href="https://netmate.app/shares/{id.asHexadecimalRepresentation()}" class="share" style="top: {apparentY}px; left: {apparentX}px;">
+<div class="share-wrapper" style="top: {apparentY}px; left: {apparentX}px;">
+<a href="https://netmate.app/shares/{id.asHexadecimalRepresentation()}" class="share">
   <div class="content">
     <div class="texts">
       {#if hasTitle()}
@@ -196,10 +197,22 @@
     </div>
   </div>
 </a>
+</div>
 
 <style>
-  .share {
+  .share-wrapper {
     position: absolute;
+    display: inline-flex;
+    width: 29.25rem;
+    height: 29.25rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .share {
     width: 29.25rem;
     max-height: 29.25rem;
     padding: 1rem 1rem 0.125rem 1rem;
