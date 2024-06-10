@@ -32,6 +32,6 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    z-index: 1;
+    z-index: 100;
   }
 </style>

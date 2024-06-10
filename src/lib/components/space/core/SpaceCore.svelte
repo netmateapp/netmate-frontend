@@ -3,7 +3,19 @@
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import type { Uuid4 } from "$lib/uuid";
 
-  let { tagId, apparentX, apparentY, jump2Center, shouldCancelClick }: { tagId: Uuid4, apparentX: number, apparentY: number, jump2Center: () => void, shouldCancelClick: () => boolean } = $props();
+  let {
+    tagId,
+    apparentX,
+    apparentY,
+    jump2Center,
+    shouldCancelClick,
+  }: {
+    tagId: Uuid4;
+    apparentX: number;
+    apparentY: number;
+    jump2Center: () => void;
+    shouldCancelClick: () => boolean;
+  } = $props();
 
   function isShare(element: Element): HTMLElement | undefined {
     if (element instanceof HTMLElement) {
@@ -20,9 +32,13 @@
   }
 
   function handleClick(event: InteractEvent) {
-    if (!(ref?.contains(event.target as Element) ?? false)
-      || shouldCancelClick()) return;
+    // スペースを移動するためのクリックならキャンセル
+    if (shouldCancelClick()) {
+      event.preventDefault();
+      return;
+    }
 
+    // スペースコア内の共有をクリックした場合でも、コアを共有したものとして扱う
     const maybeShare = isShare(event.target as Element);
     if (maybeShare !== undefined) {
       event.preventDefault();
@@ -30,18 +46,20 @@
       return;
     }
 
-    const core = (event.target as HTMLElement);
+    const core = ref as HTMLElement;
     const coreStyle = core.style;
-    coreStyle.borderRadius = "0";
-    coreStyle.width = "64rem";
-    coreStyle.height = "64rem";
     coreStyle.backgroundColor = "unset";
+    coreStyle.overflow = "visible";
 
-    const overlay = (core.children[0] as HTMLElement);
+    (core.parentElement as HTMLElement).style.zIndex = "1";
+
+    const overlay = overlayRef as HTMLElement;
     const overlayStyle = overlay.style;
-    overlayStyle.borderRadius = "0";
-    overlayStyle.boxShadow = "initial";
-    overlayStyle.opacity = "0";
+    overlayStyle.scale = "3";
+
+    const back = backRef as HTMLElement;
+    const backStyle = back.style;
+    backStyle.scale = "3";
 
     setTimeout(() => {
       jump2Center();
@@ -49,6 +67,8 @@
   }
 
   let ref: MaybeHTMLElement = $state(null);
+  let overlayRef: MaybeHTMLElement = $state(null);
+  let backRef: MaybeHTMLElement = $state(null);
 </script>
 
 <a
@@ -56,9 +76,11 @@
   href="../../tags/{tagId.asHexadecimalRepresentation()}/space"
   class="space-core"
   style="top: {apparentY}px; left: {apparentX}px;"
-  on:click={handleClick}>
-  <div class="shadow-overlay"></div>
+  on:click={handleClick}
+>
+  <div bind:this={overlayRef} class="shadow-overlay"></div>
   <slot></slot>
+  <div bind:this={backRef} class="back"></div>
 </a>
 
 <style>
@@ -71,7 +93,8 @@
     background-color: rgba(0, 0, 0, 0.01);
     overflow: hidden;
     cursor: pointer;
-    transition: border-radius 0.5s, width 0.5s, height 0.5s, background-color 0.5s;
+    transform-origin: center;
+    transition: background-color 1s, overflow 1s;
   }
 
   .shadow-overlay {
@@ -84,36 +107,39 @@
     box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.16) inset;
     z-index: 1;
     pointer-events: none;
-    transition: border-radius 0.5s;
-    opacity: 1;
-    transition: border-radius 0.5s, box-shadow 0.5s, opacity 0.5s;
+    transform-origin: center;
+    transition: scale 1s;
   }
 
-  @keyframes animateSpaceCore {
-    from {
-      border-radius: 50%;
-      width: 61rem;
-      height: 61rem;
+  .back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    transform-origin: center;
+    z-index: -1;
+    transition: scale 1s;
+  }
+
+  @keyframes core {
+    to {
       background-color: rgba(0, 0, 0, 0.01);
+      overflow: hidden;
     }
-    to {
-      border-radius: 0%;
-      width: 64rem;
-      height: 64rem;
+    from {
       background-color: unset;
+      overflow: visible;
     }
   }
 
-  @keyframes animateShadowOverlay {
-    from {
-      border-radius: 50%;
-      box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.16) inset;
-      opacity: 1;
+  @keyframes expand {
+    0% {
+      transform: scale(1);
     }
-    to {
-      border-radius: 0%;
-      box-shadow: initial;
-      opacity: 0;
+    100% {
+      transform: scale(3);
     }
   }
 </style>

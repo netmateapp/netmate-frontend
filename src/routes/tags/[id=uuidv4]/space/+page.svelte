@@ -228,5 +228,6 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+    z-index: 100;
   }
 </style>

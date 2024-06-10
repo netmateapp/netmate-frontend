@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    z-index: 1;
+    z-index: 100;
   }
 
   .logo {

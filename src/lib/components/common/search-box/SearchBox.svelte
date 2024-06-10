@@ -104,7 +104,7 @@
     flex-direction: column;
     align-items: center;
     overflow: hidden;
-    z-index: 1;
+    z-index: 100;
   }
 
   .search-box:hover {

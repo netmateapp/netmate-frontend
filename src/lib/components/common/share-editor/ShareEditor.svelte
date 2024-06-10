@@ -425,7 +425,7 @@
     left: 50%;
     transform: translate(-50%, 0%);
     height: 100vh;
-    z-index: 2;
+    z-index: 101;
   }
 
   .floating {
