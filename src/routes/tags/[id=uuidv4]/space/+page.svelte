@@ -17,9 +17,9 @@
   import Chunk from "$lib/components/space/chunk/Chunk.svelte";
   import { Scaler } from "$lib/components/space/scale.svelte";
   import Location from "$lib/components/space/location-name/LocationName.svelte";
-  import type { PageServerData } from "./$types";
   import { Uuid4 } from "$lib/uuid";
-   import type { Ok } from "$lib/result";
+  import type { Ok } from "$lib/result";
+  import type { PageServerData } from "./$types";
 
   let { data }: { data: PageServerData } = $props(); 
 
@@ -181,10 +181,6 @@
 </div>
 
 <style>
-  :global(body) {
-    overflow: hidden;
-  }
-
   .side-bar {
     position: fixed;
     top: 6rem;

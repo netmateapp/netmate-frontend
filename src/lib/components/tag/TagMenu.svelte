@@ -97,7 +97,7 @@
   }
 
   function randomlyGenItemTagData4Test(): ItemTagData[] {
-    const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
+    const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "アロナ", "シッテムの箱","夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
     const items = tagsNames
       .map(name => DisplayName.from(name))
       .filter(res => res.isOk())
@@ -329,6 +329,11 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+    max-height: 200px;
+  }
+
+  .tags:hover {
+    overflow-y: auto;
   }
 
   .tag-item {
