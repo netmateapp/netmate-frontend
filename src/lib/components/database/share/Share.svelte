@@ -14,7 +14,6 @@
   export type MediaKey = ImageUrl | YouTubeId | SoundCloudId;
 </script>
 
-
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
   import type { Option } from "$lib/option";
@@ -52,6 +51,7 @@
   }
 
   function hasImage(key: Option<MediaKey> = mediaKey): key is ImageUrl {
+    console.log(key instanceof ImageUrl);
     return key instanceof ImageUrl;
   }
 
