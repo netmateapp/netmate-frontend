@@ -37,7 +37,9 @@
       "korea": "韓国",
       "taiwan": "台湾",
       "united-states": "アメリカ合衆国",
-      "signin-button-label": "ログイン"
+      "signin-button-label": "ログイン",
+      "go-to-database": "データベースへ",
+      "go-to-space": "スペースへ"
     },
     "search-box": {
       "tag-specifier-tip": "キーワードの前に # をつけるとタグを指定できます",
