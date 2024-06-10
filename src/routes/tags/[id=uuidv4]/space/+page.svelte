@@ -47,9 +47,9 @@
   let position = new Position(512, 512 + 256);
   const scaler = new Scaler(position);
 
-  const renderChunks = new RenderChunks();
-  const chunkLoader = new DynamicChunkLoader(
-    new ChunkLoader((i) => fetchChunks(i, tagId())),
+  let renderChunks = new RenderChunks();
+  let chunkLoader = new DynamicChunkLoader(
+    new ChunkLoader((i) => fetchChunks(i)),
     (x, y, map) => renderChunks.updateChunks(x, y, map)
   );
   let isInitialized = false;
@@ -62,9 +62,16 @@
     viewportHeight = window.innerHeight;
   }
 
+  function debugCommand(event: KeyboardEvent) {
+    if (event.key === "p") {
+      console.log(`x: ${position.reactiveX()}, y: ${position.reactiveY()}`);
+    }
+  }
+
   $effect(() => {
-    position = new Position(512, 512 + 256);
+    console.log("new position");
     const positionFinalizer = position.init();
+
     chunkLoader.initialLoad(0, 0);
     const scalerFinalizer = scaler.initScaler();
     isInitialized = true;
@@ -73,10 +80,18 @@
     viewportHeight = window.innerHeight;
     window.addEventListener("resize", onResize);
 
+    document.addEventListener("keydown", debugCommand);
+
     return () => {
       positionFinalizer();
+
+      console.log("finalize");
+
       scalerFinalizer();
+
       window.removeEventListener("resize", onResize);
+
+      document.removeEventListener("keydown", debugCommand);
     };
   });
 
@@ -85,6 +100,23 @@
       chunkLoader.onPositionUpdate(position.reactiveX(), position.reactiveY());
     }
   });
+
+  function jump2Center() {
+    renderChunks.clearChunks();
+
+    scaler.reset();
+
+    chunkLoader = new DynamicChunkLoader(
+      new ChunkLoader((i) => fetchChunks(i)),
+      (x, y, map) => renderChunks.updateChunks(x, y, map)
+    );
+
+    chunkLoader.initialLoad(0, 0);
+
+    position.set(512, 512 + 256);
+
+    chunkLoader.onPositionUpdate(position.reactiveX(), position.reactiveY());
+  }
 
   function mapToHtmlX(chunkX: number): number {
     return toHtmlX(
@@ -149,7 +181,7 @@
   {#if chunk instanceof SharesChunk}
     <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
       {#if isCenterChunk(chunk.chunkX, chunk.chunkY)}
-        <Location bind:this={pageLocationRef} locationName={tagName()} isTag={true} id={tagId()} apparentX={512} apparentY={40} />
+        <Location bind:this={pageLocationRef} locationName={tagId().asHexadecimalRepresentation()} isTag={true} id={tagId()} apparentX={512} apparentY={40} />
       {/if}
       {#each (chunk as SharesChunk).getShareDataInOrder() as share, index}
         <Share
@@ -165,7 +197,7 @@
     </Chunk>
   {:else}
     <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
-      <SpaceCore tagId={(chunk as SpaceCoreChunk).subtagId} apparentX={24} apparentY={24} >
+      <SpaceCore tagId={(chunk as SpaceCoreChunk).subtagId} apparentX={24} apparentY={24} jump2Center={jump2Center} shouldCancelClick={() => position.getIsCoordinateUpdated()} >
         <Location locationName={(chunk as SpaceCoreChunk).subtagName} isTag={true} id={(chunk as SpaceCoreChunk).subtagId} apparentX={488} apparentY={160} />
         {#each (chunk as SpaceCoreChunk).getShareDataInOrder() as share, index}
         <Share

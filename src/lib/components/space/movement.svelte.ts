@@ -25,6 +25,10 @@ export class Position {
     this.y = initialY;
   }
 
+  getIsCoordinateUpdated(): boolean {
+    return this.isCoordinateUpdated;
+  }
+
   add(ax: number, ay: number) {
     this.x += ax;
     this.y += ay;

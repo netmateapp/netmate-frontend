@@ -14,6 +14,10 @@ export class Scaler {
     return this.__scale;
   }
 
+  reset() {
+    this.__scale = MAX_SCALE;
+  }
+
   scaleUp() {
     if (this.__scale + 0.1 <= MAX_SCALE) {
       this.__scale += 0.1;
