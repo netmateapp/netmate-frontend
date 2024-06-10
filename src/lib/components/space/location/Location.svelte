@@ -1,11 +1,12 @@
 <script lang="ts">
-  let { locationName }: { locationName: string } = $props();
+  let { locationName, apparentX, apparentY }: { locationName: string, apparentX: number, apparentY: number } = $props();
 </script>
 
 <span class="location-name">{locationName}</span>
 
 <style>
   .location-name {
+    position: absolute;
     color: var(--accent-color);
     text-align: center;
     font-family: var(--primary-font);
