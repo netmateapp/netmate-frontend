@@ -16,6 +16,7 @@
   import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "$lib/components/space/coordinate-mapper";
   import Chunk from "$lib/components/space/chunk/Chunk.svelte";
   import { Scaler } from "$lib/components/space/scale.svelte";
+    import Location from "$lib/components/space/location/Location.svelte";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -125,11 +126,12 @@
     </Chunk>
   {:else}
     <Chunk apparentX={makeScalableX(mapToHtmlX(chunk.chunkX))} apparentY={makeScalableY(mapToHtmlY(chunk.chunkY))} scale={scaler.scale()} >
-      <SpaceCore apparentX={24} apparentY={24} >
+      <SpaceCore tagId={(chunk as SpaceCoreChunk).subtagId} apparentX={24} apparentY={24} >
+        <Location locationName={(chunk as SpaceCoreChunk).subtagName} apparentX={488} apparentY={160} />
         {#each (chunk as SpaceCoreChunk).getShareDataInOrder() as share, index}
         <Share
-          apparentX={index === 0 ? 22 : 534}
-          apparentY={index === 0 ? 22 : 534}
+          apparentX={index === 0 ? -2 : 510}
+          apparentY={index === 0 ? 254 : 430}
           id={share.id}
           title={share.title}
           text={share.text}

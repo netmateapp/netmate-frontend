@@ -1,5 +1,6 @@
 import type { Option } from "$lib/option";
-import { genTestShareData, TestShareData } from "./shareData";
+import type { Uuid4 } from "$lib/uuid";
+import { genTestShareData, genTestTagId, getTestTagName, TestShareData } from "./mockData";
 
 const CHUNK_SCALE = 10;
 
@@ -127,6 +128,9 @@ export class SharesChunk extends Chunk {
 }
 
 export class SpaceCoreChunk extends Chunk {
+  public readonly subtagId: Uuid4 = genTestTagId();
+  public readonly subtagName: string = getTestTagName();
+
   constructor(chunkX: number, chunkY: number) {
     super(chunkX, chunkY);
   }

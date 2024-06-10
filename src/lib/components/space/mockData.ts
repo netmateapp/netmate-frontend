@@ -1,5 +1,5 @@
 import type { Option } from "$lib/option";
-import { genTestUuid7, type Uuid7 } from "$lib/uuid";
+import { genTestUuid4, genTestUuid7, Uuid4, type Uuid7 } from "$lib/uuid";
 import { ImageUrl, type MediaKey } from "./share/Share.svelte";
 
 export class TestShareData {
@@ -76,4 +76,13 @@ function genTestConversationsCount(): number {
 
 function genTestTimestamp(): number {
   return 1717989007669 - getRandomInt(259200000);
+}
+
+export function genTestTagId(): Uuid4 {
+  return genTestUuid4();
+}
+
+export function getTestTagName(): string {
+  const tagNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
+  return tagNames[getRandomInt(tagNames.length)];
 }

@@ -1,11 +1,13 @@
 <script lang="ts">
-  let { apparentX, apparentY }: { apparentX: number, apparentY: number } = $props();
+    import type { Uuid4 } from "$lib/uuid";
+
+  let { tagId, apparentX, apparentY }: { tagId: Uuid4, apparentX: number, apparentY: number } = $props();
 </script>
 
-<div class="space-core" style="top: {apparentY}px; left: {apparentX}px;">
+<a href="https://netmate.app/tags/{tagId.asHexadecimalRepresentation()}/space" class="space-core" style="top: {apparentY}px; left: {apparentX}px;">
   <div class="shadow-overlay"></div>
   <slot></slot>
-</div>
+</a>
 
 <style>
   .space-core {

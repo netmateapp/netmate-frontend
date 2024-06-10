@@ -23,7 +23,7 @@ function fetchTestChunks(requiredChunkIndexes: Set<number>): Chunk[] {
     if (xy[0] === 0 && xy[1] === 0) {
       chunks.push(new SharesChunk(xy[0], xy[1]));
     } else {
-      const max = 12;
+      const max = 8;
       const rand = Math.floor(Math.random() * max);
       if (rand < max - 1) {
         chunks.push(new SharesChunk(xy[0], xy[1]));
