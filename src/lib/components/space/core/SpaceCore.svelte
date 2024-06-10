@@ -4,7 +4,7 @@
   let { tagId, apparentX, apparentY }: { tagId: Uuid4, apparentX: number, apparentY: number } = $props();
 </script>
 
-<a href="https://netmate.app/tags/{tagId.asHexadecimalRepresentation()}/space" class="space-core" style="top: {apparentY}px; left: {apparentX}px;">
+<a href="../../tags/{tagId.asHexadecimalRepresentation()}/space" class="space-core" style="top: {apparentY}px; left: {apparentX}px;">
   <div class="shadow-overlay"></div>
   <slot></slot>
 </a>

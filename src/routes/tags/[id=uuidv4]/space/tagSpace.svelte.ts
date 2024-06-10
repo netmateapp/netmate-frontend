@@ -1,4 +1,5 @@
 import { toChunkX, toChunkY, type Chunk, type ChunkMap, SharesChunk, toChunkXY, SpaceCoreChunk } from "$lib/components/space/chunkLoader.svelte";
+import type { Uuid4 } from "$lib/uuid";
 
 export class RenderChunks {
   chunks: Chunk[] = $state([]);
@@ -12,7 +13,7 @@ export class RenderChunks {
   }
 }
 
-export function fetchChunks(requiredChunkIndexes: Set<number>): Chunk[] {
+export function fetchChunks(requiredChunkIndexes: Set<number>, id: Uuid4): Chunk[] {
   return fetchTestChunks(requiredChunkIndexes);
 }
 

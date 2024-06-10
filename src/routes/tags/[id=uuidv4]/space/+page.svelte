@@ -44,12 +44,12 @@
     isShareEditorVisible = false;
   }
 
-  const position = new Position(512, 512 + 256);
+  let position = new Position(512, 512 + 256);
   const scaler = new Scaler(position);
 
   const renderChunks = new RenderChunks();
   const chunkLoader = new DynamicChunkLoader(
-    new ChunkLoader(fetchChunks),
+    new ChunkLoader((i) => fetchChunks(i, tagId())),
     (x, y, map) => renderChunks.updateChunks(x, y, map)
   );
   let isInitialized = false;
@@ -61,16 +61,23 @@
     viewportWidth = window.innerWidth;
     viewportHeight = window.innerHeight;
   }
-  
+
   $effect(() => {
-    position.init();
+    position = new Position(512, 512 + 256);
+    const positionFinalizer = position.init();
     chunkLoader.initialLoad(0, 0);
-    scaler.initScaler();
+    const scalerFinalizer = scaler.initScaler();
     isInitialized = true;
 
     viewportWidth = window.innerWidth;
     viewportHeight = window.innerHeight;
     window.addEventListener("resize", onResize);
+
+    return () => {
+      positionFinalizer();
+      scalerFinalizer();
+      window.removeEventListener("resize", onResize);
+    };
   });
 
   $effect(() => {

@@ -40,12 +40,18 @@ export class Scaler {
     }
   }
 
-  initScaler() {
-    document.addEventListener("wheel", (event) => {
+  initScaler(): () => void {
+    const handler = (event: WheelEvent) => {
       if (!event.ctrlKey) {
         if (event.deltaY > 0) this.scaleDown();
         else this.scaleUp();
       }
-    });
+    };
+
+    document.addEventListener("wheel", handler);
+
+    return () => {
+      document.removeEventListener("wheel", handler);
+    };
   }
 }

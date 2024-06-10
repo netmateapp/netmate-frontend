@@ -130,7 +130,7 @@ export class Position {
       movementX = -(htmlX - this.previousHtmlX);
       const movementHtmlY = -(htmlY - this.previousHtmlY);
       movementY = -movementHtmlY;
-  
+
       this.x += movementX;
       this.y += movementY;
 
@@ -158,18 +158,39 @@ export class Position {
     }
   }
   
-  init() {
-    document.addEventListener("touchstart", (event) => this.interactStart(event));
-    document.addEventListener("touchmove", (event) => this.interactMove(event));
-    document.addEventListener("touchend", (event) => this.interactEnd(event));
+  init(): () => void {
+    const start = (event: InteractionEvent) => this.interactStart(event);
+    const end = (event: InteractionEvent) => this.interactEnd(event);
+    const move = (event: InteractionEvent) => this.interactMove(event);
+    const click = (event: MouseEvent) => this.cancelDefaultBehaviorWhenMoving(event);
+    const dragstart = (event: DragEvent) => this.disableDrag(event);
 
-    document.addEventListener("mousedown", (event) => this.interactStart(event));
-    document.addEventListener("mousemove", (event) => this.interactMove(event));
-    document.addEventListener("mouseleave", (event) => this.interactEnd(event));
-    document.addEventListener("mouseup", (event) => this.interactEnd(event));
+    document.addEventListener("touchstart", start);
+    document.addEventListener("touchmove", move);
+    document.addEventListener("touchend", end);
 
-    document.addEventListener("click", (event) => this.cancelDefaultBehaviorWhenMoving(event));
+    document.addEventListener("mousedown", start);
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseleave", end);
+    document.addEventListener("mouseup", end);
 
-    document.addEventListener("dragstart", (event) => this.disableDrag(event));
+    document.addEventListener("click", click);
+
+    document.addEventListener("dragstart", dragstart);
+
+    return () => {
+      document.removeEventListener("touchstart", start);
+      document.removeEventListener("touchmove", move);
+      document.removeEventListener("touchend", end);
+  
+      document.removeEventListener("mousedown", start);
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseleave", end);
+      document.removeEventListener("mouseup", end);
+  
+      document.removeEventListener("click", click);
+  
+      document.removeEventListener("dragstart", dragstart);
+    };
   }
 }
