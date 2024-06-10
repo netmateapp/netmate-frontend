@@ -1,5 +1,6 @@
 <script lang="ts">
   import Brand from "$lib/components/common/brand/Brand.svelte";
+  import LocationDisplay from "$lib/components/common/location-display/LocationDisplay.svelte";
   import Navigation from "$lib/components/common/navigation/Navigation.svelte";
   import SearchBox from "$lib/components/common/search-box/SearchBox.svelte";
   import OpenShareEditorButton from "$lib/components/common/share-editor/OpenShareEditorButton.svelte";
@@ -15,7 +16,7 @@
   import { centerHtmlX, centerHtmlY, diffX, diffY, toHtmlX, toHtmlY } from "$lib/components/space/coordinateMapper";
   import Chunk from "$lib/components/space/chunk/Chunk.svelte";
   import { Scaler } from "$lib/components/space/scale.svelte";
-  import Location from "$lib/components/space/location/Location.svelte";
+  import Location from "$lib/components/space/location-name/LocationName.svelte";
   import type { PageServerData } from "./$types";
   import { Uuid4 } from "$lib/uuid";
    import type { Ok } from "$lib/result";
@@ -122,6 +123,10 @@
   function tagId(): Uuid4 {
     return (Uuid4.from(data.tag.id) as Ok<{}, Uuid4>).value;
   }
+
+  function isSpaceCoreChunkHere(): boolean {
+    return false;
+  }
 </script>
 
 <title>{tagName()}</title>
@@ -170,10 +175,23 @@
     </Chunk>
   {/if}
 {/each}
-<TagMenu />
+<div class="side-bar">
+  <LocationDisplay locationName={tagName()} isSpace={true} />
+  <TagMenu />
+</div>
 
 <style>
   :global(body) {
     overflow: hidden;
+  }
+
+  .side-bar {
+    position: fixed;
+    top: 6rem;
+    left: 0.75rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 </style>

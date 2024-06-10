@@ -246,10 +246,6 @@
 
 <style>
   .menu {
-    position: fixed;
-    top: 183px;
-    left: 12px;
-
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
