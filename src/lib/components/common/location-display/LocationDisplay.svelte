@@ -9,6 +9,8 @@
   function buttonLabelTranslationKey(): string {
     return isSpace ? "go-to-database" : "go-to-space";
   }
+
+  
 </script>
 
 <div class="current-location">
@@ -48,6 +50,7 @@
     font-family: var(--primary-font);
     font-size: 1.375rem;
     line-height: 1.875rem;
+    cursor: default;
   }
 
   .centered-button {
