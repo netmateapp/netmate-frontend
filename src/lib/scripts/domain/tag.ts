@@ -9,7 +9,7 @@ export class TagName {
   public readonly name: string;
 
   constructor(name: string) {
-    if (!TagName.isValid(name)) throw new Error(`A characters cost of name must be less than or equal to ${MAX_TAG_NAME_CHARACTERS_COST}.`);
+    if (!TagName.isValid(name)) throw new Error(`The characters cost of name must be less than or equal to ${MAX_TAG_NAME_CHARACTERS_COST}.`);
     this.name = name;
   }
 

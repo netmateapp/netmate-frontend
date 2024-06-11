@@ -9,7 +9,7 @@ export class HandleName {
   public readonly name: string;
 
   constructor(name: string) {
-    if (!HandleName.isValid(name)) throw new Error(`A characters cost of name must be less than or equal to ${MAX_HANDLE_NAME_CHARACTERS_COST}.`);
+    if (!HandleName.isValid(name)) throw new Error(`The characters cost of name must be less than or equal to ${MAX_HANDLE_NAME_CHARACTERS_COST}.`);
     this.name = name;
   }
 
