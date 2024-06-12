@@ -1,6 +1,6 @@
 import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, ShareNibblesSchool, SubtagSpaceCore, type ChunkRepository } from "./chunk";
 import { genTestShareNibble, genTestTag } from "./mockShare";
-import type { VirtualLocation } from "./position";
+import type { VirtualLocation } from "./coordinateSystem";
 
 export interface ChunkFetcher {
   fetchChunksBy(indexes: Set<ChunkIndex>): Set<Chunk>;

@@ -1,7 +1,7 @@
 import type { Option } from "$lib/option";
 import type { ShareNibble } from "$lib/scripts/domain/shareNibble";
 import type { Tag } from "$lib/scripts/domain/tag";
-import { VirtualCoordinate, VirtualLocation } from "./position";
+import { VirtualCoordinate, VirtualLocation } from "./coordinateSystem";
 
 const MIN_SIZE_OF_SHARE_NIBBLES_SCHOOL = 1;
 const MAX_SIZE_OF_SHARE_NIBBLES_SCHOOL = 2;

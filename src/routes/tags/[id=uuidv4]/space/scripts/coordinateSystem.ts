@@ -13,6 +13,10 @@ export class VirtualCoordinate {
   static of(coordinate: number): VirtualCoordinate {
     return new VirtualCoordinate(coordinate);
   }
+
+  createOffsetCordinate(offset: VirtualCoordinate): VirtualCoordinate {
+    return VirtualCoordinate.of(this.coordinate + offset.coordinate);
+  }
 }
 
 export class VirtualLocation {
@@ -27,6 +31,10 @@ export class VirtualLocation {
   static of(x: VirtualCoordinate, y: VirtualCoordinate): VirtualLocation {
     return new VirtualLocation(x, y);
   }
+
+  createOffsetLocation(offsetX: VirtualCoordinate, offsetY: VirtualCoordinate): VirtualLocation {
+    return VirtualLocation.of(this.x.createOffsetCordinate(offsetX), this.y.createOffsetCordinate(offsetY));
+  }
 }
 
 export const VIRTUAL_COORDINATE_SYSTEM_ORIGIN = VirtualLocation.of(VirtualCoordinate.of(0), VirtualCoordinate.of(0));
@@ -38,12 +46,8 @@ export class ReactiveVirtualLocation {
     this.location = initialLocation;
   }
 
-  reactiveX(): VirtualCoordinate {
-    return this.location.x;
-  }
-
-  reactiveY(): VirtualCoordinate {
-    return this.location.y;
+  reactiveLocation(): VirtualLocation {
+    return this.location;
   }
 
   update(newLocation: VirtualLocation) {
@@ -66,7 +70,6 @@ export class HtmlCoordinate {
   static of(coordinate: number): HtmlCoordinate {
     return new HtmlCoordinate(coordinate);
   }
-
 }
 
 export class HtmlLocation {
