@@ -1,5 +1,9 @@
 export type Option<T> = T | undefined;
 
+export function map<T, U>(option: Option<T>, mapper: (t: T) => U): Option<U> {
+  return option !== undefined ? mapper(option) : undefined;
+}
+
 export interface Optional<Value> {
   flatMap<MappedValue>(map: (value: Value) => Optional<MappedValue>): Optional<MappedValue>;
   map<MappedValue>(map: (value: Value) => MappedValue): Optional<MappedValue>;
