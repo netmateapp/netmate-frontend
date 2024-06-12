@@ -30,7 +30,7 @@ export class SubtagSpaceCore {
   }
 }
 
-export class Empty {}
+export class Empty { }
 
 export type ChunkContent = ShareNibblesSchool | SubtagSpaceCore | Empty;
 
@@ -51,6 +51,9 @@ export class ChunkCoordinate {
   }
 }
 
+const CHUNK_SIDE_LENGTH = 1024;
+export const BASE_2_CHUNK_SIDE_LENGTH_LOGARITHM = Math.log(CHUNK_SIDE_LENGTH) / Math.log(2);
+
 export class ChunkLocation {
   public readonly chunkX: ChunkCoordinate;
   public readonly chunkY: ChunkCoordinate;
@@ -63,11 +66,51 @@ export class ChunkLocation {
   static of(chunkX: ChunkCoordinate, chunkY: ChunkCoordinate) {
     return new ChunkLocation(chunkX, chunkY);
   }
+
+  static fromIndex(chunkIndex: ChunkIndex): ChunkLocation {
+    const index: number = chunkIndex.index;
+
+    // インデックス0は原点に対応する
+    if (index === 0) return CHUNK_COORDINATE_SYSTEM_ORIGIN;
+
+    // 螺旋の層を決定する
+    const layer: number = Math.floor((Math.sqrt(index) + 1) / 2);
+
+    // この層の開始番号を計算
+    const layerStart: number = Math.pow(2 * layer - 1, 2);
+
+    // 層内の位置を計算
+    const position: number = index - layerStart;
+    const sideLength: number = 2 * layer;
+
+    // それぞれの辺の位置を計算
+    let chunkX: number;
+    let chunkY: number;
+    if (position < sideLength) { // 右辺
+      chunkX = layer;
+      chunkY = (layer - 1) - position;
+    } if (position < 2 * sideLength) { // 下辺
+      chunkX = (layer - 1) - (position - sideLength);
+      chunkY = -layer;
+    } else if (position < 3 * sideLength) { // 左辺
+      chunkX = -layer;
+      chunkY = -(layer - 1) + (position - sideLength * 2);
+    } else { // 上辺
+      chunkX = -(layer - 1) + (position - sideLength * 3);
+      chunkY = layer;
+    }
+
+    return ChunkLocation.of(ChunkCoordinate.of(chunkX), ChunkCoordinate.of(chunkY));
+  }
+
+  static fromVirtualLocation(virtualLocation: VirtualLocation): ChunkLocation {
+    const chunkX = ChunkCoordinate.of(virtualLocation.x.coordinate >> BASE_2_CHUNK_SIDE_LENGTH_LOGARITHM);
+    const chunkY = ChunkCoordinate.of(virtualLocation.y.coordinate >> BASE_2_CHUNK_SIDE_LENGTH_LOGARITHM);
+    return ChunkLocation.of(chunkX, chunkY);
+  }
 }
 
 const CHUNK_COORDINATE_SYSTEM_ORIGIN = ChunkLocation.of(ChunkCoordinate.of(0), ChunkCoordinate.of(0));
-
-const CHUNK_SIDE_LENGTH = 1024;
 
 export class Chunk {
   public readonly location: ChunkLocation;
@@ -93,24 +136,24 @@ export class ChunkKey {
     this.key = `${chunkX.coordinate}${chunkY.coordinate}`;
   }
 
-  static from(chunkX: ChunkCoordinate, chunkY: ChunkCoordinate): ChunkKey {
-    return new ChunkKey(chunkX, chunkY);
+  static from(location: ChunkLocation): ChunkKey {
+    return new ChunkKey(location.chunkX, location.chunkY);
   }
 }
 
 export class ChunkRepository {
   private readonly map = new Map<string, Chunk>();
 
-  chunkAt(chunkX: ChunkCoordinate, chunkY: ChunkCoordinate): Option<Chunk> {
-    return this.map.get(ChunkKey.from(chunkX, chunkY).key);
+  chunkAt(location: ChunkLocation): Option<Chunk> {
+    return this.map.get(ChunkKey.from(location).key);
   }
 
-  hasChunkAt(chunkX: ChunkCoordinate, chunkY: ChunkCoordinate): boolean {
-    return this.map.has(ChunkKey.from(chunkX, chunkY).key);
+  hasChunkAt(location: ChunkLocation): boolean {
+    return this.map.has(ChunkKey.from(location).key);
   }
 
   register(chunk: Chunk) {
-    this.map.set(ChunkKey.from(chunk.location.chunkX, chunk.location.chunkY).key, chunk);
+    this.map.set(ChunkKey.from(chunk.location).key, chunk);
   }
 }
 
@@ -152,49 +195,15 @@ export class ChunkIndex {
       chunkGroupId = 4 * distanceFromOrigin - 1;
       offset = chunkY + distanceFromOrigin;
     }
-  
+
     const chunkGroupLongSideLength: number = 1 + Math.floor(chunkGroupId / 2);
-  
+
     // チャンクグループ内の最初のチャンクのインデックスを計算
     const chunkGroupStartIndex: number = chunkGroupLongSideLength * chunkGroupLongSideLength + (chunkGroupId % 2 === 0 ? -chunkGroupLongSideLength : 0);
-  
+
     // チャンクグループ内での位置と足し合わせ、全体におけるチャンクの番号を返す
     const index: number = chunkGroupStartIndex + offset;
 
     return new ChunkIndex(index);
-  }
-
-  toLocation(): ChunkLocation {
-    // インデックス0は原点に対応する
-    if (this.index === 0) return CHUNK_COORDINATE_SYSTEM_ORIGIN;
-
-    // 螺旋の層を決定する
-    const layer: number = Math.floor((Math.sqrt(this.index) + 1) / 2);
-
-    // この層の開始番号を計算
-    const layerStart: number = Math.pow(2 * layer - 1, 2);
-    
-    // 層内の位置を計算
-    const position: number = this.index - layerStart;
-    const sideLength: number = 2 * layer;
-
-    // それぞれの辺の位置を計算
-    let chunkX: number;
-    let chunkY: number;
-    if (position < sideLength) { // 右辺
-      chunkX = layer;
-      chunkY = (layer - 1) - position;
-    }if (position < 2 * sideLength) { // 下辺
-      chunkX = (layer - 1) - (position - sideLength);
-      chunkY = -layer;
-    } else if (position < 3 * sideLength) { // 左辺
-      chunkX = -layer;
-      chunkY = -(layer - 1) + (position - sideLength * 2);
-    } else { // 上辺
-      chunkX = -(layer - 1) + (position - sideLength * 3);
-      chunkY = layer;
-    }
-
-    return ChunkLocation.of(ChunkCoordinate.of(chunkX), ChunkCoordinate.of(chunkY));
   }
 }
