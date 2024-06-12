@@ -1,6 +1,7 @@
 import { calculateCharactersCosts } from "$lib/cjk.svelte";
 import type { Option } from "$lib/option";
 import type { Uuid7 } from "$lib/uuid";
+import type { UnixTimeMillis } from "./utils";
 
 export type ShareId = Uuid7;
 
@@ -105,19 +106,10 @@ export class ConversationsCount {
 }
 
 export class Timestamp {
-  public readonly unixTimeMillis: number;
+  public readonly unixTimeMillis: UnixTimeMillis;
 
-  constructor(unixTimeMillis: number) {
-    if (!Timestamp.isValid(unixTimeMillis)) throw new Error(`A unixTimeMillis must be a non-negative integer.`);
+  constructor(unixTimeMillis: UnixTimeMillis) {
     this.unixTimeMillis = unixTimeMillis;
-  }
-
-  private static isValid(unixTimeMillis: number): boolean {
-    return this.isUnixTimeMillis(unixTimeMillis);
-  }
-
-  private static isUnixTimeMillis(n: number): boolean {
-    return n >= 0 && Number.isInteger(n);
   }
 }
 
