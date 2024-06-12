@@ -3,7 +3,7 @@ import { ConversationsCount, NetmateImageId, Timestamp, Title, type MediaId } fr
 import { LeadSenetences, ShareNibble } from "$lib/scripts/domain/shareNibble";
 import { Tag, TagName } from "$lib/scripts/domain/tag";
 import { UnixTimeMillis } from "$lib/scripts/domain/utils";
-import { genTestUuid4, genTestUuid7, Uuid4 } from "$lib/uuid";
+import { genTestUuid4, genTestUuid7 } from "$lib/uuid";
 
 export function genTestShareNibble(): ShareNibble {
   const title = genTestTitle();
