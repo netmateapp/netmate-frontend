@@ -1,6 +1,7 @@
 import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, ShareNibblesSchool, SubtagSpaceCore, type ChunkRepository } from "./chunk";
 import { genTestShareNibble, genTestTag } from "./mockShare";
-import type { VirtualLocation } from "./coordinateSystem";
+import type { ReactiveVirtualLocation, VirtualLocation } from "./coordinateSystem";
+import type { Scale } from "./scale";
 
 export interface ChunkFetcher {
   fetchChunksBy(indexes: Set<ChunkIndex>): Set<Chunk>;
@@ -38,6 +39,31 @@ export class TagSpaceChunkFetcher implements ChunkFetcher {
   }
 }
 
+// forEach()以外のStream処理をメソッドチェーンで行えないSetのためのクラス
+class ChunkLocationSet {
+  private readonly locations: Set<ChunkLocation>
+
+  constructor(locations: Set<ChunkLocation>) {
+    this.locations = locations;
+  }
+
+  values(): ChunkLocation[] {
+    return [...this.locations];
+  }
+}
+
+function calculateChunkAreaLocations(center: ChunkLocation, radius: number): ChunkLocationSet {
+  const locations = new Set<ChunkLocation>();
+  const chunkX: number = center.chunkX.coordinate;
+  const chunkY: number = center.chunkY.coordinate;
+  for (var x = chunkX - radius; x <= chunkX + radius; x++) {
+    for (var y = chunkY - radius; y <= chunkY + radius; y++) {
+      locations.add(ChunkLocation.of(ChunkCoordinate.of(x), ChunkCoordinate.of(y)));
+    }
+  }
+  return new ChunkLocationSet(locations);
+}
+
 export class ChunkLoader {
   private readonly repository: ChunkRepository;
   private readonly fetcher: ChunkFetcher;
@@ -59,7 +85,7 @@ export class ChunkLoader {
 
     const startChunkLocation = ChunkLocation.fromVirtualLocation(from);
 
-    this.getNecessaryChunkIndexesInRange(startChunkLocation, radius)
+    this.calculateChunkIndexesToLoadInRange(startChunkLocation, radius)
       .forEach(index => necessaryChunkIndexes.add(index));
 
     const deltaX: number = to.x.coordinate - from.x.coordinate;
@@ -72,7 +98,7 @@ export class ChunkLoader {
         for (var d = radius + 1; d <= distance; d++) {
           const chunkX = ChunkCoordinate.of(startChunkLocation.chunkX.coordinate + d * Math.sign(deltaX));
           const chunkY = ChunkCoordinate.of(startChunkLocation.chunkY.coordinate + d * Math.sign(deltaY));
-          this.getNecessaryChunkIndexesInRange(ChunkLocation.of(chunkX, chunkY), radius)
+          this.calculateChunkIndexesToLoadInRange(ChunkLocation.of(chunkX, chunkY), radius)
             .forEach(index => necessaryChunkIndexes.add(index));
         }
       }
@@ -82,20 +108,13 @@ export class ChunkLoader {
     necessaryChunks.forEach(chunk => this.loadChunk(chunk));
   }
 
-  private getNecessaryChunkIndexesInRange(center: ChunkLocation, radius: number): Set<ChunkIndex> {
-    const indexes = new Set<ChunkIndex>();
-    const chunkX: number = center.chunkX.coordinate;
-    const chunkY: number = center.chunkY.coordinate;
-    for (var x = chunkX - radius; x <= chunkX + radius; x++) {
-      for (var y = chunkY - radius; y <= chunkY + radius; y++) {
-        const location = ChunkLocation.of(ChunkCoordinate.of(x), ChunkCoordinate.of(y));
-        if (this.repository.hasChunkAt(location)) {
-          const index = ChunkIndex.from(location);
-          indexes.add(index);
-        }
-      }
-    }
-    return indexes;
+  private calculateChunkIndexesToLoadInRange(center: ChunkLocation, radius: number): Set<ChunkIndex> {
+    return new Set<ChunkIndex>(
+      calculateChunkAreaLocations(center, radius)
+      .values()
+      .filter(location => !this.repository.hasChunkAt(location))
+      .map(location => ChunkIndex.from(location))
+    );
   }
 
   private static isMoved(deltaX: number, deltaY: number): boolean {
@@ -104,5 +123,78 @@ export class ChunkLoader {
 
   private loadChunk(chunk: Chunk) {
     this.repository.register(chunk);
+  }
+}
+
+const DYNAMIC_CHUNK_LOADING_RADIUS: number = 1;
+const DYNAMIC_CHUNK_LOADING_DISTANCE: number = 5;
+
+export class DynamicChunkLoader {
+  private readonly chunkLoader: ChunkLoader;
+  private previousViewCenterVirtualLocation: VirtualLocation;
+
+  constructor(chunkLoader: ChunkLoader, initialViewCenterVirtualLocation: VirtualLocation) {
+    this.chunkLoader = chunkLoader;
+    this.previousViewCenterVirtualLocation = initialViewCenterVirtualLocation;
+  }
+
+  startDyanmicChunkLoading(reactiveViewCenterLocation: VirtualLocation) {
+    this.chunkLoader.loadChunksInMovementDirection(
+      this.previousViewCenterVirtualLocation,
+      reactiveViewCenterLocation,
+      DYNAMIC_CHUNK_LOADING_RADIUS,
+      DYNAMIC_CHUNK_LOADING_DISTANCE
+    );
+  }
+}
+
+type RenderedChunks = Set<Chunk>;
+
+export class ReactiveRenderedChunks {
+  private renderedChunks: RenderedChunks = $state(new Set<Chunk>());
+
+  reactiveRenderedChunks(): RenderedChunks {
+    return this.renderedChunks;
+  }
+
+  update(renderedChunks: RenderedChunks) {
+    this.renderedChunks = renderedChunks;
+  }
+}
+
+export class ChunkRenderer {
+  private readonly renderedChunks: ReactiveRenderedChunks;
+  private readonly chunkRepository: ChunkRepository;
+
+  constructor(renderedChunks: ReactiveRenderedChunks, repository: ChunkRepository) {
+    this.renderedChunks = renderedChunks;
+    this.chunkRepository = repository;
+  }
+
+  renderChunksWithinRadius(viewCenterLocation: VirtualLocation, radius: number) {
+    const newRenderChunks: RenderedChunks = new Set<Chunk>(
+      calculateChunkAreaLocations(ChunkLocation.fromVirtualLocation(viewCenterLocation), radius)
+      .values()
+      .map(chunkLocation => this.chunkRepository.chunkAt(chunkLocation))
+      .filter(chunk => chunk !== undefined)
+    );
+    this.renderedChunks.update(newRenderChunks);
+  }
+}
+
+const DYNAMIC_CHUNK_RENDERING_RADIUS = 1;
+
+export class DynamicChunkRenderer {
+  private readonly dynamicChunkLoader: DynamicChunkLoader;
+  private readonly chunkRenderer: ChunkRenderer;
+
+  constructor(dynamicChunkLoader: DynamicChunkLoader, chunkRenderer: ChunkRenderer) {
+    this.dynamicChunkLoader = dynamicChunkLoader;
+    this.chunkRenderer = chunkRenderer;
+  }
+
+  startDynamicChunkRendering(reactiveViewCenterLocation: VirtualLocation, reactiveScale: Scale) {
+    this.dynamicChunkLoader.startDyanmicChunkLoading(reactiveViewCenterLocation);
+    this.chunkRenderer.renderChunksWithinRadius(reactiveViewCenterLocation, DYNAMIC_CHUNK_RENDERING_RADIUS);
   }
 }
