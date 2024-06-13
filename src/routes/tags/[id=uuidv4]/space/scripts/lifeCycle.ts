@@ -1,14 +1,12 @@
 import type { Option } from "$lib/option";
 
 export type Finalizer = () => void;
-export type RuneEffect = () => void;
-export type Initializer = (() => Finalizer) | RuneEffect;
 
 export interface LifeCycle {
-  createInitializationEffect(): Initializer;
+  initialize(): Finalizer;
 }
 
-export function invokeInitializer(initializer: Initializer): Option<Finalizer> {
+/*export function invokeInitializer(initializer: Initializer): Option<Finalizer> {
   const returnValue: Finalizer | void = initializer();
   const finalizer: Option<Finalizer> = returnValue !== undefined ? returnValue : undefined;
   return finalizer;
@@ -24,4 +22,4 @@ export function combineInitializers(...initializers: Initializer[]): Initializer
       finalizers.forEach(finalizer => finalizer());
     }
   }
-}
+}*/

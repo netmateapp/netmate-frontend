@@ -1,4 +1,4 @@
-import type { Initializer, LifeCycle } from "./lifeCycle";
+import type { Finalizer, LifeCycle } from "./lifeCycle";
 import { HtmlCoordinate, HtmlLocation, VirtualCoordinate, VirtualLocation, type ReactiveVirtualLocation } from "./coordinateSystem";
 
 type MoveEvent = MouseEvent | TouchEvent;
@@ -112,41 +112,39 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     ViewCenterVirtualLocationUpdater.enableSelection();
   }
 
-  createInitializationEffect(): Initializer {
-    return () => {
-      const onTouchStart = (event: MoveEvent) => this.onTouchStart(event);
-      const onTouchMove = (event: MoveEvent) => this.onTouchMove(event);
-      const onTouchEnd = (event: MoveEvent) => this.onTouchEnd(event);
-      const onDrag = ViewCenterVirtualLocationUpdater.disableDragging;
-      const onClick = (event: MouseEvent) => this.cancelClickOnTouchMove(event);
+  initialize(): Finalizer {
+    const onTouchStart = (event: MoveEvent) => this.onTouchStart(event);
+    const onTouchMove = (event: MoveEvent) => this.onTouchMove(event);
+    const onTouchEnd = (event: MoveEvent) => this.onTouchEnd(event);
+    const onDrag = ViewCenterVirtualLocationUpdater.disableDragging;
+    const onClick = (event: MouseEvent) => this.cancelClickOnTouchMove(event);
 
-      document.addEventListener("touchstart", onTouchStart);
-      document.addEventListener("touchmove", onTouchMove);
-      document.addEventListener("touchend", onTouchEnd);
+    document.addEventListener("touchstart", onTouchStart);
+    document.addEventListener("touchmove", onTouchMove);
+    document.addEventListener("touchend", onTouchEnd);
+
+    document.addEventListener("mousedown", onTouchStart);
+    document.addEventListener("mousemove", onTouchMove);
+    document.addEventListener("mouseleave", onTouchEnd);
+    document.addEventListener("mouseup", onTouchEnd);
+
+    document.addEventListener("click", onClick);
+
+    document.addEventListener("dragstart", onDrag);
+
+    return () => {
+      document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("touchmove", onTouchMove);
+      document.removeEventListener("touchend", onTouchEnd);
   
-      document.addEventListener("mousedown", onTouchStart);
-      document.addEventListener("mousemove", onTouchMove);
-      document.addEventListener("mouseleave", onTouchEnd);
-      document.addEventListener("mouseup", onTouchEnd);
+      document.removeEventListener("mousedown", onTouchStart);
+      document.removeEventListener("mousemove", onTouchMove);
+      document.removeEventListener("mouseleave", onTouchEnd);
+      document.removeEventListener("mouseup", onTouchEnd);
   
-      document.addEventListener("click", onClick);
+      document.removeEventListener("click", onClick);
   
-      document.addEventListener("dragstart", onDrag);
-  
-      return () => {
-        document.removeEventListener("touchstart", onTouchStart);
-        document.removeEventListener("touchmove", onTouchMove);
-        document.removeEventListener("touchend", onTouchEnd);
-    
-        document.removeEventListener("mousedown", onTouchStart);
-        document.removeEventListener("mousemove", onTouchMove);
-        document.removeEventListener("mouseleave", onTouchEnd);
-        document.removeEventListener("mouseup", onTouchEnd);
-    
-        document.removeEventListener("click", onClick);
-    
-        document.removeEventListener("dragstart", onDrag);
-      };
+      document.removeEventListener("dragstart", onDrag);
     };
   }
 
