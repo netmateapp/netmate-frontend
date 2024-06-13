@@ -1,7 +1,6 @@
 import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, ShareNibblesSchool, SubtagSpaceCore, type ChunkRepository } from "./chunk";
 import { genTestShareNibble, genTestTag } from "./mockShare";
-import type { ReactiveVirtualLocation, VirtualLocation } from "./coordinateSystem";
-import type { Scale } from "./scale";
+import type { VirtualLocation } from "./coordinateSystem";
 
 export interface ChunkFetcher {
   fetchChunksBy(indexes: Set<ChunkIndex>): Set<Chunk>;
@@ -182,7 +181,7 @@ export class ChunkRenderer {
   }
 }
 
-const DYNAMIC_CHUNK_RENDERING_RADIUS = 1;
+const DYNAMIC_CHUNK_RENDERING_RADIUS: number = 1;
 
 export class DynamicChunkRenderer {
   private readonly dynamicChunkLoader: DynamicChunkLoader;
@@ -193,7 +192,7 @@ export class DynamicChunkRenderer {
     this.chunkRenderer = chunkRenderer;
   }
 
-  startDynamicChunkRendering(reactiveViewCenterLocation: VirtualLocation, reactiveScale: Scale) {
+  startDynamicChunkRendering(reactiveViewCenterLocation: VirtualLocation) {
     this.dynamicChunkLoader.startDyanmicChunkLoading(reactiveViewCenterLocation);
     this.chunkRenderer.renderChunksWithinRadius(reactiveViewCenterLocation, DYNAMIC_CHUNK_RENDERING_RADIUS);
   }
