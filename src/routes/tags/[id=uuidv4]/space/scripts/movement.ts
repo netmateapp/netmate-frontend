@@ -1,3 +1,4 @@
+import type { Initializer, LifeCycle } from "./lifeCycle";
 import { HtmlCoordinate, HtmlLocation, VirtualCoordinate, VirtualLocation, type ReactiveVirtualLocation } from "./coordinateSystem";
 
 type MoveEvent = MouseEvent | TouchEvent;
@@ -34,9 +35,8 @@ class Velocity2d {
 }
 
 type ClickEvent = MouseEvent;
-type Finalizer = () => void;
 
-export class ViewCenterLocationUpdater {
+export class ViewCenterVirtualLocationUpdater implements LifeCycle {
   private readonly viewCenterLocation: ReactiveVirtualLocation;
   private isUserTouching: boolean = false;
   private hasMovedDuringTouch: boolean = false;
@@ -66,8 +66,8 @@ export class ViewCenterLocationUpdater {
     cancelAnimationFrame(this.inertiaAnimationFrameId);
   
     // ドラッグ移動時にサイドバーの要素などが選択されないように
-    ViewCenterLocationUpdater.clearSelection();
-    ViewCenterLocationUpdater.disableSelection();
+    ViewCenterVirtualLocationUpdater.clearSelection();
+    ViewCenterVirtualLocationUpdater.disableSelection();
   }
 
   onTouchMove(event: MoveEvent) {
@@ -93,7 +93,7 @@ export class ViewCenterLocationUpdater {
     );
     this.viewCenterLocation.update(newLocation);
 
-    const maxVelocity = ViewCenterLocationUpdater.MAX_VELOCITY;
+    const maxVelocity = ViewCenterVirtualLocationUpdater.MAX_VELOCITY;
     const newVelocityX = VelocityCoordinate.of(Math.max(-maxVelocity, Math.min(maxVelocity, movementX.coordinate)));
     const newVelocityY = VelocityCoordinate.of(Math.max(-maxVelocity, Math.min(maxVelocity, movementY.coordinate)));
     this.velocity = Velocity2d.of(newVelocityX, newVelocityY);
@@ -109,48 +109,50 @@ export class ViewCenterLocationUpdater {
   
     this.applyInertia();
   
-    ViewCenterLocationUpdater.enableSelection();
+    ViewCenterVirtualLocationUpdater.enableSelection();
   }
 
-  initialize(): Finalizer {
-    const onTouchStart = (event: MoveEvent) => this.onTouchStart(event);
-    const onTouchMove = (event: MoveEvent) => this.onTouchMove(event);
-    const onTouchEnd = (event: MoveEvent) => this.onTouchEnd(event);
-    const onDrag = ViewCenterLocationUpdater.disableDragging;
-    const onClick = (event: MouseEvent) => this.cancelClickOnTouchMove(event);
-
-    document.addEventListener("touchstart", onTouchStart);
-    document.addEventListener("touchmove", onTouchMove);
-    document.addEventListener("touchend", onTouchEnd);
-
-    document.addEventListener("mousedown", onTouchStart);
-    document.addEventListener("mousemove", onTouchMove);
-    document.addEventListener("mouseleave", onTouchEnd);
-    document.addEventListener("mouseup", onTouchEnd);
-
-    document.addEventListener("click", onClick);
-
-    document.addEventListener("dragstart", onDrag);
-
+  createInitializationEffect(): Initializer {
     return () => {
-      document.removeEventListener("touchstart", onTouchStart);
-      document.removeEventListener("touchmove", onTouchMove);
-      document.removeEventListener("touchend", onTouchEnd);
+      const onTouchStart = (event: MoveEvent) => this.onTouchStart(event);
+      const onTouchMove = (event: MoveEvent) => this.onTouchMove(event);
+      const onTouchEnd = (event: MoveEvent) => this.onTouchEnd(event);
+      const onDrag = ViewCenterVirtualLocationUpdater.disableDragging;
+      const onClick = (event: MouseEvent) => this.cancelClickOnTouchMove(event);
+
+      document.addEventListener("touchstart", onTouchStart);
+      document.addEventListener("touchmove", onTouchMove);
+      document.addEventListener("touchend", onTouchEnd);
   
-      document.removeEventListener("mousedown", onTouchStart);
-      document.removeEventListener("mousemove", onTouchMove);
-      document.removeEventListener("mouseleave", onTouchEnd);
-      document.removeEventListener("mouseup", onTouchEnd);
+      document.addEventListener("mousedown", onTouchStart);
+      document.addEventListener("mousemove", onTouchMove);
+      document.addEventListener("mouseleave", onTouchEnd);
+      document.addEventListener("mouseup", onTouchEnd);
   
-      document.removeEventListener("click", onClick);
+      document.addEventListener("click", onClick);
   
-      document.removeEventListener("dragstart", onDrag);
+      document.addEventListener("dragstart", onDrag);
+  
+      return () => {
+        document.removeEventListener("touchstart", onTouchStart);
+        document.removeEventListener("touchmove", onTouchMove);
+        document.removeEventListener("touchend", onTouchEnd);
+    
+        document.removeEventListener("mousedown", onTouchStart);
+        document.removeEventListener("mousemove", onTouchMove);
+        document.removeEventListener("mouseleave", onTouchEnd);
+        document.removeEventListener("mouseup", onTouchEnd);
+    
+        document.removeEventListener("click", onClick);
+    
+        document.removeEventListener("dragstart", onDrag);
+      };
     };
   }
 
   applyInertia() {
-    const friction = ViewCenterLocationUpdater.FRICTION;
-    const minVelocity = ViewCenterLocationUpdater.INERTIA_MIN_VELOCITY;
+    const friction = ViewCenterVirtualLocationUpdater.FRICTION;
+    const minVelocity = ViewCenterVirtualLocationUpdater.INERTIA_MIN_VELOCITY;
   
     const step = () =>  {
       if (Math.abs(this.velocity.x.coordinate) > minVelocity || Math.abs(this.velocity.y.coordinate) > minVelocity) {
