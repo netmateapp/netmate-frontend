@@ -89,7 +89,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     const movementHtmlY = RealCoordinate.of(-(htmlLocation.y.coordinate - this.previousRealLocation.y.coordinate));
     const movementY = VelocityCoordinate.of(-movementHtmlY.coordinate);
 
-    const newLocation = this.viewCenterLocation.reactiveLocation().createOffsetLocation(
+    const newLocation = this.viewCenterLocation.reactiveValue().createOffsetLocation(
       VirtualCoordinate.of(movementX.coordinate),
       VirtualCoordinate.of(movementY.coordinate)
     );
@@ -156,7 +156,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
   
     const step = () =>  {
       if (Math.abs(this.velocity.x.coordinate) > minVelocity || Math.abs(this.velocity.y.coordinate) > minVelocity) {
-        const newLocation: VirtualLocation = this.viewCenterLocation.reactiveLocation().createOffsetLocation(
+        const newLocation: VirtualLocation = this.viewCenterLocation.reactiveValue().createOffsetLocation(
           VirtualCoordinate.of(this.velocity.x.coordinate),
           VirtualCoordinate.of(this.velocity.y.coordinate)
         );
