@@ -1,3 +1,5 @@
+import type { Reactive, Reactivity } from "../reactivity";
+
 export class VirtualCoordinate {
   public readonly coordinate: number;
 
@@ -39,14 +41,14 @@ export class VirtualLocation {
 
 export const VIRTUAL_COORDINATE_SYSTEM_ORIGIN = VirtualLocation.of(VirtualCoordinate.of(0), VirtualCoordinate.of(0));
 
-export class ReactiveVirtualLocation {
+export class ReactiveVirtualLocation implements Reactivity<VirtualLocation> {
   private location: VirtualLocation = $state(VIRTUAL_COORDINATE_SYSTEM_ORIGIN);
 
   constructor(initialLocation: VirtualLocation) {
     this.location = initialLocation;
   }
 
-  reactiveLocation(): VirtualLocation {
+  reactiveValue(): Reactive<VirtualLocation> {
     return this.location;
   }
 
@@ -54,4 +56,3 @@ export class ReactiveVirtualLocation {
     this.location = newLocation;
   }
 }
-

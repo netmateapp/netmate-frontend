@@ -1,4 +1,5 @@
 import type { Finalizer, LifeCycle } from "../lifeCycle";
+import type { Reactive, Reactivity } from "../reactivity";
 
 export class ViewportWidth {
   public readonly width: number;
@@ -34,14 +35,14 @@ export class ViewportHeight {
   }
 }
 
-export class ReactiveViewportWidth {
+export class ReactiveViewportWidth implements Reactivity<ViewportWidth> {
   private width: ViewportWidth = $state(new ViewportWidth(0));
 
   constructor(width: ViewportWidth) {
     this.width = width;
   }
 
-  currentViewportWidth(): ViewportWidth {
+  reactiveValue(): Reactive<ViewportWidth> {
     return this.width;
   }
 
@@ -50,14 +51,14 @@ export class ReactiveViewportWidth {
   }
 }
 
-export class ReactiveViewportHeight {
+export class ReactiveViewportHeight implements Reactivity<ViewportHeight> {
   private height: ViewportHeight = $state(new ViewportHeight(0));
 
   constructor(height: ViewportHeight) {
     this.height = height;
   }
 
-  currentViewportHeight(): ViewportHeight {
+  reactiveValue(): Reactive<ViewportHeight> {
     return this.height;
   }
 
