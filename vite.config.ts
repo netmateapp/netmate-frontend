@@ -5,6 +5,10 @@ import reloadSettings from './vite-plugins/reloadSettings';
 export default defineConfig({
 	plugins: [sveltekit(), reloadSettings()],
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
+		include: ['src/**/*.{test,spec}.{js,ts}'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+    }
 	}
 });
