@@ -19,7 +19,7 @@ export class ChunkCoordinate {
   }
 }
 
-const CHUNK_SIDE_LENGTH = 1024;
+export const CHUNK_SIDE_LENGTH = 1024;
 export const BASE_2_CHUNK_SIDE_LENGTH_LOGARITHM = Math.log(CHUNK_SIDE_LENGTH) / Math.log(2);
 
 export class ChunkLocation {
@@ -57,7 +57,7 @@ export class ChunkLocation {
     if (position < sideLength) { // 右辺
       chunkX = layer;
       chunkY = (layer - 1) - position;
-    } if (position < 2 * sideLength) { // 下辺
+    } else if (position < 2 * sideLength) { // 下辺
       chunkX = (layer - 1) - (position - sideLength);
       chunkY = -layer;
     } else if (position < 3 * sideLength) { // 左辺
@@ -109,22 +109,6 @@ export class ChunkKey {
   }
 }
 
-export class ChunkRepository {
-  private readonly map = new Map<string, Chunk>();
-
-  chunkAt(location: ChunkLocation): Option<Chunk> {
-    return this.map.get(ChunkKey.from(location).key);
-  }
-
-  hasChunkAt(location: ChunkLocation): boolean {
-    return this.map.has(ChunkKey.from(location).key);
-  }
-
-  register(chunk: Chunk) {
-    this.map.set(ChunkKey.from(chunk.location).key, chunk);
-  }
-}
-
 export class ChunkIndex {
   public readonly index: number;
 
@@ -173,5 +157,21 @@ export class ChunkIndex {
     const index: number = chunkGroupStartIndex + offset;
 
     return new ChunkIndex(index);
+  }
+}
+
+export class ChunkRepository {
+  private readonly map = new Map<string, Chunk>();
+
+  chunkAt(location: ChunkLocation): Option<Chunk> {
+    return this.map.get(ChunkKey.from(location).key);
+  }
+
+  hasChunkAt(location: ChunkLocation): boolean {
+    return this.map.has(ChunkKey.from(location).key);
+  }
+
+  register(chunk: Chunk) {
+    this.map.set(ChunkKey.from(chunk.location).key, chunk);
   }
 }
