@@ -1,38 +1,6 @@
 import type { Option } from "$lib/option";
-import type { ShareCard } from "$lib/scripts/domain/shareCard";
-import type { Tag } from "$lib/scripts/domain/tag";
 import { VirtualCoordinate, VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
-
-const MIN_SIZE_OF_SHARE_NIBBLES_SCHOOL = 1;
-const MAX_SIZE_OF_SHARE_NIBBLES_SCHOOL = 2;
-
-export class ShareCardsCluster {
-  public readonly shareCards: ShareCard[];
-
-  constructor(shareCards: ShareCard[]) {
-    if (!ShareCardsCluster.isValid(shareCards)) throw new Error(`The length of shareCards must be between ${MIN_SIZE_OF_SHARE_NIBBLES_SCHOOL} and ${MAX_SIZE_OF_SHARE_NIBBLES_SCHOOL}.`);
-    this.shareCards = shareCards;
-  }
-
-  private static isValid(shareNibbles: ShareCard[]): boolean {
-    const size = shareNibbles.length;
-    return MAX_SIZE_OF_SHARE_NIBBLES_SCHOOL <= size && size <= MAX_SIZE_OF_SHARE_NIBBLES_SCHOOL;
-  }
-}
-
-export class SpaceCore {
-  public readonly tag: Tag;
-  public readonly shareCardsCluster: ShareCardsCluster;
-
-  constructor(tag: Tag, shareCardsCluster: ShareCardsCluster) {
-    this.tag = tag;
-    this.shareCardsCluster = shareCardsCluster;
-  }
-}
-
-export type None = undefined;
-
-export type ChunkContent = ShareCardsCluster | SpaceCore | None;
+import type { ChunkContent } from "./chunkContent";
 
 export class ChunkCoordinate {
   public readonly coordinate: number;
