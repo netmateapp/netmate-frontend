@@ -1,6 +1,7 @@
 import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, ShareNibblesSchool, SubtagSpaceCore, type ChunkRepository } from "./chunk";
 import { genTestShareNibble, genTestTag } from "./mockShare";
-import type { VirtualLocation } from "./coordinateSystem";
+import type { VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
+import type { Reactive, Reactivity } from "./reactivity";
 
 export interface ChunkFetcher {
   fetchChunksBy(indexes: Set<ChunkIndex>): Set<Chunk>;
@@ -137,10 +138,10 @@ export class DynamicChunkLoader {
     this.previousViewCenterVirtualLocation = initialViewCenterVirtualLocation;
   }
 
-  startDyanmicChunkLoading(reactiveViewCenterLocation: VirtualLocation) {
+  startDyanmicChunkLoading(viewCenterLocation: Reactive<VirtualLocation>) {
     this.chunkLoader.loadChunksInMovementDirection(
       this.previousViewCenterVirtualLocation,
-      reactiveViewCenterLocation,
+      viewCenterLocation,
       DYNAMIC_CHUNK_LOADING_RADIUS,
       DYNAMIC_CHUNK_LOADING_DISTANCE
     );
@@ -149,10 +150,10 @@ export class DynamicChunkLoader {
 
 type RenderedChunks = Set<Chunk>;
 
-export class ReactiveRenderedChunks {
+export class ReactiveRenderedChunks implements Reactivity<RenderedChunks> {
   private renderedChunks: RenderedChunks = $state(new Set<Chunk>());
 
-  reactiveRenderedChunks(): RenderedChunks {
+  reactiveValue(): Reactive<RenderedChunks> {
     return this.renderedChunks;
   }
 
@@ -192,8 +193,8 @@ export class DynamicChunkRenderer {
     this.chunkRenderer = chunkRenderer;
   }
 
-  startDynamicChunkRendering(reactiveViewCenterLocation: VirtualLocation) {
-    this.dynamicChunkLoader.startDyanmicChunkLoading(reactiveViewCenterLocation);
-    this.chunkRenderer.renderChunksWithinRadius(reactiveViewCenterLocation, DYNAMIC_CHUNK_RENDERING_RADIUS);
+  startDynamicChunkRendering(viewCenterLocation: Reactive<VirtualLocation>) {
+    this.dynamicChunkLoader.startDyanmicChunkLoading(viewCenterLocation);
+    this.chunkRenderer.renderChunksWithinRadius(viewCenterLocation, DYNAMIC_CHUNK_RENDERING_RADIUS);
   }
 }
