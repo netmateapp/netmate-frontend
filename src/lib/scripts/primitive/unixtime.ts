@@ -1,3 +1,4 @@
+
 export class UnixTimeMillis {
   public readonly time: number;
 
