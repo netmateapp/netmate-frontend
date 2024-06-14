@@ -1,7 +1,7 @@
-import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, ShareNibblesSchool, SubtagSpaceCore, type ChunkRepository } from "./chunk";
-import { genTestShareNibble, genTestTag } from "./mockShare";
-import type { VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
-import type { Reactive, Reactivity } from "./reactivity";
+import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, ShareCardsCluster, SpaceCore, type ChunkRepository } from "./chunk";
+import { genTestShareNibble, genTestTag } from "../mockShare";
+import type { VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
+import type { Reactive, Reactivity } from "../../../../../../lib/scripts/extension/reactivity";
 
 export interface ChunkFetcher {
   fetchChunksBy(indexes: Set<ChunkIndex>): Set<Chunk>;
@@ -17,7 +17,7 @@ export class TagSpaceChunkFetcher implements ChunkFetcher {
 
     for (var index of indexes) {
       const location = ChunkLocation.fromIndex(index);
-      const school: ShareNibblesSchool = new ShareNibblesSchool([
+      const school: ShareCardsCluster = new ShareCardsCluster([
         genTestShareNibble(),
         genTestShareNibble()
       ]);
@@ -29,7 +29,7 @@ export class TagSpaceChunkFetcher implements ChunkFetcher {
         if (rand < max - 1) {
           chunks.add( new Chunk(location, school));
         } else {
-          const core = new SubtagSpaceCore(genTestTag(), school);
+          const core = new SpaceCore(genTestTag(), school);
           chunks.add(new Chunk(location, core));
         }
       }

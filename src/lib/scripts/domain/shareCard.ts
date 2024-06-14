@@ -18,7 +18,7 @@ export class LeadSenetences {
   }
 }
 
-export class ShareNibble {
+export class ShareCard {
   public readonly id: ShareId;
   public readonly sharerId: HandleId;
   public readonly timestamp: Timestamp;
@@ -38,7 +38,7 @@ export class ShareNibble {
     thumbnailMediaId?: Option<MediaId>,
     shouldProcessThumbnailImage: boolean = false,
   ) {
-    if (!ShareNibble.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
+    if (!ShareCard.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
 
     this.id = id;
     this.sharerId = sharerId;
