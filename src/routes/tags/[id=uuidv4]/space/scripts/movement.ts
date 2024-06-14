@@ -1,5 +1,7 @@
 import type { Finalizer, LifeCycle } from "./lifeCycle";
-import { HtmlCoordinate, HtmlLocation, VirtualCoordinate, VirtualLocation, type ReactiveVirtualLocation } from "./coordinateSystem";
+import { type ReactiveVirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
+import { VirtualCoordinate, VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
+import { RealLocation, RealCoordinate } from "./coordinateSystem/realCoordinateSystem";
 
 type MoveEvent = MouseEvent | TouchEvent;
 
@@ -40,7 +42,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
   private readonly viewCenterLocation: ReactiveVirtualLocation;
   private isUserTouching: boolean = false;
   private hasMovedDuringTouch: boolean = false;
-  private previousHtmlLocation = HtmlLocation.of(HtmlCoordinate.of(0), HtmlCoordinate.of(0));
+  private previousRealLocation = RealLocation.of(RealCoordinate.of(0), RealCoordinate.of(0));
   private static MAX_VELOCITY: number = 60;
   private velocity = Velocity2d.of(VelocityCoordinate.of(0), VelocityCoordinate.of(0));
   private static FRICTION: number = 0.95;
@@ -55,10 +57,10 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     this.isUserTouching = true;
 
     if (event instanceof MouseEvent) {
-      this.previousHtmlLocation = HtmlLocation.of(HtmlCoordinate.of(event.clientX), HtmlCoordinate.of(event.clientY));
+      this.previousRealLocation = RealLocation.of(RealCoordinate.of(event.clientX), RealCoordinate.of(event.clientY));
     } else {
       const touch: Touch = event.touches[0];
-      this.previousHtmlLocation = HtmlLocation.of(HtmlCoordinate.of(touch.clientX), HtmlCoordinate.of(touch.clientY));
+      this.previousRealLocation = RealLocation.of(RealCoordinate.of(touch.clientX), RealCoordinate.of(touch.clientY));
     }
 
     this.velocity = Velocity2d.of(VelocityCoordinate.of(0), VelocityCoordinate.of(0));
@@ -75,16 +77,16 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
 
     if (!this.hasMovedDuringTouch) this.hasMovedDuringTouch = true;
   
-    let htmlLocation: HtmlLocation;
+    let htmlLocation: RealLocation;
     if (event instanceof MouseEvent) {
-      htmlLocation = HtmlLocation.of(HtmlCoordinate.of(event.clientX), HtmlCoordinate.of(event.clientY));
+      htmlLocation = RealLocation.of(RealCoordinate.of(event.clientX), RealCoordinate.of(event.clientY));
     } else {
       const touch: Touch = event.touches[0];
-      htmlLocation = HtmlLocation.of(HtmlCoordinate.of(touch.clientX), HtmlCoordinate.of(touch.clientY));
+      htmlLocation = RealLocation.of(RealCoordinate.of(touch.clientX), RealCoordinate.of(touch.clientY));
     }
 
-    const movementX = VelocityCoordinate.of(htmlLocation.x.coordinate - this.previousHtmlLocation.x.coordinate);
-    const movementHtmlY = HtmlCoordinate.of(-(htmlLocation.y.coordinate - this.previousHtmlLocation.y.coordinate));
+    const movementX = VelocityCoordinate.of(htmlLocation.x.coordinate - this.previousRealLocation.x.coordinate);
+    const movementHtmlY = RealCoordinate.of(-(htmlLocation.y.coordinate - this.previousRealLocation.y.coordinate));
     const movementY = VelocityCoordinate.of(-movementHtmlY.coordinate);
 
     const newLocation = this.viewCenterLocation.reactiveLocation().createOffsetLocation(
@@ -98,7 +100,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     const newVelocityY = VelocityCoordinate.of(Math.max(-maxVelocity, Math.min(maxVelocity, movementY.coordinate)));
     this.velocity = Velocity2d.of(newVelocityX, newVelocityY);
 
-    this.previousHtmlLocation = htmlLocation;
+    this.previousRealLocation = htmlLocation;
   }
 
   onTouchEnd(event: MoveEvent) {
