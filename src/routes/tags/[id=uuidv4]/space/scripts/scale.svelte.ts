@@ -8,7 +8,6 @@ export class Scale {
   public readonly scale: number;
 
   constructor(scale: number) {
-    console.log(`${scale}`);
     if (!Scale.isValid(scale)) throw new Error(`A scale must be between ${MIN_SCALE} and ${MAX_SCALE}.`);
     this.scale = scale;
   }
