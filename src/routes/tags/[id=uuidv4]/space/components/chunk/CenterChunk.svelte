@@ -1,13 +1,12 @@
 <script lang="ts">
   import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
-  import { REAL_COORDINATE_SYSTEM_ORIGIN, RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
+  import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import type { TagSpace } from "../../scripts/space";
   import LocationName from "./content/LocationName.svelte";
   import ShareCardsCluster from "./content/ShareCardsCluster.svelte";
-  import SpaceCore from "./content/SpaceCore.svelte";
-
+  
   type Props = {
     space: TagSpace;
     chunk: Chunk;
@@ -15,18 +14,13 @@
 
   let { space, chunk }: Props = $props();
 
-  let realLocation: RealLocation = REAL_COORDINATE_SYSTEM_ORIGIN;
-
-  $effect(() => {
-    realLocation = space.locationTransformer.transformToRealLocation(
-      space.viewCenterLocation.reactiveValue(),
-      VirtualLocation.fromChunkLocation(chunk.location),
-      space.viewportWidth.reactiveValue(),
-      space.viewportHeight.reactiveValue(),
-      space.scale.reactiveValue()
-    );
-  });
-
+  let realLocation: RealLocation = $derived(space.locationTransformer.transformToRealLocation(
+    space.viewCenterLocation.reactiveValue(),
+    VirtualLocation.fromChunkLocation(chunk.location),
+    space.viewportWidth.reactiveValue(),
+    space.viewportHeight.reactiveValue(),
+    space.scale.reactiveValue()
+  ));
 
   function bottomStyle(): number {
     return realLocation.y.coordinate;

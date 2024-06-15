@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
-  import { REAL_COORDINATE_SYSTEM_ORIGIN, type RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
+  import { type RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import type { TagSpace } from "../../scripts/space";
   import ShareCardsCluster from "./content/ShareCardsCluster.svelte";
