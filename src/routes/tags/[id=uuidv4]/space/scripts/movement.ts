@@ -80,8 +80,8 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
       htmlLocation = RealLocation.of(RealCoordinate.of(touch.clientX), RealCoordinate.of(touch.clientY));
     }
 
-    const movementX = VelocityCoordinate.of(htmlLocation.x.coordinate - this.previousRealLocation.x.coordinate);
-    const movementHtmlY = RealCoordinate.of(-(htmlLocation.y.coordinate - this.previousRealLocation.y.coordinate));
+    const movementX = VelocityCoordinate.of(this.previousRealLocation.x.coordinate - htmlLocation.x.coordinate);
+    const movementHtmlY = RealCoordinate.of(this.previousRealLocation.y.coordinate - htmlLocation.y.coordinate);
     const movementY = VelocityCoordinate.of(-movementHtmlY.coordinate);
 
     const newLocation = this.viewCenterLocation.reactiveValue().createOffsetLocation(
