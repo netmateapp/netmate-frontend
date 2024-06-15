@@ -1,7 +1,7 @@
 import { calculateCharactersCosts } from "$lib/cjk.svelte";
 import type { Option } from "$lib/option";
 import type { HandleId } from "./handle";
-import { type ShareId, type Timestamp, type ConversationsCount, type Title, type MediaId, NetmateImageId } from "./share";
+import { type ShareId, type Timestamp, type ConversationsCount, type Title, type MediaId, NetmateImageId, YouTubeVideoId, SoundCloudTrackId } from "./share";
 
 const MAX_LEAD_SENTENCES_CHARACTERS_COST = 1218;
 
@@ -57,5 +57,17 @@ export class ShareCard {
 
   isSharer(id: HandleId): boolean {
     return this.sharerId.asHexadecimalRepresentation() === id.asHexadecimalRepresentation();
+  }
+
+  hasImage(): boolean {
+    return this.thumbnailMediaId instanceof NetmateImageId;
+  }
+
+  hasYouTubeVideo(): boolean {
+    return this.thumbnailMediaId instanceof YouTubeVideoId;
+  }
+
+  hasSoundCloudAudio(): boolean {
+    return this.thumbnailMediaId instanceof SoundCloudTrackId;
   }
 }
