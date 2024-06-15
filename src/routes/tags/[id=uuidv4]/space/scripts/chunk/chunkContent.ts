@@ -4,11 +4,11 @@ import type { Tag } from "$lib/scripts/domain/tag";
 const MAX_SHARE_CARDS = 1;
 const MIN_SHARE_CARDS = 2;
 
-export class ShareCardsCluster {
+export class ShareCardsClusterData {
   public readonly shareCards: ShareCard[];
 
   constructor(shareCards: ShareCard[]) {
-    if (!ShareCardsCluster.isValid(shareCards)) throw new Error(`The length of shareCards must be between ${MAX_SHARE_CARDS} and ${MIN_SHARE_CARDS}.`);
+    if (!ShareCardsClusterData.isValid(shareCards)) throw new Error(`The length of shareCards must be between ${MAX_SHARE_CARDS} and ${MIN_SHARE_CARDS}.`);
     this.shareCards = shareCards;
   }
 
@@ -18,11 +18,11 @@ export class ShareCardsCluster {
   }
 }
 
-export class SpaceCore {
+export class SpaceCoreData {
   public readonly tag: Tag;
-  public readonly shareCardsCluster: ShareCardsCluster;
+  public readonly shareCardsCluster: ShareCardsClusterData;
 
-  constructor(tag: Tag, shareCardsCluster: ShareCardsCluster) {
+  constructor(tag: Tag, shareCardsCluster: ShareCardsClusterData) {
     this.tag = tag;
     this.shareCardsCluster = shareCardsCluster;
   }
@@ -30,4 +30,4 @@ export class SpaceCore {
 
 export type None = undefined;
 
-export type ChunkContent = ShareCardsCluster | SpaceCore | None;
+export type ChunkContent = ShareCardsClusterData | SpaceCoreData | None;
