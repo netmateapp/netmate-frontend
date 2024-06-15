@@ -10,4 +10,8 @@ export class UnixTimeMillis {
   private static isValid(time: number) {
     return time >= 0 && Number.isInteger(time);
   }
+
+  static now(): UnixTimeMillis {
+    return new UnixTimeMillis(Date.now());
+  }
 }
