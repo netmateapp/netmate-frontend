@@ -55,6 +55,9 @@ export class TagSpace implements LifeCycle {
   }
 
   initialize(): Finalizer {
+    this.viewportWidth.update(ViewportWidth.fromCurrentViewport());
+    this.viewportHeight.update(ViewportHeight.fromCurrentViewport());
+
     return composeLifeCycles(
       this.viewCenterLocationUpdater,
       this.viewportSizeUpdater,

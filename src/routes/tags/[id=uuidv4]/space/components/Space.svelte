@@ -27,8 +27,6 @@
   });
 
   $effect(() => {
-    space.viewportWidth.update(ViewportWidth.fromCurrentViewport());
-    space.viewportHeight.update(ViewportHeight.fromCurrentViewport());
     space.dynamicChunkRenderer.startDynamicChunkRendering(space.viewCenterLocation.reactiveValue());
   });
 
