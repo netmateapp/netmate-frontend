@@ -1,12 +1,14 @@
+import type { Hasher } from "./hasher";
+
 export class HashSet<T> implements Iterable<T> {
   private table: Array<LinkedList<Entry<T>>>;
   private size: number;
   private thereshold: number;
-  private hashFunction: (t: T) => number;
+  private hashFunction: Hasher<T>;
   private static readonly DEFAULT_CAPACITY = 16;
   private static readonly LOAD_FACTOR = 0.75;
 
-  constructor(hashFunction: (t: T) => number) {
+  constructor(hashFunction: Hasher<T>) {
     this.table = new Array(HashSet.DEFAULT_CAPACITY);
     this.size = 0;
     this.thereshold = Math.floor(HashSet.DEFAULT_CAPACITY * HashSet.LOAD_FACTOR);
