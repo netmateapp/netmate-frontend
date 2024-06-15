@@ -90,7 +90,7 @@ export class Chunk {
   }
 
   centerLocation(): VirtualLocation {
-    const halfChunkSideLength: number = CHUNK_SIDE_LENGTH / 2;
+    const halfChunkSideLength: number = Math.floor(CHUNK_SIDE_LENGTH / 2);
     const virtualX: number = this.location.chunkX.coordinate * CHUNK_SIDE_LENGTH + halfChunkSideLength;
     const virtualY: number = this.location.chunkY.coordinate * CHUNK_SIDE_LENGTH + halfChunkSideLength;
     return VirtualLocation.of(VirtualCoordinate.of(virtualX), VirtualCoordinate.of(virtualY));
@@ -172,6 +172,7 @@ export class ChunkRepository {
   }
 
   register(chunk: Chunk) {
+    console.log(`register: ${ChunkKey.from(chunk.location).key}`);
     this.map.set(ChunkKey.from(chunk.location).key, chunk);
   }
 }
