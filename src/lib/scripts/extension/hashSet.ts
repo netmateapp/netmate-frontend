@@ -95,6 +95,18 @@ export class HashSet<T> implements Iterable<T> {
     return this.size;
   }
 
+  values(): T[] {
+    const values: T[] = [];
+    for (const bucket of this.table) {
+      if (bucket) {
+        for (const entry of bucket.getItems()) {
+          values.push(entry.value);
+        }
+      }
+    }
+    return values;
+  }
+
   [Symbol.iterator](): Iterator<T> {
     return this.iterate();
   }
