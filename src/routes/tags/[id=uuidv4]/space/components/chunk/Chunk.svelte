@@ -22,11 +22,6 @@
     space.scale.reactiveValue()
   ));
 
-  $effect(() => {
-    console.log(`vc: ${space.viewCenterLocation.reactiveValue().x.coordinate}, vc: ${space.viewCenterLocation.reactiveValue().y.coordinate}`);
-    //console.log(`rx: ${realLocation.x.coordinate}, ry: ${realLocation.y.coordinate}`);
-  });
-
   function bottomStyle(): number {
     return realLocation.y.coordinate;
   }
