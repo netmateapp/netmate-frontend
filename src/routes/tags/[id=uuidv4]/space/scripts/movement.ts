@@ -1,4 +1,4 @@
-import type { Finalizer, LifeCycle } from "./lifeCycle";
+import type { Finalizer, LifeCycle } from "../../../../../lib/scripts/extension/lifeCycle";
 import { type ReactiveVirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
 import { VirtualCoordinate, VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
 import { RealLocation, RealCoordinate } from "./coordinateSystem/realCoordinateSystem";
@@ -43,10 +43,10 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
   private isUserTouching: boolean = false;
   private hasMovedDuringTouch: boolean = false;
   private previousRealLocation = RealLocation.of(RealCoordinate.of(0), RealCoordinate.of(0));
-  private static MAX_VELOCITY: number = 60;
+  private static readonly MAX_VELOCITY: number = 60;
   private velocity = Velocity2d.of(VelocityCoordinate.of(0), VelocityCoordinate.of(0));
-  private static FRICTION: number = 0.95;
-  private static INERTIA_MIN_VELOCITY: number = 0.5;
+  private static readonly FRICTION: number = 0.95;
+  private static readonly INERTIA_MIN_VELOCITY: number = 0.5;
   private inertiaAnimationFrameId: number = 0;
 
   constructor(viewCenterLocation: ReactiveVirtualLocation) {
