@@ -8,6 +8,7 @@ export class Scale {
   public readonly scale: number;
 
   constructor(scale: number) {
+    console.log(`${scale}`);
     if (!Scale.isValid(scale)) throw new Error(`A scale must be between ${MIN_SCALE} and ${MAX_SCALE}.`);
     this.scale = scale;
   }
@@ -51,12 +52,18 @@ export class ScaleUpdater implements LifeCycle {
 
   tryScaleUp() {
     const currentScale = this.scale.reactiveValue().scale;
-    if (currentScale < MAX_SCALE) this.scale.update(new Scale(currentScale + ScaleUpdater.INCREMENTATION));
+    if (currentScale < MAX_SCALE) {
+      const newScale: number = ScaleUpdater.roundToTenth(currentScale + ScaleUpdater.INCREMENTATION);
+      this.scale.update(new Scale(newScale));
+    }
   }
 
   tryScaleDown() {
     const currentScale = this.scale.reactiveValue().scale;
-    if (currentScale > MIN_SCALE) this.scale.update(new Scale(currentScale - ScaleUpdater.INCREMENTATION));
+    if (currentScale > MIN_SCALE) {
+      const newScale: number = ScaleUpdater.roundToTenth(currentScale - ScaleUpdater.INCREMENTATION);
+      this.scale.update(new Scale(newScale));
+    }
   }
 
   initialize(): Finalizer {
@@ -65,5 +72,9 @@ export class ScaleUpdater implements LifeCycle {
     return () => {
       document.removeEventListener("wheel", onWheel);
     };
+  }
+
+  private static roundToTenth(decimal: number): number {
+    return Math.round(decimal * 10) / 10;
   }
 }
