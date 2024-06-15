@@ -20,7 +20,8 @@ export function generateMockShareCards(): ShareCard {
     generateTestConversationsCount(),
     title,
     leadSentences,
-    mediaId
+    mediaId,
+    mediaId instanceof NetmateImageId
   )
 }
 
