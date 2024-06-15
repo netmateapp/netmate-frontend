@@ -1,23 +1,23 @@
 import { map, type Option } from "$lib/option";
 import { ConversationsCount, NetmateImageId, Timestamp, Title, type MediaId } from "$lib/scripts/domain/share";
-import { LeadSenetences, ShareNibble } from "$lib/scripts/domain/shareNibble";
+import { LeadSenetences, ShareCard } from "$lib/scripts/domain/shareCard";
 import { Tag, TagName } from "$lib/scripts/domain/tag";
-import { UnixTimeMillis } from "$lib/scripts/domain/utils";
+import { UnixTimeMillis } from "$lib/scripts/primitive/unixtime";
 import { genTestUuid4, genTestUuid7 } from "$lib/uuid";
 
-export function genTestShareNibble(): ShareNibble {
-  const title = genTestTitle();
-  let leadSentences = genTestLeadSentences();
-  const mediaId = genTestMediaId();
+export function generateMockShareCards(): ShareCard {
+  const title = generateTestTitle();
+  let leadSentences = generateTestLeadSentences();
+  const mediaId = generateTestMediaId();
   if (title === undefined && leadSentences === undefined && mediaId === undefined) {
     leadSentences = new LeadSenetences(TEST_TEXTS[getRandomInt(TEST_TEXTS.length)]);
   }
 
-  return new ShareNibble(
+  return new ShareCard(
     genTestUuid7(),
     genTestUuid4(),
-    genTestTimestamp(),
-    genTestConversationsCount(),
+    generateTestTimestamp(),
+    generateTestConversationsCount(),
     title,
     leadSentences,
     mediaId
@@ -39,7 +39,7 @@ const TEST_TITLES: string[] = [
   "学マスなるものが出たらしい"
 ];
 
-function genTestTitle(): Option<Title> {
+function generateTestTitle(): Option<Title> {
   const title: Option<string> = pickUpValueOrUndefinedAtRandom(7, TEST_TITLES);
   return map(title, t => new Title(t));
 }
@@ -57,7 +57,7 @@ const TEST_TEXTS: string[] = [
   "クリスマスにこういう画像を上げるというのは一種の「祭り」の側面があったために広く行われていたわけだが、オタクのメインストリームがtwitterに移行してからは、「クリスマススレ」みたいなものが立てられなくなったことや、ガラケー・スマホ時代からインターネットに流入した人間の大半はオタクではなかったため、このような風習はだんだんと廃れていく。",
 ];
 
-function genTestLeadSentences(): Option<LeadSenetences> {
+function generateTestLeadSentences(): Option<LeadSenetences> {
   const text: Option<string> = pickUpValueOrUndefinedAtRandom(5, TEST_TEXTS);
   return map(text, t => new LeadSenetences(t));
 }
@@ -72,21 +72,21 @@ const NETMATE_IMAGE_IDS = [
   new NetmateImageId("/src/lib/assets/test/sampleimage7.jpg")
 ];
 
-function genTestMediaId(): Option<MediaId> {
+function generateTestMediaId(): Option<MediaId> {
   return pickUpValueOrUndefinedAtRandom(15, NETMATE_IMAGE_IDS);
 }
 
-function genTestConversationsCount(): ConversationsCount {
+function generateTestConversationsCount(): ConversationsCount {
   return new ConversationsCount(getRandomInt(1000));
 }
 
-function genTestTimestamp(): Timestamp {
+function generateTestTimestamp(): Timestamp {
   const unixtime = new UnixTimeMillis(1717989007669 - getRandomInt(259200000));
   return new Timestamp(unixtime);
 }
 
-export function genTestTag(): Tag {
-  return new Tag(genTestUuid4(), genTestTagName());
+export function generateTestTag(): Tag {
+  return new Tag(genTestUuid4(), generateTestTagName());
 }
 
 const TAG_NAMES: string[] = [
@@ -101,6 +101,6 @@ const TAG_NAMES: string[] = [
   "空崎ヒナ"
 ];
 
-function genTestTagName(): TagName {
+function generateTestTagName(): TagName {
   return new TagName(TAG_NAMES[getRandomInt(TAG_NAMES.length)]);
 }
