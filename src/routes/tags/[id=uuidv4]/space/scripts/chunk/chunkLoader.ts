@@ -1,25 +1,35 @@
-import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, ShareCardsCluster, SpaceCore, type ChunkRepository } from "./chunk";
-import { genTestShareNibble, genTestTag } from "../mockShare";
+import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, type ChunkRepository } from "./chunk";
+import { ShareCardsCluster, SpaceCore } from "./chunkContent";
+import { generateMockShareCards, generateTestTag } from "../mockShare";
 import type { VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
 import type { Reactive } from "../../../../../../lib/scripts/extension/reactivity";
+import { HashSet } from "$lib/scripts/extension/hashSet/hashSet";
 
-export interface ChunkFetcher {
-  fetchChunksBy(indexes: Set<ChunkIndex>): Set<Chunk>;
+export abstract class ChunkFetcher {
+  abstract fetchChunksBy(indexes: HashSet<ChunkIndex>): HashSet<Chunk>;
+
+  protected static hashChunk(chunk: Chunk): number {
+    return ChunkIndex.from(chunk.location).index;
+  }
+
+  protected static equalsChunk(a: Chunk, b: Chunk): boolean {
+    return this.hashChunk(a) === this.hashChunk(b);
+  }
 }
 
-export class TagSpaceChunkFetcher implements ChunkFetcher {
-  fetchChunksBy(indexes: Set<ChunkIndex>): Set<Chunk> {
+export class TagSpaceChunkFetcher extends ChunkFetcher {
+  fetchChunksBy(indexes: HashSet<ChunkIndex>): HashSet<Chunk> {
     return this.fetchMockChunksBy(indexes);
   }
   
-  fetchMockChunksBy(indexes: Set<ChunkIndex>): Set<Chunk> {
-    const chunks = new Set<Chunk>();
+  fetchMockChunksBy(indexes: HashSet<ChunkIndex>): HashSet<Chunk> {
+    const chunks = new HashSet<Chunk>(ChunkFetcher.hashChunk, ChunkFetcher.equalsChunk);
 
     for (var index of indexes) {
       const location = ChunkLocation.fromIndex(index);
       const school: ShareCardsCluster = new ShareCardsCluster([
-        genTestShareNibble(),
-        genTestShareNibble()
+        generateMockShareCards(),
+        generateMockShareCards()
       ]);
       if (location.chunkX.coordinate === 0 && location.chunkY.coordinate === 0) {
         chunks.add(new Chunk(location, school));
@@ -29,7 +39,7 @@ export class TagSpaceChunkFetcher implements ChunkFetcher {
         if (rand < max - 1) {
           chunks.add( new Chunk(location, school));
         } else {
-          const core = new SpaceCore(genTestTag(), school);
+          const core = new SpaceCore(generateTestTag(), school);
           chunks.add(new Chunk(location, core));
         }
       }
@@ -78,14 +88,15 @@ export class ChunkLoader {
   }
 
   // 現在のチャンクから移動方向の `radius + 1` チャンク先のチャンクが未ロードの場合、
-  // 移動方向の `distance + radius * 2` チャンク先までチャンクを先読みする
+  // 移動方向の `directionalPreloadsCount + radius * 2` チャンク先までチャンクを先読みする
   // `+ radius * 2` は、通常の読み込み及び最後の先読み時の読み込み範囲 `radius` のチャンクまでを含めての意である
-  loadChunksInMovementDirection(from: VirtualLocation, to: VirtualLocation, radius: number, distance: number) {
-    const necessaryChunkIndexes = new Set<ChunkIndex>();
+  loadChunksInMovementDirection(from: VirtualLocation, to: VirtualLocation, radius: number, directionalPreloadsCount: number) {
+    const necessaryChunkIndexes = new HashSet<ChunkIndex>(ChunkLoader.hashChunkIndex, ChunkLoader.equalsChunkIndex);
 
     const startChunkLocation = ChunkLocation.fromVirtualLocation(from);
 
     this.calculateChunkIndexesToLoadInRange(startChunkLocation, radius)
+      .values()
       .forEach(index => necessaryChunkIndexes.add(index));
 
     const deltaX: number = to.x.coordinate - from.x.coordinate;
@@ -95,26 +106,37 @@ export class ChunkLoader {
       const nCoordinateYsAhead = ChunkCoordinate.of(startChunkLocation.chunkY.coordinate + (radius + 1) * Math.sign(deltaY));
       const nLocationsAhead = ChunkLocation.of(nCoordinateXsAhead, nCoordinateYsAhead);
       if (!this.repository.hasChunkAt(nLocationsAhead)) {
-        for (var d = radius + 1; d <= distance; d++) {
+        for (var d = radius; d <= directionalPreloadsCount; d++) {
           const chunkX = ChunkCoordinate.of(startChunkLocation.chunkX.coordinate + d * Math.sign(deltaX));
           const chunkY = ChunkCoordinate.of(startChunkLocation.chunkY.coordinate + d * Math.sign(deltaY));
           this.calculateChunkIndexesToLoadInRange(ChunkLocation.of(chunkX, chunkY), radius)
+            .values()
             .forEach(index => necessaryChunkIndexes.add(index));
         }
       }
     }
 
-    const necessaryChunks: Set<Chunk> = this.fetcher.fetchChunksBy(necessaryChunkIndexes);
-    necessaryChunks.forEach(chunk => this.loadChunk(chunk));
+    this.fetcher.fetchChunksBy(necessaryChunkIndexes)
+      .values()
+      .forEach(chunk => this.loadChunk(chunk));
   }
 
-  private calculateChunkIndexesToLoadInRange(center: ChunkLocation, radius: number): Set<ChunkIndex> {
-    return new Set<ChunkIndex>(
-      calculateChunkAreaLocations(center, radius)
-      .values()
-      .filter(location => !this.repository.hasChunkAt(location))
-      .map(location => ChunkIndex.from(location))
-    );
+  private calculateChunkIndexesToLoadInRange(center: ChunkLocation, radius: number): HashSet<ChunkIndex> {
+    const set = new HashSet<ChunkIndex>(ChunkLoader.hashChunkIndex, ChunkLoader.equalsChunkIndex);
+    calculateChunkAreaLocations(center, radius)
+    .values()
+    .filter(location => !this.repository.hasChunkAt(location))
+    .map(location => ChunkIndex.from(location))
+    .forEach(index => set.add(index));
+    return set;
+  }
+
+  private static hashChunkIndex(index: ChunkIndex): number {
+    return index.index;
+  }
+
+  private static equalsChunkIndex(a: ChunkIndex, b: ChunkIndex): boolean {
+    return a.index === b.index;
   }
 
   private static isMoved(deltaX: number, deltaY: number): boolean {
