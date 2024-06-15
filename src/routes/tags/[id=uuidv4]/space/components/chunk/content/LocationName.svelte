@@ -20,7 +20,7 @@
 
 <div
   class="location-wrapper"
-  style="top: {relativeLocation.x.coordinate}px; left: {relativeLocation.y.coordinate}px;">
+  style="top: {relativeLocation.y.coordinate}px; left: {relativeLocation.x.coordinate}px;">
   <a
     href="https://netmate.app/tags/{tag.id.asHexadecimalRepresentation()}/space"
     bind:this={locationNameElementRef}
