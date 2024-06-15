@@ -1,29 +1,31 @@
 <script lang="ts">
-  import type { Handle } from "$lib/scripts/domain/handle";
   import { Tag } from "$lib/scripts/domain/tag";
   import type { MaybeHTMLElement } from "$lib/types";
-  import type { RealLocation } from "../../../../routes/tags/[id=uuidv4]/space/scripts/coordinateSystem/realCoordinateSystem";
+  import { RealLocation } from "../../../scripts/coordinateSystem/realCoordinateSystem";
 
   type Props = {
-    locationName: string;
-    object: Tag | Handle;
+    tag: Tag;
     relativeLocation: RealLocation;
   };
 
-  let { locationName, object, relativeLocation }: Props = $props();
+  let { tag, relativeLocation }: Props = $props();
 
-  let ref: MaybeHTMLElement = $state(null);
-  export function getHeight(): number {
-    return ref?.getBoundingClientRect().height ?? 42;
+  let locationNameElementRef: MaybeHTMLElement;
+  const LOCATION_NAME_ELEMENT_MIN_HEIGHT = 42;
+
+  export function locationNameElementHeight(): number {
+    return locationNameElementRef?.getBoundingClientRect().height ?? LOCATION_NAME_ELEMENT_MIN_HEIGHT;
   }
 </script>
 
-<div class="location-wrapper" style="top: {relativeLocation.x.coordinate}px; left: {relativeLocation.y.coordinate}px;">
+<div
+  class="location-wrapper"
+  style="top: {relativeLocation.x.coordinate}px; left: {relativeLocation.y.coordinate}px;">
   <a
-    href="https://netmate.app/{object instanceof Tag ? "tags" : "handles"}/{object.id.asHexadecimalRepresentation()}/space"
-    bind:this={ref}
+    href="https://netmate.app/tags/{tag.id.asHexadecimalRepresentation()}/space"
+    bind:this={locationNameElementRef}
     class="location-name">
-    {locationName}
+    {tag.name.name}
   </a>
 </div>
 
