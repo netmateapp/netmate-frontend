@@ -85,10 +85,10 @@
     <div class="content">
       <div class="texts">
         {#if shareCard.title !== undefined}
-          <span class="title">{shareCard.title}</span>
+          <span class="title">{shareCard.title.title}</span>
         {/if}
         {#if shareCard.leadSentences !== undefined}
-          <div class="text">{shareCard.leadSentences}</div>
+          <div class="text">{shareCard.leadSentences.sentences}</div>
         {/if}
       </div>
       {#if shareCard.thumbnailMediaId !== undefined}
@@ -118,7 +118,7 @@
     </div>
     <div class="footer">
       <div class="information">
-        <span class="conversations-count">{_("conversations-count", { count: shareCard.conversationsCount })}</span>
+        <span class="conversations-count">{_("conversations-count", { count: shareCard.conversationsCount.count })}</span>
         <span class="timestamp">{_("timestamp", { ...elapsedTime(shareCard.timestamp.unixTimeMillis.time) })}</span>
       </div>
       <div class="more-button" use:tooltip={_("more-button-tooltip")}>
