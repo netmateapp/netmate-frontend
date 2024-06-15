@@ -1,4 +1,5 @@
 import type { Reactive, Reactivity } from "../../../../../../lib/scripts/extension/reactivity";
+import { CHUNK_SIDE_LENGTH, type ChunkLocation } from "../chunk/chunk";
 
 export class VirtualCoordinate {
   public readonly coordinate: number;
@@ -32,6 +33,13 @@ export class VirtualLocation {
 
   static of(x: VirtualCoordinate, y: VirtualCoordinate): VirtualLocation {
     return new VirtualLocation(x, y);
+  }
+
+  static fromChunkLocation(location: ChunkLocation): VirtualLocation {
+    return VirtualLocation.of(
+      VirtualCoordinate.of(location.chunkX.coordinate * CHUNK_SIDE_LENGTH),
+      VirtualCoordinate.of(location.chunkY.coordinate * CHUNK_SIDE_LENGTH)
+    );
   }
 
   createOffsetLocation(offsetX: VirtualCoordinate, offsetY: VirtualCoordinate): VirtualLocation {
