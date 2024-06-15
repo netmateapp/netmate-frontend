@@ -1,10 +1,10 @@
 <script lang="ts">
   import SpaceShareCard from "$lib/components/space/share/SpaceShareCard.svelte";
-  import type { ShareCardsCluster } from "../../../scripts/chunk/chunkContent";
-    import { RealCoordinate, RealLocation } from "../../../scripts/coordinateSystem/realCoordinateSystem";
+  import type { ShareCardsClusterData } from "../../../scripts/chunk/chunkContent";
+  import { RealCoordinate, RealLocation } from "../../../scripts/coordinateSystem/realCoordinateSystem";
 
   type Props = {
-    shareCardsCluster: ShareCardsCluster
+    shareCardsCluster: ShareCardsClusterData
   };
 
   let { shareCardsCluster }: Props = $props();
@@ -16,5 +16,5 @@
 </script>
 
 {#each shareCardsCluster.shareCards as shareCard, index}
-  <SpaceShareCard location={createRealLocation(index)} shareCard={shareCard} />
+  <SpaceShareCard location={createRealLocation(index)} {shareCard} />
 {/each}

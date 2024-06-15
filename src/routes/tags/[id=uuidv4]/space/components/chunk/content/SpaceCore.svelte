@@ -1,7 +1,7 @@
 <script lang="ts">
   import SpaceShareCard from "$lib/components/space/share/SpaceShareCard.svelte";
   import type { Reactive } from "$lib/scripts/extension/reactivity";
-  import type { SpaceCore } from "../../../scripts/chunk/chunkContent";
+  import type { SpaceCoreData } from "../../../scripts/chunk/chunkContent";
   import type { LocationTransformer } from "../../../scripts/coordinateSystem/locationTransformer";
   import { RealCoordinate, RealLocation } from "../../../scripts/coordinateSystem/realCoordinateSystem";
   import type { ViewportWidth, ViewportHeight } from "../../../scripts/coordinateSystem/viewportRelativeCoordinateSystem";
@@ -15,7 +15,7 @@
     viewportHeight: Reactive<ViewportHeight>;
     scale: Reactive<Scale>;
     locationTransformer: LocationTransformer;
-    spaceCore: SpaceCore;
+    spaceCore: SpaceCoreData;
   };
 
   let { viewCenterLocation, viewportWidth, viewportHeight, scale, locationTransformer, spaceCore }: Props = $props();
