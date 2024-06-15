@@ -1,8 +1,8 @@
 import type { Finalizer, LifeCycle } from "../../../../../lib/scripts/extension/lifeCycle";
 import type { Reactive, Reactivity } from "../../../../../lib/scripts/extension/reactivity";
 
-const MAX_SCALE = 1.0;
-const MIN_SCALE = 0.5;
+export const MAX_SCALE = 1.0;
+export const MIN_SCALE = 0.5;
 
 export class Scale {
   public readonly scale: number;
