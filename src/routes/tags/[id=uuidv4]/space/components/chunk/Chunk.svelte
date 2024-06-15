@@ -14,16 +14,17 @@
 
   let { space, chunk }: Props = $props();
 
-  let realLocation: RealLocation = REAL_COORDINATE_SYSTEM_ORIGIN;
+  let realLocation: RealLocation = $derived(space.locationTransformer.transformToRealLocation(
+    space.viewCenterLocation.reactiveValue(),
+    VirtualLocation.fromChunkLocation(chunk.location),
+    space.viewportWidth.reactiveValue(),
+    space.viewportHeight.reactiveValue(),
+    space.scale.reactiveValue()
+  ));
 
   $effect(() => {
-    realLocation = space.locationTransformer.transformToRealLocation(
-      space.viewCenterLocation.reactiveValue(),
-      VirtualLocation.fromChunkLocation(chunk.location),
-      space.viewportWidth.reactiveValue(),
-      space.viewportHeight.reactiveValue(),
-      space.scale.reactiveValue()
-    );
+    console.log(`vc: ${space.viewCenterLocation.reactiveValue().x.coordinate}, vc: ${space.viewCenterLocation.reactiveValue().y.coordinate}`);
+    //console.log(`rx: ${realLocation.x.coordinate}, ry: ${realLocation.y.coordinate}`);
   });
 
   function bottomStyle(): number {
