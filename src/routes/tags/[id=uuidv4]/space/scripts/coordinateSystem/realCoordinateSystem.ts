@@ -23,3 +23,5 @@ export class RealLocation {
     return new RealLocation(x, y);
   }
 }
+
+export const REAL_COORDINATE_SYSTEM_ORIGIN = RealLocation.of(RealCoordinate.of(0), RealCoordinate.of(0));
