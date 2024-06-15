@@ -1,1 +1,0 @@
-export type Hasher<T> = (value: T) => number;

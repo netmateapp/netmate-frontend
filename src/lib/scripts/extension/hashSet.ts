@@ -1,18 +1,18 @@
-import type { Hasher } from "./hasher";
-
 export class HashSet<T> implements Iterable<T> {
   private table: Array<LinkedList<Entry<T>>>;
   private size: number;
   private thereshold: number;
   private hashFunction: Hasher<T>;
+  private equalsFunction: EqualityComparer<T>;
   private static readonly DEFAULT_CAPACITY = 16;
   private static readonly LOAD_FACTOR = 0.75;
 
-  constructor(hashFunction: Hasher<T>) {
+  constructor(hashFunction: Hasher<T>, equalsFunction: EqualityComparer<T>) {
     this.table = new Array(HashSet.DEFAULT_CAPACITY);
     this.size = 0;
     this.thereshold = Math.floor(HashSet.DEFAULT_CAPACITY * HashSet.LOAD_FACTOR);
     this.hashFunction = hashFunction;
+    this.equalsFunction = equalsFunction;
   }
 
   private indexFor(hash: number): number {
@@ -28,7 +28,7 @@ export class HashSet<T> implements Iterable<T> {
     }
 
     for (const entry of this.table[index].getItems()) {
-      if (entry.hash === hash && entry.equals(value)) {
+      if (entry.hash === hash && this.equalsFunction(entry.value, value)) {
         return false;
       }
     }
@@ -68,7 +68,7 @@ export class HashSet<T> implements Iterable<T> {
     if (!this.table[index]) return false;
 
     for (const entry of this.table[index].getItems()) {
-      if (entry.hash === hash && entry.equals(value)) {
+      if (entry.hash === hash && this.equalsFunction(entry.value, value)) {
         return true;
       }
     }
@@ -83,7 +83,7 @@ export class HashSet<T> implements Iterable<T> {
     if (!this.table[index]) return false;
 
     for (const entry of this.table[index].getItems()) {
-      if (entry.hash === hash && entry.equals(value)) {
+      if (entry.hash === hash && this.equalsFunction(entry.value, value)) {
         this.table[index].remove(entry);
         this.size--;
         return true;
@@ -123,6 +123,10 @@ export class HashSet<T> implements Iterable<T> {
     }
   }
 }
+
+export type Hasher<T> = (value: T) => number;
+export type EqualityComparer<T> = (a: T, b: T) => boolean;
+export const STRICT_EQUALITY: EqualityComparer<unknown> = (a: unknown, b: unknown) => a === b;
   
 class Entry<T> {
   public readonly value: T;
@@ -131,10 +135,6 @@ class Entry<T> {
   constructor(value: T, hash: number) {
     this.value = value;
     this.hash = hash;
-  }
-
-  equals(value: T): boolean {
-    return this.value === value;
   }
 }
 
