@@ -1,3 +1,5 @@
+import type { Hasher, EqualityComparer } from "./objectIdentity";
+
 export class HashSet<T> implements Iterable<T> {
   private table: Array<LinkedList<Entry<T>>>;
   private size: number;
@@ -124,10 +126,6 @@ export class HashSet<T> implements Iterable<T> {
   }
 }
 
-export type Hasher<T> = (value: T) => number;
-export type EqualityComparer<T> = (a: T, b: T) => boolean;
-export const STRICT_EQUALITY: EqualityComparer<unknown> = (a: unknown, b: unknown) => a === b;
-  
 class Entry<T> {
   public readonly value: T;
   public readonly hash: number;

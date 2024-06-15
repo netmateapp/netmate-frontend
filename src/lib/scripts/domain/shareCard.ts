@@ -51,8 +51,8 @@ export class ShareCard {
   }
 
   private static isValid(thumbnailMediaId: Option<MediaId>, shouldProcessThumbnailImage: boolean) {
-    const hasImageThumbnail = thumbnailMediaId === undefined || !(thumbnailMediaId instanceof NetmateImageId);
-    return shouldProcessThumbnailImage && hasImageThumbnail;
+    const hasImageThumbnail = thumbnailMediaId instanceof NetmateImageId;
+    return hasImageThumbnail ? true : !shouldProcessThumbnailImage;
   }
 
   isSharer(id: HandleId): boolean {

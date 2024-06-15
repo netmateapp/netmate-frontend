@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { HashSet, STRICT_EQUALITY, type EqualityComparer, type Hasher } from "./hashSet";
+import { HashSet } from "./hashSet";
+import { STRICT_EQUALITY, type EqualityComparer, type Hasher } from "./objectIdentity";
 
 class Wrap {
   constructor(public readonly value: number) {}
