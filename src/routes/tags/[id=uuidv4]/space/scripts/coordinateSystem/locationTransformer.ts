@@ -1,8 +1,8 @@
 import type { Reactive } from "../../../../../../lib/scripts/extension/reactivity";
-import type { Scale } from "../scale";
+import type { Scale } from "../scale.svelte";
 import { RealCoordinate, RealLocation } from "./realCoordinateSystem";
-import type { ViewportHeight, ViewportRelativePosition, ViewportWidth } from "./viewportRelativeCoordinateSystem";
-import type { VirtualLocation } from "./virtualCoordinateSystem";
+import type { ViewportHeight, ViewportRelativePosition, ViewportWidth } from "./viewportRelativeCoordinateSystem.svelte";
+import type { VirtualLocation } from "./virtualCoordinateSystem.svelte";
 
 export class LocationTransformer {
   private readonly viewCenterPosition: ViewportRelativePosition;

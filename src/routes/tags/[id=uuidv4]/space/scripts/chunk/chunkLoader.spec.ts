@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { VirtualCoordinate, VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
+import { VirtualCoordinate, VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem.svelte";
 import { ChunkLoader, TagSpaceChunkFetcher } from "./chunkLoader";
 import { ChunkCoordinate, ChunkLocation, ChunkRepository } from "./chunk";
 

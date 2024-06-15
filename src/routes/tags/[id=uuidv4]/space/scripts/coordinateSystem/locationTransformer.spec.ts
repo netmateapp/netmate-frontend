@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { LocationTransformer } from "./locationTransformer";
-import { ViewportHeight, ViewportRelativeCoordinate, ViewportRelativePosition, ViewportWidth } from "./viewportRelativeCoordinateSystem";
-import { MAX_SCALE, MIN_SCALE, Scale } from "../scale";
-import { VirtualCoordinate, VirtualLocation } from "./virtualCoordinateSystem";
+import { ViewportHeight, ViewportRelativeCoordinate, ViewportRelativePosition, ViewportWidth } from "./viewportRelativeCoordinateSystem.svelte";
+import { MAX_SCALE, MIN_SCALE, Scale } from "../scale.svelte";
+import { VirtualCoordinate, VirtualLocation } from "./virtualCoordinateSystem.svelte";
 import type { RealLocation } from "./realCoordinateSystem";
 
 const viewCenterRelativePosition = ViewportRelativePosition.of(

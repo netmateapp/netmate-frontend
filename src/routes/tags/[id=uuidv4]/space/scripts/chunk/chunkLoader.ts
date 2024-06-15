@@ -1,7 +1,7 @@
 import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, type ChunkRepository } from "./chunk";
-import { ShareCardsCluster, SpaceCore } from "./chunkContent";
+import { ShareCardsClusterData, SpaceCoreData } from "./chunkContent";
 import { generateMockShareCards, generateTestTag } from "../mockShare";
-import type { VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
+import type { VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem.svelte";
 import type { Reactive } from "../../../../../../lib/scripts/extension/reactivity";
 import { HashSet } from "$lib/scripts/extension/hashSet/hashSet";
 
@@ -27,7 +27,7 @@ export class TagSpaceChunkFetcher extends ChunkFetcher {
 
     for (var index of indexes) {
       const location = ChunkLocation.fromIndex(index);
-      const school: ShareCardsCluster = new ShareCardsCluster([
+      const school: ShareCardsClusterData = new ShareCardsClusterData([
         generateMockShareCards(),
         generateMockShareCards()
       ]);
@@ -39,7 +39,7 @@ export class TagSpaceChunkFetcher extends ChunkFetcher {
         if (rand < max - 1) {
           chunks.add( new Chunk(location, school));
         } else {
-          const core = new SpaceCore(generateTestTag(), school);
+          const core = new SpaceCoreData(generateTestTag(), school);
           chunks.add(new Chunk(location, core));
         }
       }

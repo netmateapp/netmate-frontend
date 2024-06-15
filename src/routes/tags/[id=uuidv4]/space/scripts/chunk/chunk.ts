@@ -1,5 +1,5 @@
 import type { Option } from "$lib/option";
-import { VirtualCoordinate, VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
+import { VirtualCoordinate, VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem.svelte";
 import type { ChunkContent } from "./chunkContent";
 
 export class ChunkCoordinate {
@@ -172,7 +172,6 @@ export class ChunkRepository {
   }
 
   register(chunk: Chunk) {
-    console.log(`register: ${ChunkKey.from(chunk.location).key}`);
     this.map.set(ChunkKey.from(chunk.location).key, chunk);
   }
 }

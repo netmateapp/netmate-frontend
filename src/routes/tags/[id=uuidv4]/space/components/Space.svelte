@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Tag } from "$lib/scripts/domain/tag";
   import { CHUNK_SIDE_LENGTH, ChunkLocation, ChunkRepository } from "../scripts/chunk/chunk";
-  import { VirtualCoordinate, VirtualLocation } from "../scripts/coordinateSystem/virtualCoordinateSystem";
-  import { MAX_SCALE, Scale } from "../scripts/scale";
+    import { ViewportHeight, ViewportWidth } from "../scripts/coordinateSystem/viewportRelativeCoordinateSystem.svelte";
+  import { VirtualCoordinate, VirtualLocation } from "../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
+  import { MAX_SCALE, Scale } from "../scripts/scale.svelte";
   import { TagSpace } from "../scripts/space";
   import CenterChunk from "./chunk/CenterChunk.svelte";
   import Chunk from "./chunk/Chunk.svelte";
@@ -26,6 +27,8 @@
   });
 
   $effect(() => {
+    space.viewportWidth.update(ViewportWidth.fromCurrentViewport());
+    space.viewportHeight.update(ViewportHeight.fromCurrentViewport());
     space.dynamicChunkRenderer.startDynamicChunkRendering(space.viewCenterLocation.reactiveValue());
   });
 

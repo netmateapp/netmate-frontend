@@ -1,5 +1,5 @@
 import type { Reactivity, Reactive } from "$lib/scripts/extension/reactivity";
-import type { VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
+import type { VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem.svelte";
 import { Chunk, type ChunkRepository, ChunkLocation } from "./chunk";
 import { calculateChunkAreaLocations, DynamicChunkLoader } from "./chunkLoader";
 

@@ -1,6 +1,6 @@
 import type { Finalizer, LifeCycle } from "../../../../../lib/scripts/extension/lifeCycle";
-import { type ReactiveVirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
-import { VirtualCoordinate, VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
+import { type ReactiveVirtualLocation } from "./coordinateSystem/virtualCoordinateSystem.svelte";
+import { VirtualCoordinate, VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem.svelte";
 import { RealLocation, RealCoordinate } from "./coordinateSystem/realCoordinateSystem";
 
 type MoveEvent = MouseEvent | TouchEvent;

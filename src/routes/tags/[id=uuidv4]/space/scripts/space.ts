@@ -1,12 +1,12 @@
 import type { Tag } from "$lib/scripts/domain/tag";
 import { type ChunkRepository } from "./chunk/chunk";
 import { ChunkLoader, DynamicChunkLoader, TagSpaceChunkFetcher } from "./chunk/chunkLoader";
-import { ReactiveViewportHeight, ReactiveViewportWidth, ViewportHeight, ViewportRelativeCoordinate, ViewportRelativePosition, ViewportSizeUpdater, ViewportWidth } from "./coordinateSystem/viewportRelativeCoordinateSystem";
-import { ReactiveVirtualLocation, type VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem";
+import { ReactiveViewportHeight, ReactiveViewportWidth, ViewportHeight, ViewportRelativeCoordinate, ViewportRelativePosition, ViewportSizeUpdater, ViewportWidth } from "./coordinateSystem/viewportRelativeCoordinateSystem.svelte";
+import { ReactiveVirtualLocation, type VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem.svelte";
 import { composeLifeCycles, type Finalizer, type LifeCycle } from "../../../../../lib/scripts/extension/lifeCycle";
 import { ViewCenterVirtualLocationUpdater } from "./movement";
-import { ReactiveScale, Scale, ScaleUpdater } from "./scale";
-import { ChunkRenderer, DynamicChunkRenderer, ReactiveRenderedChunks } from "./chunk/chunkRender";
+import { ReactiveScale, Scale, ScaleUpdater } from "./scale.svelte";
+import { ChunkRenderer, DynamicChunkRenderer, ReactiveRenderedChunks } from "./chunk/chunkRender.svelte";
 import { LocationTransformer } from "./coordinateSystem/locationTransformer";
 
 export class TagSpace implements LifeCycle {
@@ -42,8 +42,8 @@ export class TagSpace implements LifeCycle {
       new ChunkRenderer(this.renderedChunks, this.chunkRepository)
     );
 
-    this.viewportWidth = new ReactiveViewportWidth(ViewportWidth.fromCurrentViewport());
-    this.viewportHeight = new ReactiveViewportHeight(ViewportHeight.fromCurrentViewport());
+    this.viewportWidth = new ReactiveViewportWidth(new ViewportWidth(0));
+    this.viewportHeight = new ReactiveViewportHeight(new ViewportHeight(0));
     this.viewportSizeUpdater = new ViewportSizeUpdater(this.viewportWidth, this.viewportHeight);
 
     this.scale = new ReactiveScale(initialScale);

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { BASE_2_CHUNK_SIDE_LENGTH_LOGARITHM, Chunk, CHUNK_SIDE_LENGTH, ChunkCoordinate, ChunkIndex, ChunkLocation } from "./chunk";
-import { VirtualCoordinate, VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem";
+import { VirtualCoordinate, VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem.svelte";
 
 test("チャンクの辺長に関する定数", () => {
   expect(Math.pow(2, BASE_2_CHUNK_SIDE_LENGTH_LOGARITHM)).toBe(CHUNK_SIDE_LENGTH);
