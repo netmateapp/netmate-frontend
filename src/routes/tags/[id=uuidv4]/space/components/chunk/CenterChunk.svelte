@@ -1,6 +1,6 @@
 <script lang="ts">
   import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
-  import { ShareCardsClusterData } from "../../scripts/chunk/chunkContent";
+  import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
   import { REAL_COORDINATE_SYSTEM_ORIGIN, RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import type { TagSpace } from "../../scripts/space";
@@ -45,11 +45,11 @@
   }
 
   function hasShareCardsCluster(): boolean {
-    return chunk.content instanceof ShareCardsCluster;
+    return chunk.content instanceof ShareCardsClusterData;
   }
 
   function hasSpaceCore(): boolean {
-    return chunk.content instanceof SpaceCore;
+    return chunk.content instanceof SpaceCoreData;
   }
 
 </script>

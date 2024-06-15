@@ -43,11 +43,11 @@
   }
 
   function hasShareCardsCluster(): boolean {
-    return chunk.content instanceof ShareCardsCluster;
+    return chunk.content instanceof ShareCardsClusterData;
   }
 
   function hasSpaceCore(): boolean {
-    return chunk.content instanceof SpaceCore;
+    return chunk.content instanceof SpaceCoreData;
   }
 
 </script>
