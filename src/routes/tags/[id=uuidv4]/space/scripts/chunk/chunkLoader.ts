@@ -27,7 +27,6 @@ export class TagSpaceChunkFetcher extends ChunkFetcher {
 
     for (var index of indexes) {
       const location = ChunkLocation.fromIndex(index);
-      console.log(`${index.index}: x: ${location.chunkX.coordinate * 1024}, y: ${location.chunkY.coordinate * 1024}`);
       const shareCards: ShareCardsClusterData = new ShareCardsClusterData([
         generateMockShareCards(),
         generateMockShareCards()
