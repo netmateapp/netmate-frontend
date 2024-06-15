@@ -1,4 +1,4 @@
-import type { Reactive } from "../reactivity";
+import type { Reactive } from "../../../../../../lib/scripts/extension/reactivity";
 import type { Scale } from "../scale";
 import { RealCoordinate, RealLocation } from "./realCoordinateSystem";
 import type { ViewportHeight, ViewportRelativePosition, ViewportWidth } from "./viewportRelativeCoordinateSystem";

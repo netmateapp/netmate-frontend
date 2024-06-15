@@ -1,5 +1,5 @@
-import type { Finalizer, LifeCycle } from "./lifeCycle";
-import type { Reactive, Reactivity } from "./reactivity";
+import type { Finalizer, LifeCycle } from "../../../../../lib/scripts/extension/lifeCycle";
+import type { Reactive, Reactivity } from "../../../../../lib/scripts/extension/reactivity";
 
 const MAX_SCALE = 1.0;
 const MIN_SCALE = 0.5;

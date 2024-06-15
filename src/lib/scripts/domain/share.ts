@@ -1,7 +1,7 @@
 import { calculateCharactersCosts } from "$lib/cjk.svelte";
 import type { Option } from "$lib/option";
 import type { Uuid7 } from "$lib/uuid";
-import type { UnixTimeMillis } from "./utils";
+import type { UnixTimeMillis } from "../primitive/unixtime";
 
 export type ShareId = Uuid7;
 

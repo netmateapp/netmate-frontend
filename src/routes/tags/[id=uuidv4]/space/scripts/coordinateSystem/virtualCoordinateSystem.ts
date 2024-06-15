@@ -1,4 +1,4 @@
-import type { Reactive, Reactivity } from "../reactivity";
+import type { Reactive, Reactivity } from "../../../../../../lib/scripts/extension/reactivity";
 
 export class VirtualCoordinate {
   public readonly coordinate: number;
