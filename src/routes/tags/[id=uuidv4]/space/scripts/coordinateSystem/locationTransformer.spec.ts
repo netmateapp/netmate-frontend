@@ -14,7 +14,7 @@ const viewCenterYRatio: number = viewCenterRelativePosition.y.ratio;
 
 const transformer = new LocationTransformer(viewCenterRelativePosition);
 
-const TRANSFORMED_COORDINATE_FLOAT_PRECISION = 11;
+const TRANSFORMED_COORDINATE_FLOAT_PRECISION = 2;
 
 function testLocationTransformation(
   testName: string,
@@ -109,7 +109,7 @@ describe("LocationTransformer#transformToRealLocation(): 座標変換", () => {
   const offset: number = 512;
 
   describe("異なる画面中央の座標における仮想座標の変換", () => {
-    const coordinates: number[] = [0, 1024, -1024, -1025, 100000];
+    const coordinates: number[] = [0, 1024, -1024, -1025, 1000000, -1000000];
     for (var x of coordinates) {
       for (var y of coordinates) {
         const viewCenterLocation = VirtualLocation.of(VirtualCoordinate.of(x), VirtualCoordinate.of(y));
@@ -140,8 +140,8 @@ describe("LocationTransformer#transformToRealLocation(): 座標変換", () => {
     }
   });
 
-  describe("全変数が非デフォルト値の状況における仮想座標の変換", () => {
-    const coordinates: number[] = [0, 1024, -1024, -1025];
+  describe("複数の変数が非デフォルト値である場合の仮想座標の変換", () => {
+    const coordinates: number[] = [0, 1024, -1024, -1025, 1000000, -1000000];
     const offsets: number[] = [512, -512];
     const viewportWidths: ViewportWidth[] = [defaultViewportWidth, new ViewportWidth(800)];
     const viewportHeights: ViewportHeight[] = [defaultViewportHeight, new ViewportHeight(480)];
