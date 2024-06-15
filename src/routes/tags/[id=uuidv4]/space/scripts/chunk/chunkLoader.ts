@@ -27,19 +27,20 @@ export class TagSpaceChunkFetcher extends ChunkFetcher {
 
     for (var index of indexes) {
       const location = ChunkLocation.fromIndex(index);
-      const school: ShareCardsClusterData = new ShareCardsClusterData([
+      console.log(`${index.index}: x: ${location.chunkX.coordinate * 1024}, y: ${location.chunkY.coordinate * 1024}`);
+      const shareCards: ShareCardsClusterData = new ShareCardsClusterData([
         generateMockShareCards(),
         generateMockShareCards()
       ]);
       if (location.chunkX.coordinate === 0 && location.chunkY.coordinate === 0) {
-        chunks.add(new Chunk(location, school));
+        chunks.add(new Chunk(location, shareCards));
       } else {
         const max: number = 2;
         const rand: number = Math.floor(Math.random() * max);
         if (rand < max - 1) {
-          chunks.add( new Chunk(location, school));
+          chunks.add(new Chunk(location, shareCards));
         } else {
-          const core = new SpaceCoreData(generateTestTag(), school);
+          const core = new SpaceCoreData(generateTestTag(), shareCards);
           chunks.add(new Chunk(location, core));
         }
       }
@@ -167,5 +168,6 @@ export class DynamicChunkLoader {
       DYNAMIC_CHUNK_LOADING_RADIUS,
       DYNAMIC_CHUNK_LOADING_DISTANCE
     );
+    this.previousViewCenterVirtualLocation = viewCenterLocation;
   }
 }
