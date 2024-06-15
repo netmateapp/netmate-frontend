@@ -5,12 +5,7 @@ export class VirtualCoordinate {
   public readonly coordinate: number;
 
   private constructor(coordinate: number) {
-    if (!VirtualCoordinate.isValid(coordinate)) throw new Error(`A coordinate must be an integer.`);
     this.coordinate = coordinate;
-  }
-
-  private static isValid(coordinate: number): boolean {
-    return Number.isInteger(coordinate);
   }
 
   static of(coordinate: number): VirtualCoordinate {
