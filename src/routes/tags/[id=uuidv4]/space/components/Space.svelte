@@ -22,3 +22,11 @@
     <Chunk {space} {chunk} />
   {/each}
 </div>
+
+<style>
+  .space {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+  }
+</style>

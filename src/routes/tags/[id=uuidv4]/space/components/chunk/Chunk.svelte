@@ -1,7 +1,6 @@
 <script lang="ts">
-    import type { Option } from "$lib/option";
-    import { Tag } from "$lib/scripts/domain/tag";
-    import type { SvelteComponent } from "svelte";
+  import type { Option } from "$lib/option";
+  import type { SvelteComponent } from "svelte";
   import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
   import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
@@ -90,6 +89,6 @@
 
 <style>
   .chunk {
-    position: fixed;
+    position: absolute;
   }
 </style>

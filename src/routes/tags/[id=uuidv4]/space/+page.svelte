@@ -16,10 +16,10 @@
   import type { Option } from "$lib/option";
   import { VirtualCoordinate, VirtualLocation } from "./scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import { CHUNK_SIDE_LENGTH, ChunkRepository } from "./scripts/chunk/chunk";
-    import { TagSpace } from "./scripts/space";
-    import { MAX_SCALE, Scale } from "./scripts/scale.svelte";
-    import { SpaceCoreData } from "./scripts/chunk/chunkContent";
-    import { REAL_COORDINATE_SYSTEM_ORIGIN, RealLocation } from "./scripts/coordinateSystem/realCoordinateSystem";
+  import { TagSpace } from "./scripts/space";
+  import { MAX_SCALE, Scale } from "./scripts/scale.svelte";
+  import { SpaceCoreData } from "./scripts/chunk/chunkContent";
+  import { REAL_COORDINATE_SYSTEM_ORIGIN, RealLocation } from "./scripts/coordinateSystem/realCoordinateSystem";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -96,27 +96,21 @@
     }
   });
 
-  let expandingSpace: Option<HTMLElement> = $state(undefined);
   let spaceCoreOverlayRef: Option<HTMLElement> = $state(undefined);
+  let centeredSpaceRef: Option<HTMLElement> = $state(undefined);
   function startTransition() {
     isTransitioning = true;
 
     setTimeout(() => {
-      if (expandingSpace !== undefined) {
-        expandingSpace.style.width = "183rem";
-        expandingSpace.style.height = "183rem";
-      }
-      if (spaceCoreOverlayRef !== undefined) spaceCoreOverlayRef.style.scale = "3.0";
+      if (centeredSpaceRef !== undefined) centeredSpaceRef.style.clipPath = "circle(61rem)";
+      if (spaceCoreOverlayRef !== undefined) spaceCoreOverlayRef.style.scale = "2.0";
     }, 0);
 
     setTimeout(() => {
       currentSpace = nextSpace!;
-      console.log(`${currentSpace.tag.name.name}`);
       isTransitioning = false;
-
-      expandingSpace = undefined;
       spaceCoreOverlayRef = undefined;
-    }, 1000);
+    }, 15000);
   }
 
   function defaultInitialViewCenterLocation(): VirtualLocation {
@@ -139,12 +133,12 @@
 
 <Space space={currentSpace} />
 {#if isTransitioning}
-  <div bind:this={expandingSpace} class="expanding-space" style="bottom: {spaceCoreCenterRealLocation.y.coordinate}px; left: {spaceCoreCenterRealLocation.x.coordinate}px;">
-    <div bind:this={spaceCoreOverlayRef} class="space-core-overlay"></div>
-    <div class="centered-space">
-      <Space space={nextSpace!} />
-    </div>
+  <div class="expanding-space-wrapper" style="bottom: {spaceCoreCenterRealLocation.y.coordinate}px; left: {spaceCoreCenterRealLocation.x.coordinate}px;">
+  <div bind:this={spaceCoreOverlayRef} class="space-core-overlay"></div>
+  <div bind:this={centeredSpaceRef} class="centered-space">
+    <Space space={nextSpace!} />
   </div>
+</div>
 {/if}
 
 <div class="side-bar">
@@ -168,25 +162,20 @@
     z-index: 100;
   }
 
-  .expanding-space {
+  .expanding-space-wrapper {
     position: absolute;
-    width: 61rem;
-    height: 61rem;
-    transform: translateX(-50%) translateY(50%);
-    border-radius: 50%;
-    overflow: hidden;
-    z-index: 2;
-    background-color: white;
-    transition: width 1.0s, height 1.0s;
+    transform: translate(-50%, 50%);
+    display: grid;
+    place-content: center;
+    z-index: 1;
   }
 
   .centered-space {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
     width: 100vw;
     height: 100vh;
+    clip-path: circle(30.5rem);
+    transition: clip-path 15.0s linear;
+    background-color: white;
   }
 
   .space-core-overlay {
@@ -200,26 +189,24 @@
     box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.16) inset;
     pointer-events: none;
     z-index: 2;
-    transition: scale 1.0s;
+    transition: scale 15.0s linear;
   }
 
-  @keyframes transit {
+  @keyframes scaleShadowOverlay {
     from {
-      scale: 1.0;
+      transform: scale(1.0);
     }
     to {
-      scale: 3.0;
+      transform: scale(2.0);
     }
   }
 
-  @keyframes expand {
+  @keyframes expandNewSpace {
     from {
-      width: 61rem;
-      height: 61rem;
+      clip-path: circle(30.5rem);
     }
     to {
-      width: 183rem;
-      height: 183rem;
+      clip-path: circle(61rem);
     }
   }
 </style>
