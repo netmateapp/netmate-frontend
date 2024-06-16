@@ -1,5 +1,7 @@
 <script lang="ts">
+    import type { Option } from "$lib/option";
     import { Tag } from "$lib/scripts/domain/tag";
+    import type { SvelteComponent } from "svelte";
   import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
   import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
@@ -56,23 +58,38 @@
     return space.tag.id.asHexadecimalRepresentation() === "";
   }
 
+  let locationName: Option<SvelteComponent> = $state(undefined);
+  
+  function allocatedHeight(): number {
+    if (isCenterChunk()) {
+      if (isTopTag()) {
+        return 160;
+      } else {
+        return locationName?.locationNameElementHeight() + 40 + 16;
+      }
+    } else {
+      return 0;
+    }
+  }
+
+  const color = Math.floor(Math.random() * 255);
+  // background-color: rgba({color}, {color}, {color}, 0.1); 
 </script>
 <div
   class="chunk"
   style="bottom: {bottomStyle()}px; left: {leftStyle()}px; width: {sizeStyle()}px; height: {sizeStyle()}px; scale: {scaleStyle()};">
   {#if isCenterChunk()}
-    <LocationName tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(40))} />
+    <LocationName bind:this={locationName} tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(40))} />
   {/if}
   {#if hasShareCardsCluster()}
-    <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} />
+    <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} allocatedHeight={allocatedHeight()} />
   {:else if hasSpaceCore()}
-    <SpaceCore {space} spaceCore={chunk.content as SpaceCoreData} />
+    <SpaceCore {space} {chunk} spaceCore={chunk.content as SpaceCoreData} />
   {/if}
 </div>
 
 <style>
   .chunk {
     position: fixed;
-    transition: scale .5s;
   }
 </style>

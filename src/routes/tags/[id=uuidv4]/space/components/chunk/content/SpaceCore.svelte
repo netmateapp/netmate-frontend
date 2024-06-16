@@ -1,28 +1,37 @@
 <script lang="ts">
   import SpaceShareCard from "$lib/components/space/share/SpaceShareCard.svelte";
+  import type { InteractEvent } from "$lib/types";
+  import type { Chunk } from "../../../scripts/chunk/chunk";
   import type { SpaceCoreData } from "../../../scripts/chunk/chunkContent";
   import { RealCoordinate, RealLocation } from "../../../scripts/coordinateSystem/realCoordinateSystem";
   import type { TagSpace } from "../../../scripts/space";
+  import { onTransitSpaceCore } from "../../../scripts/spaceTransit";
   import LocationName from "./LocationName.svelte";
 
   type Props = {
     space: TagSpace;
+    chunk: Chunk;
     spaceCore: SpaceCoreData;
   };
 
-  let { space, spaceCore }: Props = $props();
+  let { space, chunk, spaceCore }: Props = $props();
 
   function createRealLocation(index: number): RealLocation {
     const offsetX = RealCoordinate.of(index === 0 ? -2 : 510);
     const offsetY = RealCoordinate.of(index === 0 ? 254 : 430);
     return RealLocation.of(offsetX, offsetY);
   }
+
+  function onInteract(event: InteractEvent) {
+    onTransitSpaceCore(chunk.centerLocation());
+  }
 </script>
 
 <a
   href="../../tags/{spaceCore.tag.id.asHexadecimalRepresentation()}/space"
   class="space-core"
-  style="top: {22}px; left: {22}px;">
+  style="top: {22}px; left: {22}px;"
+  onclick={onInteract}>
   <div class="shadow-overlay"></div>
   <LocationName tag={spaceCore.tag} relativeLocation={RealLocation.of(RealCoordinate.of(488), RealCoordinate.of(160))} />
   {#each spaceCore.shareCardsCluster.shareCards as shareCard, index}

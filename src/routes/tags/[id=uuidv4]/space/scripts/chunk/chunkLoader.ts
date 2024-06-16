@@ -148,7 +148,7 @@ export class ChunkLoader {
   }
 }
 
-const DYNAMIC_CHUNK_LOADING_RADIUS: number = 1;
+const DYNAMIC_CHUNK_LOADING_RADIUS: number = 2;
 const DYNAMIC_CHUNK_LOADING_DISTANCE: number = 5;
 
 export class DynamicChunkLoader {

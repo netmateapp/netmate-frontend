@@ -1,19 +1,16 @@
 <script lang="ts">
   import type { InteractEvent, MaybeHTMLElement } from "$lib/types";
-  import { interactHandlersEffect } from "$lib/utils.svelte";
   import type { Uuid4 } from "$lib/uuid";
 
   let {
     tagId,
     apparentX,
     apparentY,
-    jump2Center,
     shouldCancelClick,
   }: {
     tagId: Uuid4;
     apparentX: number;
     apparentY: number;
-    jump2Center: () => void;
     shouldCancelClick: () => boolean;
   } = $props();
 
@@ -60,10 +57,6 @@
     const back = backRef as HTMLElement;
     const backStyle = back.style;
     backStyle.scale = "3";
-
-    setTimeout(() => {
-      jump2Center();
-    }, 500);
   }
 
   let ref: MaybeHTMLElement = $state(null);

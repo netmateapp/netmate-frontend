@@ -130,6 +130,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     document.addEventListener("dragstart", onDrag);
 
     return () => {
+      console.log("finalize");
       document.removeEventListener("touchstart", onTouchStart);
       document.removeEventListener("touchmove", onTouchMove);
       document.removeEventListener("touchend", onTouchEnd);
