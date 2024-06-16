@@ -64,9 +64,11 @@
   );
   let nextSpace: Option<TagSpace> = $state(undefined);
   let spaceCoreCenterRealLocation: RealLocation = REAL_COORDINATE_SYSTEM_ORIGIN;
+  let spaceCoreRelativeLocation: VirtualLocation;
 
   $effect(() => {
-    if (currentSpace.tag.id.asHexadecimalRepresentation() !== tag.id.asHexadecimalRepresentation()) {
+    console.log("eff");
+    if (currentSpace.tag.id.asHexadecimalRepresentation() !== tag.id.asHexadecimalRepresentation() && !isTransitioning) {
       let targetSpaceCoreCenter: VirtualLocation = defaultInitialViewCenterLocation();
       for (var chunk of currentSpace.renderedChunks.reactiveValue()) {
         if (chunk.content instanceof SpaceCoreData) {
@@ -77,6 +79,11 @@
         }
       }
       
+      const viewCenter = currentSpace.viewCenterLocation.reactiveValue();
+      spaceCoreRelativeLocation = VirtualLocation.of(
+        VirtualCoordinate.of(viewCenter.x.coordinate - targetSpaceCoreCenter.x.coordinate),
+        VirtualCoordinate.of(viewCenter.y.coordinate - targetSpaceCoreCenter.y.coordinate)
+      );
       spaceCoreCenterRealLocation = currentSpace.locationTransformer.transformToRealLocation(
         currentSpace.viewCenterLocation.reactiveValue(),
         targetSpaceCoreCenter,
@@ -108,9 +115,15 @@
 
     setTimeout(() => {
       currentSpace = nextSpace!;
+      const viewCenter = currentSpace.viewCenterLocation.reactiveValue().createOffsetLocation(
+        spaceCoreRelativeLocation.x,
+        spaceCoreRelativeLocation.y
+      );
+      currentSpace.viewCenterLocation.update(viewCenter);
+
       isTransitioning = false;
       spaceCoreOverlayRef = undefined;
-    }, 15000);
+    }, 500);
   }
 
   function defaultInitialViewCenterLocation(): VirtualLocation {
@@ -174,7 +187,7 @@
     width: 100vw;
     height: 100vh;
     clip-path: circle(30.5rem);
-    transition: clip-path 15.0s linear;
+    transition: clip-path 0.5s linear;
     background-color: white;
   }
 
@@ -189,7 +202,7 @@
     box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.16) inset;
     pointer-events: none;
     z-index: 2;
-    transition: scale 15.0s linear;
+    transition: scale 0.5s linear;
   }
 
   @keyframes scaleShadowOverlay {
