@@ -105,11 +105,13 @@
 
   let spaceCoreOverlayRef: Option<HTMLElement> = $state(undefined);
   let centeredSpaceRef: Option<HTMLElement> = $state(undefined);
+  let backgroundRef: Option<HTMLElement> = $state(undefined);
   function startTransition() {
     isTransitioning = true;
 
     setTimeout(() => {
       if (centeredSpaceRef !== undefined) centeredSpaceRef.style.clipPath = "circle(61rem)";
+      if (backgroundRef !== undefined) backgroundRef.style.clipPath = "circle(61rem)";
       if (spaceCoreOverlayRef !== undefined) spaceCoreOverlayRef.style.scale = "2.0";
     }, 0);
 
@@ -123,7 +125,7 @@
 
       isTransitioning = false;
       spaceCoreOverlayRef = undefined;
-    }, 500);
+    }, 15000);
   }
 
   function defaultInitialViewCenterLocation(): VirtualLocation {
@@ -150,6 +152,7 @@
   <div bind:this={spaceCoreOverlayRef} class="space-core-overlay"></div>
   <div bind:this={centeredSpaceRef} class="centered-space">
     <Space space={nextSpace!} />
+    <div bind:this={backgroundRef} class="background"></div>
   </div>
 </div>
 {/if}
@@ -180,15 +183,24 @@
     transform: translate(-50%, 50%);
     display: grid;
     place-content: center;
-    z-index: 1;
+    z-index: 2;
   }
 
   .centered-space {
     width: 100vw;
     height: 100vh;
     clip-path: circle(30.5rem);
-    transition: clip-path 0.5s linear;
-    background-color: white;
+    transition: clip-path 15.0s linear;
+    display: grid;
+    place-content: center;
+  }
+
+  .background {
+    width: 200vmax;
+    height: 200vmax;
+    clip-path: circle(30.5rem);
+    transition: clip-path 15.0s linear;
+    background-color: aqua;
   }
 
   .space-core-overlay {
@@ -202,7 +214,7 @@
     box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.16) inset;
     pointer-events: none;
     z-index: 2;
-    transition: scale 0.5s linear;
+    transition: scale 15.0s linear;
   }
 
   @keyframes scaleShadowOverlay {

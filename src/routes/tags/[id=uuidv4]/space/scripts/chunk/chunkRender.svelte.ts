@@ -36,7 +36,7 @@ export class ChunkRenderer {
     this.renderedChunks.update(newRenderChunks);
   }
 }
-const DYNAMIC_CHUNK_RENDERING_RADIUS: number = 1;
+const DYNAMIC_CHUNK_RENDERING_RADIUS: number = 2;
 
 export class DynamicChunkRenderer {
   private readonly dynamicChunkLoader: DynamicChunkLoader;
