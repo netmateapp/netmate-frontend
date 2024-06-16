@@ -1,9 +1,11 @@
 <script lang="ts">
+    import { Tag } from "$lib/scripts/domain/tag";
   import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
-  import { type RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
+  import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import type { TagSpace } from "../../scripts/space";
+  import LocationName from "./content/LocationName.svelte";
   import ShareCardsCluster from "./content/ShareCardsCluster.svelte";
   import SpaceCore from "./content/SpaceCore.svelte";
 
@@ -46,10 +48,21 @@
     return chunk.content instanceof SpaceCoreData;
   }
 
+  function isCenterChunk(): boolean {
+    return chunk.location.chunkX.coordinate === 0 && chunk.location.chunkY.coordinate === 0;
+  }
+
+  function isTopTag(): boolean {
+    return space.tag.id.asHexadecimalRepresentation() === "";
+  }
+
 </script>
 <div
   class="chunk"
   style="bottom: {bottomStyle()}px; left: {leftStyle()}px; width: {sizeStyle()}px; height: {sizeStyle()}px; scale: {scaleStyle()};">
+  {#if isCenterChunk()}
+    <LocationName tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(40))} />
+  {/if}
   {#if hasShareCardsCluster()}
     <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} />
   {:else if hasSpaceCore()}
@@ -60,5 +73,6 @@
 <style>
   .chunk {
     position: fixed;
+    transition: scale .5s;
   }
 </style>
