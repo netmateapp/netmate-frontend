@@ -1,6 +1,6 @@
 <script lang="ts">
   import { TagSpace } from "../scripts/space";
-  import Chunk from "./chunk/Chunk.svelte";
+  import Chunk from "./Chunk.svelte";
 
   type Props = {
     space: TagSpace;

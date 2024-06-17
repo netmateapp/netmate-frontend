@@ -18,7 +18,7 @@ export class TagSpace implements LifeCycle {
   public readonly viewportHeight: ReactiveViewportHeight;
   public readonly scale: ReactiveScale;
 
-  private readonly viewCenterLocationUpdater: ViewCenterVirtualLocationUpdater;
+  public readonly viewCenterLocationUpdater: ViewCenterVirtualLocationUpdater;
   private readonly dynamicChunkLoader: DynamicChunkLoader;
   public readonly dynamicChunkRenderer: DynamicChunkRenderer;
   private readonly viewportSizeUpdater: ViewportSizeUpdater;

@@ -48,7 +48,11 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     this.viewCenterLocation = viewCenterLocation;
   }
 
-  onTouchStart(event: MoveEvent) {
+  isUserMoved(): boolean {
+    return this.hasMovedDuringTouch;
+  }
+
+  private onTouchStart(event: MoveEvent) {
     this.isUserTouching = true;
 
     if (event instanceof MouseEvent) {
@@ -67,7 +71,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     ViewCenterVirtualLocationUpdater.disableSelection();
   }
 
-  onTouchMove(event: MoveEvent) {
+  private onTouchMove(event: MoveEvent) {
     if (!this.isUserTouching) return;
 
     if (!this.hasMovedDuringTouch) this.hasMovedDuringTouch = true;
@@ -98,7 +102,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     this.previousRealLocation = htmlLocation;
   }
 
-  onTouchEnd(event: MoveEvent) {
+  private onTouchEnd(event: MoveEvent) {
     this.isUserTouching = false;
 
     // タッチのドラッグ操作終了時にClickイベントは呼び出されないため
@@ -130,7 +134,6 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     document.addEventListener("dragstart", onDrag);
 
     return () => {
-      console.log("finalize");
       document.removeEventListener("touchstart", onTouchStart);
       document.removeEventListener("touchmove", onTouchMove);
       document.removeEventListener("touchend", onTouchEnd);
@@ -146,7 +149,7 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
     };
   }
 
-  applyInertia() {
+  private applyInertia() {
     const friction = ViewCenterVirtualLocationUpdater.FRICTION;
     const minVelocity = ViewCenterVirtualLocationUpdater.INERTIA_MIN_VELOCITY;
   
@@ -190,6 +193,9 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
 
   // 共有やコアをドラッグした場合に飛ばないように
   private cancelClickOnTouchMove(event: ClickEvent) {
+    console.log(event.target);
+    console.log(`hasmove: ${this.hasMovedDuringTouch}, istouch: ${this.isUserTouching}`);
+
     if (!this.hasMovedDuringTouch) return;
 
     event.preventDefault();
