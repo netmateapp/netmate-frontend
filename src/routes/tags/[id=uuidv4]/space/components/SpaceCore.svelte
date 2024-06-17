@@ -1,10 +1,10 @@
 <script lang="ts">
   import SpaceShareCard from "$lib/components/space/share/SpaceShareCard.svelte";
   import type { InteractEvent } from "$lib/types";
-  import type { Chunk } from "../../scripts/chunk/chunk";
-  import type { SpaceCoreData } from "../../scripts/chunk/chunkContent";
-  import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
-  import type { TagSpace } from "../../scripts/space";
+  import type { Chunk } from "../scripts/chunk/chunk";
+  import type { SpaceCoreData } from "../scripts/chunk/chunkContent";
+  import { RealCoordinate, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
+  import type { TagSpace } from "../scripts/space";
   import LocationName from "./LocationName.svelte";
 
   type Props = {
@@ -22,6 +22,9 @@
   }
 
   function onInteract(event: InteractEvent) {
+    if (space.viewCenterLocationUpdater.isUserMoved()) {
+      event.preventDefault();
+    }
   }
 </script>
 

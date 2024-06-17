@@ -1,8 +1,8 @@
 <script lang="ts">
   import SpaceShareCard from "$lib/components/space/share/SpaceShareCard.svelte";
-  import { CHUNK_SIDE_LENGTH } from "../../scripts/chunk/chunk";
-  import type { ShareCardsClusterData } from "../../scripts/chunk/chunkContent";
-  import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
+  import { CHUNK_SIDE_LENGTH } from "../scripts/chunk/chunk";
+  import type { ShareCardsClusterData } from "../scripts/chunk/chunkContent";
+  import { RealCoordinate, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
 
   type Props = {
     shareCardsCluster: ShareCardsClusterData,

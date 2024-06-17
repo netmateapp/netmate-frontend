@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { Option } from "$lib/option";
   import type { SvelteComponent } from "svelte";
-  import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
-  import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
-  import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
-  import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
-  import type { TagSpace } from "../../scripts/space";
+  import { CHUNK_SIDE_LENGTH, type Chunk } from "../scripts/chunk/chunk";
+  import { ShareCardsClusterData, SpaceCoreData } from "../scripts/chunk/chunkContent";
+  import { RealCoordinate, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
+  import { VirtualLocation } from "../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
+  import type { TagSpace } from "../scripts/space";
   import LocationName from "./LocationName.svelte";
   import ShareCardsCluster from "./ShareCardsCluster.svelte";
   import SpaceCore from "./SpaceCore.svelte";
