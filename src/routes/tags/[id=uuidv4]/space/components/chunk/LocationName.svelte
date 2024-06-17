@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Tag } from "$lib/scripts/domain/tag";
   import type { MaybeHTMLElement } from "$lib/types";
-  import { RealLocation } from "../../../scripts/coordinateSystem/realCoordinateSystem";
+  import { RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
 
   type Props = {
     tag: Tag;

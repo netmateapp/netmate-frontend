@@ -6,9 +6,9 @@
   import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import type { TagSpace } from "../../scripts/space";
-  import LocationName from "./content/LocationName.svelte";
-  import ShareCardsCluster from "./content/ShareCardsCluster.svelte";
-  import SpaceCore from "./content/SpaceCore.svelte";
+  import LocationName from "./LocationName.svelte";
+  import ShareCardsCluster from "./ShareCardsCluster.svelte";
+  import SpaceCore from "./SpaceCore.svelte";
 
   type Props = {
     space: TagSpace;
