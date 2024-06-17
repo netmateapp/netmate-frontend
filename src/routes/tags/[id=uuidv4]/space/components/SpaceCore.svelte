@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
   import SpaceShareCard from "$lib/components/space/share/SpaceShareCard.svelte";
   import type { InteractEvent } from "$lib/types";
   import type { Chunk } from "../scripts/chunk/chunk";
@@ -24,6 +25,28 @@
   function onInteract(event: InteractEvent) {
     if (space.viewCenterLocationUpdater.isUserMoved()) {
       event.preventDefault();
+      return;
+    }
+
+    const maybeShare = isShare(event.target as Element);
+    if (maybeShare !== undefined) {
+      event.preventDefault();
+      goto(`../../tags/${spaceCore.tag.id.asHexadecimalRepresentation()}/space`);
+      return;
+    }
+  }
+
+  function isShare(element: Element): HTMLElement | undefined {
+    if (element instanceof HTMLElement) {
+      if (element.classList.contains("share")) {
+        return element;
+      } else if (element.parentElement !== null) {
+        return isShare(element.parentElement);
+      } else {
+        return undefined;
+      }
+    } else {
+      return undefined;
     }
   }
 </script>
