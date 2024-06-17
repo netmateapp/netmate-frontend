@@ -91,6 +91,7 @@
     }, 0);
 
     setTimeout(() => {
+      nextSpace?.scale.update(currentSpace.scale.reactiveValue());
       currentSpace = nextSpace!;
       const viewCenter = currentSpace.viewCenterLocation.reactiveValue().createOffsetLocation(
         spaceCoreRelativeLocation.x,
