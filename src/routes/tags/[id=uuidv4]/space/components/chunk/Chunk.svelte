@@ -78,7 +78,7 @@
   class="chunk"
   style="bottom: {bottomStyle()}px; left: {leftStyle()}px; width: {sizeStyle()}px; height: {sizeStyle()}px; scale: {scaleStyle()};">
   {#if isCenterChunk()}
-    <LocationName bind:this={locationName} tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(40))} />
+    <LocationName bind:this={locationName} tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(188))} />
   {/if}
   {#if hasShareCardsCluster()}
     <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} allocatedHeight={allocatedHeight()} />

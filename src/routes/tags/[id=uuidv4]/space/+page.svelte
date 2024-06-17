@@ -12,7 +12,7 @@
   import type { Ok } from "$lib/result";
   import type { PageServerData } from "./$types";
   import { Tag, TagName } from "$lib/scripts/domain/tag";
-  import InterSpace from "./components/InterSpace.svelte";
+  import InterSpace from "./components/Interspace.svelte";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);

@@ -5,7 +5,6 @@
   import type { SpaceCoreData } from "../../../scripts/chunk/chunkContent";
   import { RealCoordinate, RealLocation } from "../../../scripts/coordinateSystem/realCoordinateSystem";
   import type { TagSpace } from "../../../scripts/space";
-  import { onTransitSpaceCore } from "../../../scripts/spaceTransit";
   import LocationName from "./LocationName.svelte";
 
   type Props = {
@@ -23,7 +22,6 @@
   }
 
   function onInteract(event: InteractEvent) {
-    onTransitSpaceCore(chunk.centerLocation());
   }
 </script>
 
