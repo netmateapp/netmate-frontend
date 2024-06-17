@@ -8,7 +8,6 @@
   import { MAX_SCALE, Scale } from "../scripts/scale.svelte";
   import { SpaceCoreData } from "../scripts/chunk/chunkContent";
   import { REAL_COORDINATE_SYSTEM_ORIGIN, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
-    import { scale } from "svelte/transition";
 
   type Props = {
     tag: Tag;
@@ -27,7 +26,6 @@
     )
   );
   let nextSpace: Option<TagSpace> = $state(undefined);
-  let spaceCoreCenterRealLocation: RealLocation = REAL_COORDINATE_SYSTEM_ORIGIN;
   let spaceCoreRelativeLocation: VirtualLocation;
   let targetSpaceCoreC: VirtualLocation = VIRTUAL_COORDINATE_SYSTEM_ORIGIN;
   let spaceCoreChunkLocaiton: RealLocation = REAL_COORDINATE_SYSTEM_ORIGIN;
@@ -41,7 +39,6 @@
           if (chunk.content.tag.id.asHexadecimalRepresentation() === tag.id.asHexadecimalRepresentation()) {
             targetSpaceCoreCenter = chunk.centerLocation();
             targetSpaceCoreChunkLoc = VirtualLocation.fromChunkLocation(chunk.location);
-            console.log(`ccccccccccccccccccx: ${targetSpaceCoreChunkLoc.x.coordinate}, cy: ${targetSpaceCoreChunkLoc.y.coordinate}`);
             break;
           }
         }
@@ -76,7 +73,8 @@
   });
 
   let clipPathFrom: number = $derived(30.5);
-  let clipPathTo: number = $derived(61);
+  let clipPathTo: number = $derived(61 * (1 / currentSpace.scale.reactiveValue().scale));
+  let scaleTo: number = $derived(2 * (1 / currentSpace.scale.reactiveValue().scale));
 
   let spaceCoreOverlayRef: Option<HTMLElement> = $state(undefined);
   let centeredSpaceRef: Option<HTMLElement> = $state(undefined);
@@ -86,8 +84,13 @@
 
     setTimeout(() => {
       if (centeredSpaceRef !== undefined) centeredSpaceRef.style.clipPath = `circle(${clipPathTo}rem)`;
-      if (backgroundRef !== undefined) backgroundRef.style.clipPath = `circle(${clipPathTo}rem)`;
-      if (spaceCoreOverlayRef !== undefined) spaceCoreOverlayRef.style.scale = "2.0";
+      if (backgroundRef !== undefined) {
+        backgroundRef.style.clipPath = `circle(${clipPathTo}rem)`;
+        backgroundRef.style.backgroundColor = "white";
+        console.log(clipPathTo);
+      }
+      if (spaceCoreOverlayRef !== undefined) spaceCoreOverlayRef.style.scale = `${scaleTo}`;
+      console.log(scaleTo);
     }, 0);
 
     setTimeout(() => {
@@ -102,7 +105,7 @@
 
       isTransiting = false;
       spaceCoreOverlayRef = undefined;
-    }, 500);
+    }, 15000);
   }
 
   function defaultInitialViewCenterLocation(): VirtualLocation {
@@ -111,15 +114,13 @@
       VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2 + CHUNK_SIDE_LENGTH / 4)
     );
   }
-
-  // style="bottom: {spaceCoreCenterRealLocation.y.coordinate}px; left: {spaceCoreCenterRealLocation.x.coordinate}px;"
 </script>
 
 <Space space={currentSpace} />
 {#if isTransiting}
   <div class="virtual-chunk" style="bottom: {spaceCoreChunkLocaiton.y.coordinate}px; left: {spaceCoreChunkLocaiton.x.coordinate}px; scale: {currentSpace.scale.reactiveValue().scale};">
     <div class="expanding-space-wrapper">
-      <div bind:this={spaceCoreOverlayRef} class="space-core-overlay" style="--overlay-size: {clipPathTo}rem;"></div>
+      <div bind:this={spaceCoreOverlayRef} class="space-core-overlay" style="--overlay-size: {61}rem; --scale-to: {scaleTo};"></div>
       <div bind:this={centeredSpaceRef} class="centered-space" style="--from-clip-path: {clipPathFrom}rem; --to-clip-path: {clipPathTo}rem;">
         <Space space={nextSpace!} />
         <div bind:this={backgroundRef} class="background" style="--from-clip-path: {clipPathFrom}rem; --to-clip-path: {clipPathTo}rem;"></div>
@@ -148,17 +149,17 @@
     width: 100vw;
     height: 100vh;
     clip-path: circle(var(--from-clip-path));
-    transition: clip-path 0.5s linear;
+    transition: clip-path 15.0s linear;
     display: grid;
     place-content: center;
   }
 
   .background {
-    width: 200vmax;
-    height: 200vmax;
+    width: 1000vmax;
+    height: 1000vmax;
     clip-path: circle(var(--from-clip-path));
-    transition: clip-path 0.5s linear;
-    background-color: white;
+    background-color: #fcfcfc;
+    transition: clip-path 15.0s linear, background-color 15.0s linear;
   }
 
   .space-core-overlay {
@@ -168,11 +169,11 @@
     translate: -50% -50%;
     width: var(--overlay-size);
     height: var(--overlay-size);
-    border-radius: 50%;
     box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.16) inset;
+    border-radius: 50%;
     pointer-events: none;
     z-index: 2;
-    transition: scale 0.5s linear;
+    transition: scale 15.0s linear;
   }
 
   @keyframes scaleShadowOverlay {
@@ -180,7 +181,7 @@
       transform: scale(1.0);
     }
     to {
-      transform: scale(2.0);
+      transform: scale(var(--scale-to));
     }
   }
 
@@ -190,6 +191,15 @@
     }
     to {
       clip-path: circle(var(--to-clip-path));
+    }
+  }
+
+  @keyframes backShadow {
+    from {
+      background-color: #fcfcfc;
+    }
+    to {
+      background-color: white;
     }
   }
 </style>
