@@ -28,26 +28,15 @@
       return;
     }
 
-    const maybeShare = isShare(event.target as Element);
-    if (maybeShare !== undefined) {
+    if (!isBackground(event.target as Element)) {
       event.preventDefault();
       goto(`../../tags/${spaceCore.tag.id.asHexadecimalRepresentation()}/space`);
       return;
     }
   }
 
-  function isShare(element: Element): HTMLElement | undefined {
-    if (element instanceof HTMLElement) {
-      if (element.classList.contains("share")) {
-        return element;
-      } else if (element.parentElement !== null) {
-        return isShare(element.parentElement);
-      } else {
-        return undefined;
-      }
-    } else {
-      return undefined;
-    }
+  function isBackground(element: Element): boolean {
+    return element.classList.contains("space-core");
   }
 </script>
 
