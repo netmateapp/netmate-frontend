@@ -193,9 +193,6 @@ export class ViewCenterVirtualLocationUpdater implements LifeCycle {
 
   // 共有やコアをドラッグした場合に飛ばないように
   private cancelClickOnTouchMove(event: ClickEvent) {
-    console.log(event.target);
-    console.log(`hasmove: ${this.hasMovedDuringTouch}, istouch: ${this.isUserTouching}`);
-
     if (!this.hasMovedDuringTouch) return;
 
     event.preventDefault();
