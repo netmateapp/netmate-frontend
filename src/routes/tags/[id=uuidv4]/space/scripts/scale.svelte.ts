@@ -1,8 +1,9 @@
 import type { Finalizer, LifeCycle } from "../../../../../lib/scripts/extension/lifeCycle";
 import type { Reactive, Reactivity } from "../../../../../lib/scripts/extension/reactivity";
 
-export const MAX_SCALE = 1.0;
-export const MIN_SCALE = 0.5;
+export const MAX_SCALE: number = 1.0;
+export const MIN_SCALE: number = 0.5;
+export const DEFAULT_SCALE: number = MAX_SCALE;
 
 export class Scale {
   public readonly scale: number;
@@ -17,11 +18,9 @@ export class Scale {
   }
 }
 
-const DEFAULT_SCALE = new Scale(MAX_SCALE);
-
 // 実座標はscale=1.0時のHTML座標 * scaleで決定される
 export class ReactiveScale implements Reactivity<Scale> {
-  private scale: Scale = $state(DEFAULT_SCALE);
+  private scale: Scale = $state(new Scale(DEFAULT_SCALE));
 
   constructor(scale: Scale) {
     this.scale = scale;
