@@ -1,31 +1,38 @@
-export class SessionMemory<T> {
-  private readonly sessionKey: string;
-  private __value: T;
+import type { Finalizer, LifeCycle } from "../extension/lifeCycle";
 
-  private constructor(sessionKey: string, value: T) {
+export class SessionMemory<T> implements LifeCycle {
+  private readonly sessionKey: string;
+  private value: T;
+
+  private constructor(sessionKey: string, initialValue: T) {
     this.sessionKey = sessionKey;
-    this.__value = value;
+    this.value = initialValue;
   }
 
   static of<T>(sessionKey: string, value: T): SessionMemory<T> {
     const memory = new SessionMemory<T>(sessionKey, value);
-    memory.initialize();
+    memory.loadAfterReload();
     return memory;
   }
 
-  value(): T {
-    return this.__value;
+  get(): T {
+    return this.value;
   }
 
-  private initialize() {
-    window.addEventListener("load", () => this.loadAfterReload());
-    window.addEventListener("beforeunload", () => this.saveBeforeReload());
+  set(newValue: T) {
+    this.value = newValue;
+  }
+
+  initialize(): Finalizer {
+    const beforeReload = () => this.saveBeforeReload();
+    window.addEventListener("beforeunload", beforeReload);
+    return () => window.removeEventListener("beforeunload", beforeReload);
   }
 
   private loadAfterReload() {
     if (SessionMemory.isReloaded()) {
       const json = sessionStorage.getItem(this.sessionKey);
-      if (json) this.__value = JSON.parse(json);
+      if (json) this.value = JSON.parse(json);
     }
   }
 
@@ -34,6 +41,13 @@ export class SessionMemory<T> {
   }
 
   private static isReloaded(): boolean {
-    return performance.getEntriesByType("navigation").find(entry => entry.entryType === "reload") !== undefined;
+    // 下記のコードが何故かコンパイルエラーになるため、anyを使用する
+    // return performance.getEntriesByType("navigation").find(entry => entry.type === "reload") !== undefined;
+
+    const entries: any[] = performance.getEntriesByType("navigation");
+    for (var entry of entries) {
+      if (entry.type === "reload") return true;
+    }
+    return false;
   }
 }
