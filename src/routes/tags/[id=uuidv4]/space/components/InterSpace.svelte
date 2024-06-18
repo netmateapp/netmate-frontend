@@ -3,7 +3,7 @@
   import { Tag } from "$lib/scripts/domain/tag";
   import type { Option } from "$lib/option";
   import { VIRTUAL_COORDINATE_SYSTEM_ORIGIN, VirtualCoordinate, VirtualLocation } from "../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
-  import { CHUNK_SIDE_LENGTH, ChunkRepository } from "../scripts/chunk/chunk";
+  import { CHUNK_SIDE_LENGTH, Chunk, ChunkRepository } from "../scripts/chunk/chunk";
   import { TagSpace } from "../scripts/space";
   import { MAX_SCALE, Scale } from "../scripts/scale.svelte";
   import { SpaceCoreData } from "../scripts/chunk/chunkContent";
@@ -33,31 +33,28 @@
 
   $effect(() => {
     if (currentSpace.tag.id.asHexadecimalRepresentation() !== tag.id.asHexadecimalRepresentation() && !isTransiting) {
-      let targetSpaceCoreCenter: VirtualLocation = VIRTUAL_COORDINATE_SYSTEM_ORIGIN;
-      let targetSpaceCoreChunkLoc: VirtualLocation = VIRTUAL_COORDINATE_SYSTEM_ORIGIN;
+      let spaceCoreChunk: Option<Chunk> = undefined;
       for (var chunk of currentSpace.renderedChunks.reactiveValue()) {
         if (chunk.content instanceof SpaceCoreData) {
           if (chunk.content.tag.id.asHexadecimalRepresentation() === tag.id.asHexadecimalRepresentation()) {
-            targetSpaceCoreCenter = chunk.centerLocation();
-            targetSpaceCoreChunkLoc = VirtualLocation.fromChunkLocation(chunk.location);
+            spaceCoreChunk = chunk;
             break;
           }
         }
       }
+
+      if (spaceCoreChunk === undefined) return;
       
       const viewCenter = currentSpace.viewCenterLocation.reactiveValue();
+      const spaceCoreChunkCenterLocation: VirtualLocation = spaceCoreChunk.centerLocation();
       spaceCoreRelativeLocation = viewCenter.createOffsetLocation(
-        VirtualCoordinate.of(-targetSpaceCoreCenter.x.coordinate),
-        VirtualCoordinate.of(-targetSpaceCoreCenter.y.coordinate)
+        VirtualCoordinate.of(-spaceCoreChunkCenterLocation.x.coordinate),
+        VirtualCoordinate.of(-spaceCoreChunkCenterLocation.y.coordinate)
       );
-      /*spaceCoreRelativeLocation = VirtualLocation.of(
-        VirtualCoordinate.of(viewCenter.x.coordinate - targetSpaceCoreCenter.x.coordinate),
-        VirtualCoordinate.of(viewCenter.y.coordinate - targetSpaceCoreCenter.y.coordinate)
-      );*/
 
       spaceCoreChunkLocaiton = currentSpace.locationTransformer.transformToRealLocation(
         currentSpace.viewCenterLocation.reactiveValue(),
-        targetSpaceCoreChunkLoc,
+        VirtualLocation.fromChunkLocation(spaceCoreChunk.location),
         currentSpace.viewportWidth.reactiveValue(),
         currentSpace.viewportHeight.reactiveValue(),
         currentSpace.scale.reactiveValue()
@@ -80,7 +77,6 @@
   let clipPathTo: number = $derived(61 * (1 / currentSpace.scale.reactiveValue().scale));
   let scaleTo: number = $derived(2 * (1 / currentSpace.scale.reactiveValue().scale));
   let spaceCoreChunkLocaiton: RealLocation = REAL_COORDINATE_SYSTEM_ORIGIN;
-
   let spaceCoreOverlayRef: Option<HTMLElement> = $state(undefined);
   let centeredSpaceRef: Option<HTMLElement> = $state(undefined);
   let backgroundRef: Option<HTMLElement> = $state(undefined);

@@ -34,7 +34,7 @@ export class TagSpaceChunkFetcher extends ChunkFetcher {
       if (location.chunkX.coordinate === 0 && location.chunkY.coordinate === 0) {
         chunks.add(new Chunk(location, shareCards));
       } else {
-        const max: number = 2;
+        const max: number = 8;
         const rand: number = Math.floor(Math.random() * max);
         if (rand < max - 1) {
           chunks.add(new Chunk(location, shareCards));
