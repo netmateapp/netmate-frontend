@@ -26,4 +26,8 @@ export class Tag {
     this.id = id;
     this.name = name;
   }
+
+  equals(other: Tag): boolean {
+    return this.id.asHexadecimalRepresentation() === other.id.asHexadecimalRepresentation();
+  }
 }
