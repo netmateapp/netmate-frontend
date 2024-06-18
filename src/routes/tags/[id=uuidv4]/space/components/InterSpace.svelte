@@ -5,29 +5,15 @@
   import { VIRTUAL_COORDINATE_SYSTEM_ORIGIN, VirtualCoordinate, VirtualLocation } from "../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import { CHUNK_SIDE_LENGTH, ChunkRepository } from "../scripts/chunk/chunk";
   import { TagSpace } from "../scripts/space";
-  import { DEFAULT_SCALE, MAX_SCALE, Scale } from "../scripts/scale.svelte";
+  import { MAX_SCALE, Scale } from "../scripts/scale.svelte";
   import { SpaceCoreData } from "../scripts/chunk/chunkContent";
   import { REAL_COORDINATE_SYSTEM_ORIGIN, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
-    import { Interspace } from "../scripts/archived__interspace.svelte";
 
   type Props = {
     tag: Tag;
   };
 
   let { tag }: Props = $props();
-
-  const interspace = new Interspace(
-    new TagSpace(
-      tag,
-      new ChunkRepository(),
-      VirtualLocation.of(
-          VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2),
-          VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2 + CHUNK_SIDE_LENGTH / 4)
-      ),
-      new Scale(DEFAULT_SCALE)
-    )
-  );
-
 
   let isTransiting: boolean = $state(false);
 
