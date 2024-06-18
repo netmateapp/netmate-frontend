@@ -83,9 +83,9 @@ export class ViewportSizeUpdater implements LifeCycle {
 
   initialize(): Finalizer {
     const onResize = () => this.onResize();
-    document.addEventListener("resize", onResize);
+    window.addEventListener("resize", onResize);
     return () => {
-      document.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", onResize);
     }
   }
 }
