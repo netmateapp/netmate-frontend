@@ -12,8 +12,13 @@ export class SpaceHistoryEntry {
 }
 
 export class SpaceHistory {
-  private entries: SpaceHistoryEntry[] = [];
-  private pointer: number = 0;
+  private entries: SpaceHistoryEntry[];
+  private pointer: number;
+
+  constructor(entries: SpaceHistoryEntry[] = [], pointer: number = 0) {
+    this.entries = entries;
+    this.pointer = pointer;
+  }
 
   goToPrevious(from: Tag, lastViewCenterLocation: VirtualLocation) {
     if (this.pointer === 0) return;
