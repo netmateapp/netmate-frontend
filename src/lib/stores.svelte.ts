@@ -37,8 +37,8 @@ export function createSessionStore<T>(key: string, startValue: T): T {
 }
 
 // Location構造体で保存可
-export const userLocationX = createSessionStore("userLocationX", 0);
-export const userLocationY = createSessionStore("userLocationY", 0);
+//export const userLocationX = createSessionStore("userLocationX", 0);
+//export const userLocationY = createSessionStore("userLocationY", 0);
 // export const userLocation = $derived([userLocationX, userLocationY]);
 
 export class ReactiveStore<T> {
