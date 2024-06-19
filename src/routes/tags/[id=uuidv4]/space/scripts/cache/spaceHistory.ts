@@ -15,10 +15,6 @@ export class SpaceHistory {
   private entries: SpaceHistoryEntry[] = [];
   private pointer: number = 0;
 
-  constructor(initialEntry: SpaceHistoryEntry) {
-    this.entries.push(initialEntry);
-  }
-
   goToPrevious(from: Tag, lastViewCenterLocation: VirtualLocation) {
     if (this.pointer === 0) return;
     if (this.pointer === this.entries.length - 1) this.entries.push(new SpaceHistoryEntry(from, lastViewCenterLocation));
@@ -54,11 +50,11 @@ export class SpaceHistory {
     else return false;
   }
 
-  back() {
+  private back() {
     if (this.hasPrevious()) this.pointer--;
   }
 
-  foward() {
+  private foward() {
     if (this.hasNext()) this.pointer++;
   }
 
