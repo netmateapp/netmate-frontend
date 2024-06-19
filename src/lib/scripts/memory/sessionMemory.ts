@@ -1,16 +1,17 @@
+import type { Option } from "$lib/option";
 import type { Finalizer, LifeCycle } from "../extension/lifeCycle";
+import type { Deserializer, Serializer } from "../extension/serialization";
 
 export class SessionMemory<T> implements LifeCycle {
-  private readonly sessionKey: string;
-  private value: T;
+  constructor(
+    private readonly sessionKey: string,
+    private value: T,
+    private serializer: Serializer<T, string>,
+    private deserializer: Deserializer<T, string>,
+  ) {}
 
-  private constructor(sessionKey: string, initialValue: T) {
-    this.sessionKey = sessionKey;
-    this.value = initialValue;
-  }
-
-  static of<T>(sessionKey: string, value: T): SessionMemory<T> {
-    const memory = new SessionMemory<T>(sessionKey, value);
+  static of<T>(sessionKey: string, value: T, serializer: Serializer<T, string>, deserializer : Deserializer<T, string>): SessionMemory<T> {
+    const memory = new SessionMemory<T>(sessionKey, value, serializer, deserializer);
     memory.loadAfterReload();
     return memory;
   }
@@ -32,12 +33,16 @@ export class SessionMemory<T> implements LifeCycle {
   private loadAfterReload() {
     if (SessionMemory.isReloaded()) {
       const json = sessionStorage.getItem(this.sessionKey);
-      if (json) this.value = JSON.parse(json);
+      if (json) {
+        const value: Option<T> = this.deserializer(json);
+        if (value) this.value = value;
+      }
     }
   }
 
   private saveBeforeReload() {
-    sessionStorage.setItem(this.sessionKey, JSON.stringify(this.value));
+    const serial: Option<string> = this.serializer(this.value);
+    if (serial) sessionStorage.setItem(this.sessionKey, serial);
   }
 
   private static isReloaded(): boolean {
