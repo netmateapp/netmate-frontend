@@ -1,3 +1,4 @@
+import type { Option } from "./option";
 import { err, Ok, ok, type Result } from "./result";
 
 const UUID_V4_REGEX = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
@@ -7,6 +8,10 @@ export class Uuid4 {
 
   static from(hexadecimalRepresentation: string): Result<{}, Uuid4> {
     return UUID_V4_REGEX.test(hexadecimalRepresentation) ? ok(new Uuid4(hexadecimalRepresentation)) : err({});
+  }
+
+  static of(hexadecimalRepresentation: string): Option<Uuid4> {
+    return UUID_V4_REGEX.test(hexadecimalRepresentation) ? new Uuid4(hexadecimalRepresentation) : undefined;
   }
 
   asHexadecimalRepresentation(): string {
