@@ -7,7 +7,8 @@ import type { RealLocation } from "./coordinateSystem/realCoordinateSystem";
 import { VirtualCoordinate, VirtualLocation } from "./coordinateSystem/virtualCoordinateSystem.svelte";
 import { DEFAULT_SCALE, Scale } from "./scale.svelte";
 import { TagSpace } from "./space";
-import { SPACE_CORE_SIZE } from "./archived__spaceCore";
+
+const SPACE_CORE_SIZE = 976;
 
 export class Interspace {
   public currentSpace = $state() as TagSpace;
