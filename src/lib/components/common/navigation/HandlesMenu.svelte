@@ -171,7 +171,7 @@
         {#if isHandleEditing(index)}
           <input
             bind:this={activeRenameInput}
-            class="handle"
+            class="handle editing-handle"
             id="handle{index}"
             type="text"
             bind:value={inputValue}
@@ -271,6 +271,10 @@
     font-family: var(--primary-font);
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+
+  .editing-handle {
+    cursor: text;
   }
 
   .shares {
