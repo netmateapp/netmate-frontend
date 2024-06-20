@@ -39,7 +39,7 @@
 
   let mockTagNames = ["早瀬ユウカ", "陸八魔アル", "空崎ヒナ"];
   let mockTagNamesPointer = 0;
-
+  
   let tag = $derived(new Tag(
     (Uuid4.from(data.tag.id) as Ok<{}, Uuid4>).value,
     new TagName(mockTagNamesPointer < mockTagNames.length ? mockTagNames[mockTagNamesPointer++] : mockTagNames[mockTagNamesPointer = 0])

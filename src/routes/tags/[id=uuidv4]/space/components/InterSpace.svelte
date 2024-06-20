@@ -8,10 +8,10 @@
   import { MAX_SCALE, Scale } from "../scripts/scale.svelte";
   import { SpaceCoreData } from "../scripts/chunk/chunkContent";
   import { REAL_COORDINATE_SYSTEM_ORIGIN, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
-  import { SessionMemory } from "$lib/scripts/memory/sessionMemory";
-  import { SpaceHistory } from "../scripts/cache/spaceHisotry";
-    import TransferAnimation from "./TransferAnimation.svelte";
-    import type { SvelteComponent } from "svelte";
+  import TransferAnimation from "./TransferAnimation.svelte";
+  import type { SvelteComponent } from "svelte";
+  import { afterNavigate, beforeNavigate, replaceState } from "$app/navigation";
+  import { page } from "$app/stores";
 
   type Props = {
     tag: Tag;
@@ -19,13 +19,22 @@
 
   let { tag }: Props = $props();
 
-  const history = SessionMemory.of("space-tag-history", new SpaceHistory());
-
-  $effect(() => {
-    return history.initialize();
-  });
-
   let isUserTransferring: boolean = $state(false);
+
+  // 異なるページに移動する際の座標保存処理
+  type LastViewCenterLocation = {
+    x: number;
+    y: number;
+  };
+
+  function saveLastViewCenterLocation(lastViewCenterLocation: VirtualLocation) {
+    const serialized: LastViewCenterLocation = { x: lastViewCenterLocation.x.coordinate, y: lastViewCenterLocation.y.coordinate };
+    replaceState("", serialized);
+  }
+
+  beforeNavigate(() => {
+    saveLastViewCenterLocation(currentSpace.viewCenterLocation.reactiveValue());
+  });
 
   let currentSpace: TagSpace = $state(
     new TagSpace(
@@ -38,8 +47,9 @@
       new Scale(MAX_SCALE)
     )
   );
-  let transferSpace: Option<TagSpace> = $state(undefined);
-  let transferSpaceViewCenterLocation: VirtualLocation;
+
+  let nextSpace: Option<TagSpace> = $state(undefined);
+  let nextSpaceInitialViewCenterLocation: VirtualLocation;
 
   function findClickedSpaceCoreChunk(tag: Tag): Option<Chunk> {
     for (var renderdChunk of currentSpace.renderedChunks.reactiveValue()) {
@@ -50,35 +60,51 @@
     return undefined;
   }
 
+  afterNavigate(() => {
+    if (!isUserTransferring) {
+      const state = $page.state as LastViewCenterLocation;
+      if (state && typeof state.x === "number" && typeof state.y === "number") {
+        const loc = VirtualLocation.of(
+          VirtualCoordinate.of(state.x),
+          VirtualCoordinate.of(state.y)
+        );
+        currentSpace.viewCenterLocation.update(loc);
+      }
+    }
+  });
+
   $effect(() => {
     if (isUserTransferring || currentSpace.tag.equals(tag)) return;
 
     let spaceCoreChunk: Option<Chunk> = findClickedSpaceCoreChunk(tag);
-      if (spaceCoreChunk === undefined) return;
-      
-      const viewCenter = currentSpace.viewCenterLocation.reactiveValue();
-      const spaceCoreChunkCenterLocation: VirtualLocation = spaceCoreChunk.centerLocation();
-      transferSpaceViewCenterLocation = viewCenter.createOffsetLocation(
-        VirtualCoordinate.of(-spaceCoreChunkCenterLocation.x.coordinate),
-        VirtualCoordinate.of(-spaceCoreChunkCenterLocation.y.coordinate)
-      );
+    if (spaceCoreChunk === undefined) return;
+          
+    const viewCenter: VirtualLocation = currentSpace.viewCenterLocation.reactiveValue();
+    const spaceCoreChunkCenterLocation: VirtualLocation = spaceCoreChunk.centerLocation();
+    nextSpaceInitialViewCenterLocation = viewCenter.createOffsetLocation(
+      VirtualCoordinate.of(-spaceCoreChunkCenterLocation.x.coordinate),
+      VirtualCoordinate.of(-spaceCoreChunkCenterLocation.y.coordinate)
+    );
 
-      virtualChunkLocation = currentSpace.locationTransformer.transformToRealLocation(
-        currentSpace.viewCenterLocation.reactiveValue(),
-        VirtualLocation.fromChunkLocation(spaceCoreChunk.location),
-        currentSpace.viewportWidth.reactiveValue(),
-        currentSpace.viewportHeight.reactiveValue(),
-        currentSpace.scale.reactiveValue()
-      );
+    virtualChunkLocation = currentSpace.locationTransformer.transformToRealLocation(
+      viewCenter,
+      VirtualLocation.fromChunkLocation(spaceCoreChunk.location),
+      currentSpace.viewportWidth.reactiveValue(),
+      currentSpace.viewportHeight.reactiveValue(),
+      currentSpace.scale.reactiveValue()
+    );
 
-      transferSpace = new TagSpace(
-        tag,
-        new ChunkRepository(),
-        VirtualLocation.of(VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2), VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2)),
-        new Scale(MAX_SCALE)
-      );
+    nextSpace = new TagSpace(
+      tag,
+      new ChunkRepository(),
+      VirtualLocation.of(
+        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2),
+        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2)
+      ),
+      new Scale(MAX_SCALE)
+    );
 
-      startTransition();
+    startTransition();
   });
 
   let virtualChunkLocation: RealLocation = REAL_COORDINATE_SYSTEM_ORIGIN;
@@ -92,13 +118,14 @@
     }, 0);
 
     setTimeout(() => {
-      transferSpace?.scale.update(currentSpace.scale.reactiveValue());
-      currentSpace = transferSpace!;
-      const viewCenter = currentSpace.viewCenterLocation.reactiveValue().createOffsetLocation(
-        transferSpaceViewCenterLocation.x,
-        transferSpaceViewCenterLocation.y
+      let newViewCenter: VirtualLocation = nextSpace!.viewCenterLocation.reactiveValue().createOffsetLocation(
+        nextSpaceInitialViewCenterLocation.x,
+        nextSpaceInitialViewCenterLocation.y
       );
-      currentSpace.viewCenterLocation.update(viewCenter);
+
+      nextSpace?.scale.update(currentSpace.scale.reactiveValue());
+      currentSpace = nextSpace!;
+      currentSpace.viewCenterLocation.update(newViewCenter);
 
       isUserTransferring = false;
     }, 200);
@@ -107,5 +134,5 @@
 
 <Space space={currentSpace} />
 {#if isUserTransferring}
-  <TransferAnimation bind:this={transferAnimation} currentSpaceScale={currentSpace.scale.reactiveValue()} nextSpace={transferSpace!} {virtualChunkLocation} />
+  <TransferAnimation bind:this={transferAnimation} currentSpaceScale={currentSpace.scale.reactiveValue()} nextSpace={nextSpace!} {virtualChunkLocation} />
 {/if}
