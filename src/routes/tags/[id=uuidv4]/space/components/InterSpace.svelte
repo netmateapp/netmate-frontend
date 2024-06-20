@@ -19,7 +19,17 @@
 
   let { tag }: Props = $props();
 
-  let isUserTransferring: boolean = $state(false);
+  let currentSpace: TagSpace = $state(
+    new TagSpace(
+      tag,
+      new ChunkRepository(),
+      VirtualLocation.of(
+        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2),
+        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2 + 328 - 208) // 1024 - 184 = 840, 840 - 512 = 328, 328 - (208)微調整分
+      ),
+      new Scale(MAX_SCALE)
+    )
+  );
 
   // 異なるページに移動する際の座標保存処理
   type LastViewCenterLocation = {
@@ -36,30 +46,13 @@
     saveLastViewCenterLocation(currentSpace.viewCenterLocation.reactiveValue());
   });
 
-  let currentSpace: TagSpace = $state(
-    new TagSpace(
-      tag,
-      new ChunkRepository(),
-      VirtualLocation.of(
-        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2),
-        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2 + CHUNK_SIDE_LENGTH / 4)
-      ),
-      new Scale(MAX_SCALE)
-    )
-  );
 
   let nextSpace: Option<TagSpace> = $state(undefined);
   let nextSpaceInitialViewCenterLocation: VirtualLocation;
 
-  function findClickedSpaceCoreChunk(tag: Tag): Option<Chunk> {
-    for (var renderdChunk of currentSpace.renderedChunks.reactiveValue()) {
-      if (renderdChunk.content instanceof SpaceCoreData && renderdChunk.content.tag.equals(tag)) {
-        return renderdChunk;
-      }
-    }
-    return undefined;
-  }
+  let isUserTransferring: boolean = $state(false);
 
+  // 記録した座標の適用
   afterNavigate(() => {
     if (!isUserTransferring) {
       const state = $page.state as LastViewCenterLocation;
@@ -72,6 +65,16 @@
       }
     }
   });
+
+  // スペースコアによる遷移に関する処理
+  function findClickedSpaceCoreChunk(tag: Tag): Option<Chunk> {
+    for (var renderdChunk of currentSpace.renderedChunks.reactiveValue()) {
+      if (renderdChunk.content instanceof SpaceCoreData && renderdChunk.content.tag.equals(tag)) {
+        return renderdChunk;
+      }
+    }
+    return undefined;
+  }
 
   $effect(() => {
     if (isUserTransferring || currentSpace.tag.equals(tag)) return;
