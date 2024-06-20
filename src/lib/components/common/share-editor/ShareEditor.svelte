@@ -1,4 +1,10 @@
 <script lang="ts" context="module">
+  export class ReactiveStore<T> {
+    reactiveValue: T = $state() as T;
+    constructor(initialValue: T) {
+      this.reactiveValue = initialValue;
+    }
+  }
   // メディア関連定数
   export const MAX_MEDIA_COUNT = 4;
   export const TITLE_COSTS_LIMIT = 48;
@@ -17,7 +23,6 @@
     insertHeadingNode,
   } from "./lexical-editor";
   import { canShowContentPlaceholder } from "./placeholder-plugin.svelte";
-  import { ReactiveStore } from "$lib/stores.svelte";
   import YouTubeLinkDialog from "./YouTubeLinkDialog.svelte";
   import { _ } from "./editor.svelte";
   import { toast } from "../toast/useToast.svelte";
