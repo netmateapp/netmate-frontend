@@ -32,7 +32,6 @@
         const relation = TAG_RELATIONS[index];
         if (selectedTagRelation !== relation) {
           setTagRelation(relation);
-          console.log(relation);
         }
         break;
       }
