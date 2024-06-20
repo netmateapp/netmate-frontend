@@ -23,8 +23,8 @@ export class LocationTransformer {
     const distanceX: number = scaledSourceLocation.x.coordinate - scaledViewCenterLocation.x.coordinate;
     const distanceY: number = scaledSourceLocation.y.coordinate - scaledViewCenterLocation.y.coordinate;
 
-    const viewCenterRealLocationX = RealCoordinate.of(viewportWidth.width * this.viewCenterPosition.x.ratio);
-    const viewCenterRealLocationY = RealCoordinate.of(viewportHeight.height * this.viewCenterPosition.y.ratio);
+    const viewCenterRealLocationX = RealCoordinate.of(viewportWidth.width * scale.scale * this.viewCenterPosition.x.ratio);
+    const viewCenterRealLocationY = RealCoordinate.of(viewportHeight.height * scale.scale * this.viewCenterPosition.y.ratio);
 
     const sourceRealLocationX = RealCoordinate.of(viewCenterRealLocationX.coordinate + distanceX);
     const sourceRealLocationY = RealCoordinate.of(viewCenterRealLocationY.coordinate + distanceY);
