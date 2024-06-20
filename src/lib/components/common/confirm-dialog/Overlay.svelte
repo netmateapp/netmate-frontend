@@ -1,4 +1,8 @@
-<div class="overlay"></div>
+<script lang="ts">
+  let { zIndex = 1 }: { zIndex?: number } = $props();
+</script>
+
+<div class="overlay" style="z-index: {zIndex};"></div>
 
 <style>
   .overlay {
@@ -8,6 +12,5 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.1);
-    z-index: 101;
   }
 </style>

@@ -271,7 +271,7 @@
   }
 </script>
 
-<Overlay />
+<Overlay zIndex={101} />
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
@@ -408,7 +408,14 @@
 {/if}
 
 {#if isConfirmDialogVisible}
-  <ConfirmDialog bind:this={confirmDialog} title={_("discard-edit-dialog-title")} description={_("discard-edit-dialog-message")} actionName={_("discard")} action={closeShareEditor} close={closeConfirmDialog} />
+  <ConfirmDialog
+    bind:this={confirmDialog}
+    title={_("discard-edit-dialog-title")}
+    description={_("discard-edit-dialog-message")}
+    actionName={_("discard")}
+    action={closeShareEditor}
+    close={closeConfirmDialog}
+    zIndex={102} />
 {/if}
 
 <style>

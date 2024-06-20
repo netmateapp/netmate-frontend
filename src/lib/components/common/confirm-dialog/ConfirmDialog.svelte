@@ -10,12 +10,14 @@
     actionName,
     action,
     close,
+    zIndex = 2,
   }: {
     title: string;
     description: string;
     actionName: string;
     action: () => void;
     close: () => void;
+    zIndex?: number;
   } = $props();
 
   const _ = createTranslator("common", "confirm-dialog");
@@ -42,9 +44,9 @@
   interactHandlersEffect(handleInteractEvent)();
 </script>
 
-<Overlay />
+<Overlay zIndex={zIndex - 1} />
 
-<div bind:this={dialog} class="dialog">
+<div bind:this={dialog} class="dialog" style="z-index: {zIndex};">
   <div class="messages">
     <span class="title">{title}</span>
     <span class="description">{description}</span>
@@ -73,7 +75,6 @@
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    z-index: 2;
   }
 
   .messages {
