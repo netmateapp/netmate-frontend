@@ -5,7 +5,7 @@
   } from "$lib/cjk.svelte";
   import type { InteractEvent, MaybeComponent, MaybeHTMLElement } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
-  import { tooltip } from "../tooltip/useTooltip.svelte";
+  import { hideTooltip, tooltip } from "../tooltip/useTooltip.svelte";
   import OperateHandleMenu from "./OperateHandleMenu.svelte";
   import { _, calculateMenuPosition } from "./nav.svelte";
 
@@ -114,6 +114,7 @@
         if (button && button.contains(element)) {
           event.stopPropagation();
           event.preventDefault();
+          hideTooltip();
           currentIndex = index;
           isOperateHandleButtonToggled = true;
           return;
