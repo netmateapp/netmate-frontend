@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { ChunkKey } from "../scripts/chunk/chunk";
   import { TagSpace } from "../scripts/space";
   import Chunk from "./Chunk.svelte";
 
@@ -18,7 +19,7 @@
 </script>
 
 <div class="space">
-  {#each space.renderedChunks.reactiveValue() as chunk}
+  {#each space.renderedChunks.reactiveValue() as chunk (ChunkKey.from(chunk.location).key)}
     <Chunk {space} {chunk} />
   {/each}
 </div>
