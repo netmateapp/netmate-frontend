@@ -31,8 +31,6 @@
 
 <style>
   .location-wrapper {
-    position: absolute;
-    transform: translate(-50%, 0);
     width: 45rem;
     display: flex;
     justify-content: center;
