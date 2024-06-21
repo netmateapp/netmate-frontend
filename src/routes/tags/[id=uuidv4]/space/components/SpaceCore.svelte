@@ -48,7 +48,7 @@
   <div class="shadow-overlay"></div>
   <LocationName tag={spaceCore.tag} relativeLocation={RealLocation.of(RealCoordinate.of(488), RealCoordinate.of(160))} />
   {#each spaceCore.shareCardsCluster.shareCards as shareCard, index}
-    <SpaceShareCard location={createRealLocation(index)} shareCard={shareCard} />
+    <SpaceShareCard location={createRealLocation(index)} shareCard={shareCard} isInSpaceCore={true} />
   {/each}
 </a>
 

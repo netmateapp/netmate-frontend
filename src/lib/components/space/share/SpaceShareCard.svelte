@@ -9,9 +9,10 @@
   type Props = {
     shareCard: ShareCard;
     location: RealLocation;
+    isInSpaceCore?: boolean;
   };
 
-  let { shareCard, location }: Props = $props();
+  let { shareCard, location, isInSpaceCore = false }: Props = $props();
 
   type WithinOneWeek = { unit: string; t: number };
 
@@ -124,6 +125,8 @@
   }
 
   function onMouseDown() {
+    if (isInSpaceCore) return;
+
     isMouseDown = true;
     clearInterval(intervalId); // 既存のインターバルをクリア
     intervalId = setInterval(() => {
@@ -145,7 +148,7 @@
   }
 
   function onImageClick(event: MouseEvent) {
-    if (step > 1) {
+    if (step > 1 && !isInSpaceCore) {
       event.preventDefault();
       event.stopPropagation();
     }
