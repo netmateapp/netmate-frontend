@@ -14,8 +14,14 @@
   $effect(() => {
     document.fonts.onloadingdone = () => {
       if (logoRef) logoRef.style.visibility = "visible";
+      console.log("done");
     };
   });
+
+  setTimeout(() => {
+    // 200ms経過したら強制的に表示
+    if (logoRef && logoRef.style.visibility === "hidden") logoRef.style.visibility = "visible";
+  }, 200);
 </script>
 
 <a href="https://netmate.app" class="brand">
