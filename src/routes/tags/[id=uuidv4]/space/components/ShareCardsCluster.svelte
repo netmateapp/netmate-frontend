@@ -11,7 +11,8 @@
   let { shareCardsCluster, isInSpaceCore = false, applyRandomOffsets = false }: Props = $props();
 
   function offset(): number {
-    return applyRandomOffsets ? 22 - Math.floor(Math.random() * 15) : 22;
+    return 22;
+    //return applyRandomOffsets ? 22 - Math.floor(Math.random() * 15) : 22;
   }
 </script>
 
