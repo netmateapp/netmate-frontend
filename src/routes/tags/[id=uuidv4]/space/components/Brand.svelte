@@ -14,7 +14,6 @@
   $effect(() => {
     document.fonts.onloadingdone = () => {
       if (logoRef) logoRef.style.visibility = "visible";
-      console.log("done");
     };
   });
 

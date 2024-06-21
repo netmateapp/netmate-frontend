@@ -31,15 +31,6 @@
     )
   );
 
-  $effect(() => {
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "/") {
-        const v = currentSpace.viewCenterLocation.reactiveValue();
-        console.log(`x: ${v.x.coordinate}, y: ${v.y.coordinate}`);
-      }
-    });
-  })
-
   // 異なるページに移動する際の座標保存処理
   type LastViewCenterLocation = {
     x: number;

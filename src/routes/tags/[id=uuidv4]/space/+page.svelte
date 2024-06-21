@@ -13,8 +13,9 @@
   import type { PageServerData } from "./$types";
   import { Tag, TagName } from "$lib/scripts/domain/tag";
   import InterSpace from "./components/space/Interspace.svelte";
-    import Header from "$lib/components/common/header/Header.svelte";
+  import { fade } from "svelte/transition";
 
+  // 共有画面関連
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
   let openShareEditorButton: MaybeComponent = $state(null);
@@ -36,23 +37,74 @@
     isShareEditorVisible = false;
   }
 
+  // スペース関連
   let { data }: { data: PageServerData } = $props();
 
   let mockTagNames = ["早瀬ユウカ", "陸八魔アル", "空崎ヒナ"];
   let mockTagNamesPointer = 0;
-  
-  let tag = $derived(new Tag(
-    (Uuid4.from(data.tag.id) as Ok<{}, Uuid4>).value,
-    new TagName(mockTagNamesPointer < mockTagNames.length ? mockTagNames[mockTagNamesPointer++] : mockTagNames[mockTagNamesPointer = 0])
-  ));
+
+  let tag = $derived(
+    new Tag(
+      (Uuid4.from(data.tag.id) as Ok<{}, Uuid4>).value,
+      new TagName(
+        mockTagNamesPointer < mockTagNames.length
+          ? mockTagNames[mockTagNamesPointer++]
+          : mockTagNames[(mockTagNamesPointer = 0)],
+      ),
+    ),
+  );
+
+  // トップページの中央検索バー関連
+  let isSearchBoxVisible: boolean = $state(!isTopPage());
+
+  function isTopPage(): boolean {
+    return true;
+  }
+
+  $effect(() => {
+    if (isTopPage()) {
+      const mutationObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.addedNodes.length > 0) {
+            mutation.addedNodes.forEach((node) => {
+              if (node.hasChildNodes()) {
+                node.childNodes.forEach(child => {
+                  if (child instanceof HTMLElement && child.id === "on-top") {
+                    observeIntersection();
+                    mutationObserver.disconnect();
+                  }
+                });
+              }
+            });
+          }
+        });
+      });
+
+      mutationObserver.observe(document, { childList: true, subtree: true });
+    }
+  });
+
+  function observeIntersection() {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        // ページ読み込み時にも処理が走るため、これだけで制御可能
+        isSearchBoxVisible = !entry.isIntersecting;
+      });
+    });
+
+    const topSearchBox = document.querySelector("#on-top > div");
+    if (topSearchBox instanceof HTMLElement) obs.observe(topSearchBox);
+  }
 </script>
 
 <title>{tag.name.name}</title>
 
 <Brand x={16} y={8} />
-<div class="search-box-wrapper">
-  <SearchBox />
-</div>
+{#if isSearchBoxVisible}
+  <div class="search-box-wrapper" transition:fade={{ duration: 250 }}>
+    <SearchBox />
+  </div>
+{/if}
 <Navigation />
 
 <OpenShareEditorButton bind:this={openShareEditorButton} />

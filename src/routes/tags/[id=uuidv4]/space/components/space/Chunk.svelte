@@ -1,11 +1,11 @@
 <script lang="ts">
   import SearchBox from "$lib/components/common/search-box/SearchBox.svelte";
-import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
+  import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
   import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import type { TagSpace } from "../../scripts/space";
-    import Brand from "../Brand.svelte";
+  import Brand from "../Brand.svelte";
   import LocationName from "./LocationName.svelte";
   import ShareCardsCluster from "./ShareCardsCluster.svelte";
   import SpaceCore from "./SpaceCore.svelte";
@@ -64,7 +64,7 @@ import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   {:else}
     {#if isCenterChunk()}
       {#if isTopTag()}
-        <div class="on-top">
+        <div id="on-top" class="on-top">
           <Brand />
           <SearchBox />
         </div>
