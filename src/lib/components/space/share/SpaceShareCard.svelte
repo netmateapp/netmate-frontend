@@ -8,11 +8,10 @@
 
   type Props = {
     shareCard: ShareCard;
-    location: RealLocation;
     isInSpaceCore?: boolean;
   };
 
-  let { shareCard, location, isInSpaceCore = false }: Props = $props();
+  let { shareCard, isInSpaceCore = false }: Props = $props();
 
   type WithinOneWeek = { unit: string; t: number };
 
@@ -155,104 +154,87 @@
   }
 </script>
 
-<div
-  class="share-wrapper"
-  style="top: {location.y.coordinate}px; left: {location.x.coordinate}px;"
+<a
+  href="https://netmate.app/shares/{shareCard.sharerId.asHexadecimalRepresentation()}"
+  class="share"
 >
-  <a
-    href="https://netmate.app/shares/{shareCard.sharerId.asHexadecimalRepresentation()}"
-    class="share"
-  >
-    <div class="content">
-      <div class="texts">
-        {#if shareCard.title !== undefined}
-          <span class="title">{shareCard.title.title}</span>
-        {/if}
-        {#if shareCard.leadSentences !== undefined}
-          <div class="text">{shareCard.leadSentences.sentences}</div>
-        {/if}
-      </div>
-      {#if shareCard.thumbnailMediaId !== undefined}
-        <div class="media">
-          {#if shareCard.hasImage()}
-            {#if shareCard.shouldProcessThumbnailImage}
-              <img
-                bind:this={imageRequireProcessing}
-                src={shareCard.thumbnailMediaId.id}
-                class="should-process"
-                onmousedown={() => onMouseDown()}
-                onmouseup={() => resetFilter()}
-                onmouseleave={() => resetFilter()}
-                onmousemove={(event) => {
-                  if (event.buttons === 0) resetFilter();
-                }}
-                ondragstart={(event) => event.preventDefault()}
-                onclick={(event) => onImageClick(event)}
-              />
-            {:else}
-              <img src={shareCard.thumbnailMediaId.id} />
-            {/if}
-          {:else if shareCard.hasSoundCloudAudio()}
-            <iframe
-              title="SoundCloud audio player"
-              scrolling="no"
-              frameborder="no"
-              allow="autoplay"
-              src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{shareCard
-                .thumbnailMediaId
-                .id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true"
-            >
-            </iframe>
-          {:else if shareCard.hasYouTubeVideo()}
-            <iframe
-              src="https://www.youtube-nocookie.com/embed/{shareCard
-                .thumbnailMediaId.id}"
-              title="YouTube video player"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen
-            >
-            </iframe>
-          {/if}
-        </div>
+  <div class="content">
+    <div class="texts">
+      {#if shareCard.title !== undefined}
+        <span class="title">{shareCard.title.title}</span>
+      {/if}
+      {#if shareCard.leadSentences !== undefined}
+        <div class="text">{shareCard.leadSentences.sentences}</div>
       {/if}
     </div>
-    <div class="footer">
-      <div class="information">
-        <span class="conversations-count"
-          >{_("conversations-count", {
-            count: shareCard.conversationsCount.count,
-          })}</span
-        >
-        <span class="timestamp"
-          >{_("timestamp", {
-            ...elapsedTime(shareCard.timestamp.unixTimeMillis.time),
-          })}</span
-        >
+    {#if shareCard.thumbnailMediaId !== undefined}
+      <div class="media">
+        {#if shareCard.hasImage()}
+          {#if shareCard.shouldProcessThumbnailImage}
+            <img
+              bind:this={imageRequireProcessing}
+              src={shareCard.thumbnailMediaId.id}
+              class="should-process"
+              onmousedown={() => onMouseDown()}
+              onmouseup={() => resetFilter()}
+              onmouseleave={() => resetFilter()}
+              onmousemove={(event) => {
+                if (event.buttons === 0) resetFilter();
+              }}
+              ondragstart={(event) => event.preventDefault()}
+              onclick={(event) => onImageClick(event)}
+            />
+          {:else}
+            <img src={shareCard.thumbnailMediaId.id} />
+          {/if}
+        {:else if shareCard.hasSoundCloudAudio()}
+          <iframe
+            title="SoundCloud audio player"
+            scrolling="no"
+            frameborder="no"
+            allow="autoplay"
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{shareCard
+              .thumbnailMediaId
+              .id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+          >
+          </iframe>
+        {:else if shareCard.hasYouTubeVideo()}
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/{shareCard
+              .thumbnailMediaId.id}"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          >
+          </iframe>
+        {/if}
       </div>
-      <div class="more-button" use:tooltip={_("more-button-tooltip")}>
-        <svg class="more-button-icon">
-          <use href="/src/lib/assets/common/more_horiz.svg#more_horiz"></use>
-        </svg>
-      </div>
+    {/if}
+  </div>
+  <div class="footer">
+    <div class="information">
+      <span class="conversations-count"
+        >{_("conversations-count", {
+          count: shareCard.conversationsCount.count,
+        })}</span
+      >
+      <span class="timestamp"
+        >{_("timestamp", {
+          ...elapsedTime(shareCard.timestamp.unixTimeMillis.time),
+        })}</span
+      >
     </div>
-  </a>
-</div>
+    <div class="more-button" use:tooltip={_("more-button-tooltip")}>
+      <svg class="more-button-icon">
+        <use href="/src/lib/assets/common/more_horiz.svg#more_horiz"></use>
+      </svg>
+    </div>
+  </div>
+</a>
 
 <style>
-  .share-wrapper {
-    position: absolute;
-    display: inline-flex;
-    width: 29.25rem;
-    height: 29.25rem;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
-  }
-
   .share {
     width: 29.25rem;
     max-height: 29.25rem;

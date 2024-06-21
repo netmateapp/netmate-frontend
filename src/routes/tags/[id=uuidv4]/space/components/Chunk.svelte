@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { Option } from "$lib/option";
-  import type { SvelteComponent } from "svelte";
   import { CHUNK_SIDE_LENGTH, type Chunk } from "../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../scripts/chunk/chunkContent";
   import { RealCoordinate, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
@@ -41,10 +39,6 @@
     return space.scale.reactiveValue().scale;
   }
 
-  function hasShareCardsCluster(): boolean {
-    return chunk.content instanceof ShareCardsClusterData;
-  }
-
   function hasSpaceCore(): boolean {
     return chunk.content instanceof SpaceCoreData;
   }
@@ -57,47 +51,50 @@
     return space.tag.id.asHexadecimalRepresentation() === "";
   }
 
-  let locationName: Option<SvelteComponent> = $state(undefined);
-  const LOCATION_Y: number = 184;
-  function locationNameVirtualHeight(): number {
-    return locationName?.locationNameElementHeight() / space.scale.reactiveValue().scale; // default: 42
-  }
-  
-  function allocatedHeight(): number {
-    if (isCenterChunk()) {
-      if (isTopTag()) {
-        return 160;
-      } else {
-        return LOCATION_Y + locationNameVirtualHeight() + 16;
-      }
-    } else {
-      return 0;
-    }
-  }
-
-  const SHARE_SIZE: number = 468;
-  function buttomUp(): number {
-    return isCenterChunk() && !isTopTag() ? CHUNK_SIDE_LENGTH - (LOCATION_Y + locationNameVirtualHeight() + 16 + SHARE_SIZE + 22) : 0;
-  }
-
   const color = Math.floor(Math.random() * 255);
   // background-color: rgba({color}, {color}, {color}, 0.1); 
 </script>
 <div
   class="chunk"
   style="bottom: {bottomStyle()}px; left: {leftStyle()}px; width: {sizeStyle()}px; height: {sizeStyle()}px; scale: {scaleStyle()};">
-  {#if isCenterChunk()}
-    <LocationName bind:this={locationName} tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(LOCATION_Y))} />
-  {/if}
-  {#if hasShareCardsCluster()}
-    <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} allocatedHeight={allocatedHeight()} bottomUp={buttomUp()} />
-  {:else if hasSpaceCore()}
+  {#if hasSpaceCore()}
     <SpaceCore {space} {chunk} spaceCore={chunk.content as SpaceCoreData} />
+  {:else}
+    {#if isCenterChunk()}
+      {#if isTopTag()}
+        <div class="location-name-wrapper">
+          <LocationName tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(184))} />
+        </div>
+      {:else}
+        <div class="location-name-wrapper">
+          <LocationName tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(184))} />
+        </div>
+      {/if}
+    {/if}
+    <div class="share-cards-wrapper">
+      <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} applyRandomOffsets={!isCenterChunk()} />
+    </div>
   {/if}
 </div>
 
 <style>
   .chunk {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .location-name-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 11.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .share-cards-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
   }
 </style>
