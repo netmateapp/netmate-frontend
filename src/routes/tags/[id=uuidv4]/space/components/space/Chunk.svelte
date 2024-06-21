@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
+  import SearchBox from "$lib/components/common/search-box/SearchBox.svelte";
+import { CHUNK_SIDE_LENGTH, type Chunk } from "../../scripts/chunk/chunk";
   import { ShareCardsClusterData, SpaceCoreData } from "../../scripts/chunk/chunkContent";
   import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import { VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
   import type { TagSpace } from "../../scripts/space";
+    import Brand from "../Brand.svelte";
   import LocationName from "./LocationName.svelte";
   import ShareCardsCluster from "./ShareCardsCluster.svelte";
   import SpaceCore from "./SpaceCore.svelte";
@@ -48,7 +50,7 @@
   }
 
   function isTopTag(): boolean {
-    return space.tag.id.asHexadecimalRepresentation() === "";
+    return chunk.location.chunkX.coordinate === 0 && chunk.location.chunkY.coordinate === 0;//space.tag.id.asHexadecimalRepresentation() === "";
   }
 
   const color = Math.floor(Math.random() * 255);
@@ -62,8 +64,9 @@
   {:else}
     {#if isCenterChunk()}
       {#if isTopTag()}
-        <div class="location-name-wrapper">
-          <LocationName tag={space.tag} relativeLocation={RealLocation.of(RealCoordinate.of(512), RealCoordinate.of(184))} />
+        <div class="on-top">
+          <Brand />
+          <SearchBox />
         </div>
       {:else}
         <div class="location-name-wrapper">
@@ -74,6 +77,9 @@
     <div class="share-cards-wrapper">
       <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} applyRandomOffsets={!isCenterChunk()} />
     </div>
+    {#if isTopTag()}
+      <div class="top-spacer"></div>
+    {/if}
   {/if}
 </div>
 
@@ -82,6 +88,19 @@
     position: absolute;
     display: flex;
     flex-direction: column;
+  }
+
+  .on-top {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding-top: 12rem;
+  }
+
+  .top-spacer {
+    width: 1px;
+    height: 208px;
   }
 
   .location-name-wrapper {
