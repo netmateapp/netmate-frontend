@@ -21,7 +21,7 @@ export function generateMockShareCards(): ShareCard {
     title,
     leadSentences,
     mediaId,
-    mediaId instanceof NetmateImageId
+    mediaId instanceof NetmateImageId ? getRandomInt(5) === 0 : false
   )
 }
 
