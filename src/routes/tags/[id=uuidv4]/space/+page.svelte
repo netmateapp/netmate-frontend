@@ -12,7 +12,8 @@
   import type { Ok } from "$lib/result";
   import type { PageServerData } from "./$types";
   import { Tag, TagName } from "$lib/scripts/domain/tag";
-  import InterSpace from "./components/Interspace.svelte";
+  import InterSpace from "./components/space/Interspace.svelte";
+    import Header from "$lib/components/common/header/Header.svelte";
 
   let isShareEditorVisible = $state(false);
   let shareEditor: MaybeComponent = $state(null);
@@ -49,8 +50,11 @@
 <title>{tag.name.name}</title>
 
 <Brand x={16} y={8} />
-<SearchBox />
+<div class="search-box-wrapper">
+  <SearchBox />
+</div>
 <Navigation />
+
 <OpenShareEditorButton bind:this={openShareEditorButton} />
 {#if isShareEditorVisible}
   <ShareEditor bind:this={shareEditor} closeEditor={closeShareEditor} />
@@ -66,6 +70,14 @@
 <style>
   :global(body) {
     overflow: hidden;
+  }
+
+  .search-box-wrapper {
+    position: fixed;
+    top: 0.5rem;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    z-index: 100;
   }
 
   .side-bar {

@@ -1,13 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
 
-  type Props = {
-    x: number;
-    y: number;
-  };
-
-  let { x, y }: Props = $props();
-
   const _ = createTranslator("common", "brand");
 
   function version(): string {
@@ -15,7 +8,7 @@
   }
 </script>
 
-<a href="https://netmate.app" class="brand" style="top: {y}px; left: {x}px;">
+<a href="https://netmate.app" class="brand">
   <img class="logo" src="/src/lib/assets/logo-temp.png" alt={_("logo")} />
   <div class="types">
     <span class="logotype">{_("logotype")}</span>
@@ -46,18 +39,19 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: -1rem;
   }
 
   .logotype {
     color: var(--secondary-color);
     font-family: YuseiMagic;
     font-size: 3rem;
+    line-height: 3.75rem;
   }
 
   .version {
     color: var(--secondary-color);
     font-family: YuseiMagic;
     font-size: 1.5rem;
+    line-height: 1.25rem;
   }
 </style>

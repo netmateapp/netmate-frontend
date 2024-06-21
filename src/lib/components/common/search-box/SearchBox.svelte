@@ -91,20 +91,15 @@
 
 <style>
   .search-box {
-    position: fixed;
-    top: 0.5rem;
-    left: 50%;
-    transform: translate(-50%, 0%);
     border-radius: 100vmax;
     background-color: var(--dominant-color);
     box-shadow: 0px 2px 8px 1px rgba(0, 0, 0, 0.12);
     display: flex;
-    width: 45%;
+    width: 45vw;
     padding-right: 0.5rem;
     flex-direction: column;
     align-items: center;
     overflow: hidden;
-    z-index: 100;
   }
 
   .search-box:hover {

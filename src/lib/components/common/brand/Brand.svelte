@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
 
-  export let x: number, y: number;
+  let { x, y }: { x: number, y: number } = $props();
 
   const _ = createTranslator("common", "brand");
 </script>
