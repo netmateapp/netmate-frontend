@@ -6,10 +6,20 @@
   function version(): string {
     return "v0.0.1";
   }
+
+  let logoRef: HTMLElement;
+
+  // フォントが読み込まれる前のflexboxが横に伸びる都合で、
+  // 画像のガタつき防止のための遅延読み込み
+  $effect(() => {
+    document.fonts.onloadingdone = () => {
+      if (logoRef) logoRef.style.visibility = "visible";
+    };
+  });
 </script>
 
 <a href="https://netmate.app" class="brand">
-  <img class="logo" src="/src/lib/assets/logo-temp.png" alt={_("logo")} />
+  <img bind:this={logoRef} class="logo" src="/src/lib/assets/logo-temp.png" alt={_("logo")} />
   <div class="types">
     <span class="logotype">{_("logotype")}</span>
     <span class="version">{version()}</span>
@@ -26,6 +36,7 @@
     width: 5.375rem;
     height: 5.375rem;
     border-radius: 2.5rem;
+    visibility: hidden;
   }
 
   @font-face {
