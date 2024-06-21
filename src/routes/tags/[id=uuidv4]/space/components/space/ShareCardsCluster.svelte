@@ -1,6 +1,6 @@
 <script lang="ts">
   import SpaceShareCard from "$lib/components/space/share/SpaceShareCard.svelte";
-  import type { ShareCardsClusterData } from "../scripts/chunk/chunkContent";
+  import type { ShareCardsClusterData } from "../../scripts/chunk/chunkContent";
 
   type Props = {
     shareCardsCluster: ShareCardsClusterData;

@@ -1,10 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import type { InteractEvent } from "$lib/types";
-  import type { Chunk } from "../scripts/chunk/chunk";
-  import type { SpaceCoreData } from "../scripts/chunk/chunkContent";
-  import { RealCoordinate, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
-  import type { TagSpace } from "../scripts/space";
+  import type { Chunk } from "../../scripts/chunk/chunk";
+  import type { SpaceCoreData } from "../../scripts/chunk/chunkContent";
+  import { RealCoordinate, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
+  import type { TagSpace } from "../../scripts/space";
   import LocationName from "./LocationName.svelte";
   import ShareCardsCluster from "./ShareCardsCluster.svelte";
 

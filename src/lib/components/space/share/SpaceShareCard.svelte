@@ -168,13 +168,12 @@
       {/if}
     </div>
     {#if shareCard.thumbnailMediaId !== undefined}
-      <div class="media">
-        {#if shareCard.hasImage()}
+      {#if shareCard.hasImage()}
+        <div
+          class="media">
           {#if shareCard.shouldProcessThumbnailImage}
-            <img
-              bind:this={imageRequireProcessing}
-              src={shareCard.thumbnailMediaId.id}
-              class="should-process"
+            <div
+              class="media"
               onmousedown={() => onMouseDown()}
               onmouseup={() => resetFilter()}
               onmouseleave={() => resetFilter()}
@@ -182,12 +181,21 @@
                 if (event.buttons === 0) resetFilter();
               }}
               ondragstart={(event) => event.preventDefault()}
-              onclick={(event) => onImageClick(event)}
-            />
+              onclick={(event) => onImageClick(event)}>
+                <img
+                bind:this={imageRequireProcessing}
+                src={shareCard.thumbnailMediaId.id}
+                class="should-process"/>
+            </div>
           {:else}
-            <img src={shareCard.thumbnailMediaId.id} />
+            <div class="media">
+              <img src={shareCard.thumbnailMediaId.id} />
+            </div>
           {/if}
-        {:else if shareCard.hasSoundCloudAudio()}
+        </div>
+      {:else}
+      <div class="media">
+        {#if shareCard.hasSoundCloudAudio()}
           <iframe
             title="SoundCloud audio player"
             scrolling="no"
@@ -211,6 +219,7 @@
           </iframe>
         {/if}
       </div>
+      {/if}
     {/if}
   </div>
   <div class="footer">

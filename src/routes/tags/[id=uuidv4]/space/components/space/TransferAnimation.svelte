@@ -1,9 +1,9 @@
 <script lang="ts">
   import Space from "./Space.svelte";
   import type { Option } from "$lib/option";
-  import { RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
-  import type { Scale } from "../scripts/scale.svelte";
-  import type { TagSpace } from "../scripts/space";
+  import { RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
+  import type { Scale } from "../../scripts/scale.svelte";
+  import type { TagSpace } from "../../scripts/space";
 
   type Props = {
     currentSpaceScale: Scale;

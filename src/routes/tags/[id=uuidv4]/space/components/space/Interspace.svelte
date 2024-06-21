@@ -2,12 +2,12 @@
   import Space from "./Space.svelte";
   import { Tag } from "$lib/scripts/domain/tag";
   import type { Option } from "$lib/option";
-  import { VirtualCoordinate, VirtualLocation } from "../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
-  import { CHUNK_SIDE_LENGTH, Chunk, ChunkRepository } from "../scripts/chunk/chunk";
-  import { TagSpace } from "../scripts/space";
-  import { MAX_SCALE, Scale } from "../scripts/scale.svelte";
-  import { SpaceCoreData } from "../scripts/chunk/chunkContent";
-  import { REAL_COORDINATE_SYSTEM_ORIGIN, RealLocation } from "../scripts/coordinateSystem/realCoordinateSystem";
+  import { VirtualCoordinate, VirtualLocation } from "../../scripts/coordinateSystem/virtualCoordinateSystem.svelte";
+  import { CHUNK_SIDE_LENGTH, Chunk, ChunkRepository } from "../../scripts/chunk/chunk";
+  import { TagSpace } from "../../scripts/space";
+  import { MAX_SCALE, Scale } from "../../scripts/scale.svelte";
+  import { SpaceCoreData } from "../../scripts/chunk/chunkContent";
+  import { REAL_COORDINATE_SYSTEM_ORIGIN, RealLocation } from "../../scripts/coordinateSystem/realCoordinateSystem";
   import TransferAnimation from "./TransferAnimation.svelte";
   import type { SvelteComponent } from "svelte";
   import { afterNavigate, beforeNavigate, replaceState } from "$app/navigation";
@@ -30,6 +30,15 @@
       new Scale(MAX_SCALE)
     )
   );
+
+  $effect(() => {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/") {
+        const v = currentSpace.viewCenterLocation.reactiveValue();
+        console.log(`x: ${v.x.coordinate}, y: ${v.y.coordinate}`);
+      }
+    });
+  })
 
   // 異なるページに移動する際の座標保存処理
   type LastViewCenterLocation = {
