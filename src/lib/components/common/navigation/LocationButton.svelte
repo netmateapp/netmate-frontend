@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    delayTooltip,
     hideTooltip,
+    tooltip,
   } from "$lib/components/common/tooltip/useTooltip.svelte";
   import type { InteractEvent, MaybeComponent, MaybeHTMLElement } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
@@ -36,7 +36,7 @@
   bind:this={buttonRef}
   class="button"
   class:toggle={isToggled}
-  use:delayTooltip={{ tooltipText: _("location-button-tooltip"), delay: 400 }}
+  use:tooltip={_("location-button-tooltip")}
 >
   <svg class="icon">
     <use href="/src/lib/assets/common/public.svg#public"></use>
@@ -62,16 +62,9 @@
     cursor: pointer;
   }
 
-  .button:not(.toggle):hover {
+  .button:hover, .toggle {
     background-color: var(--dominant-color-hover);
     backdrop-filter: blur(1px);
-    transition: background-color 0.25s linear 0.35s, backdrop-filter 0.25s linear 0.35s;
-  }
-
-  .toggle {
-    background-color: var(--dominant-color-hover);
-    backdrop-filter: blur(1px);
-    transition: none;
   }
 
   .icon {

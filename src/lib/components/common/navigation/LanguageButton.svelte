@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { delayTooltip, hideTooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
+  import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
   import type { InteractEvent, MaybeComponent, MaybeHTMLElement } from "$lib/types";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import LanguageMenu from "./LanguageMenu.svelte";
@@ -33,7 +33,7 @@
   bind:this={buttonRef}
   class="button"
   class:toggle={isToggled}
-  use:delayTooltip={{ tooltipText: _("language-button-tooltip"), delay: 400 }}>
+  use:tooltip={_("language-button-tooltip")}>
   <svg class="icon">
     <use href="/src/lib/assets/common/translate.svg#translate"></use>
   </svg>
@@ -55,16 +55,9 @@
     cursor: pointer;
   }
 
-  .button:not(.toggle):hover {
+  .button:hover, .toggle {
     background-color: var(--dominant-color-hover);
     backdrop-filter: blur(1px);
-    transition: background-color 0.25s linear 0.35s, backdrop-filter 0.25s linear 0.35s;
-  }
-
-  .toggle {
-    background-color: var(--dominant-color-hover);
-    backdrop-filter: blur(1px);
-    transition: none;
   }
 
   .icon {

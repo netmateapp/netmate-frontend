@@ -8,10 +8,9 @@
 
 <style>
   .button {
-    border-radius: 2rem;
-    border: 1px solid var(--light-gray);
+    border-radius: 100vmax;
     height: 2.4375rem;
-    background: var(--dominant-color);
+    border: 1px solid var(--light-gray);
     display: inline-flex;
     padding: 0.625rem 1rem 0.5625rem 1rem;
     justify-content: center;
@@ -29,7 +28,10 @@
   }
 
   .button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
     border-color: var(--accent-color);
     color: var(--accent-color);
+    backdrop-filter: blur(1px);
+    transition: background-color 0.15s linear, border-color 0.15s linear, color 0.15s linear, backdrop-filter 0.15s linear;
   }
 </style>

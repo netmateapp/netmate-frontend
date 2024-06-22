@@ -75,7 +75,7 @@
   }
 
   .button:hover {
-    background-color: var(--dominant-color-hover);
+    background-color: var(--dominant-color);
   }
 
   .label {

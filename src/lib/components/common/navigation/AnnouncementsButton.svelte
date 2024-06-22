@@ -1,7 +1,7 @@
 <script lang="ts">
   import {
-    delayTooltip,
     hideTooltip,
+    tooltip,
   } from "$lib/components/common/tooltip/useTooltip.svelte";
   import type {
     InteractEvent,
@@ -37,11 +37,7 @@
   bind:this={buttonRef}
   class="button"
   class:toggle={isToggled}
-  use:delayTooltip={{
-    tooltipText: _("announcements-button-tooltip"),
-    delay: 400,
-  }}
->
+  use:tooltip={_("announcements-button-tooltip")}>
   <svg class="icon" class:unread={hasUnreadAnnouncements()}>
     {#if isToggled}
       <use href="/src/lib/assets/common/info_FILL.svg#info_FILL"></use>
@@ -70,16 +66,9 @@
     cursor: pointer;
   }
 
-  .button:not(.toggle):hover {
+  .button:hover, .toggle {
     background-color: var(--dominant-color-hover);
     backdrop-filter: blur(1px);
-    transition: background-color 0.25s linear 0.35s, backdrop-filter 0.25s linear 0.35s;
-  }
-
-  .toggle {
-    background-color: var(--dominant-color-hover);
-    backdrop-filter: blur(1px);
-    transition: none;
   }
 
   .icon {
