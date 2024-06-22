@@ -50,7 +50,7 @@
   }
 
   function isTopTag(): boolean {
-    return chunk.location.chunkX.coordinate === 0 && chunk.location.chunkY.coordinate === 0;//space.tag.id.asHexadecimalRepresentation() === "";
+    return space.tag.id.asHexadecimalRepresentation() === "00000000-0000-4000-8000-000000000000";
   }
 
   const color = Math.floor(Math.random() * 255);

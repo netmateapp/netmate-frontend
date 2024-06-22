@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ChunkKey } from "../../scripts/chunk/chunk";
+  import { ChunkKey } from "../../scripts/chunk/chunk";
   import { TagSpace } from "../../scripts/space";
   import Chunk from "./Chunk.svelte";
 

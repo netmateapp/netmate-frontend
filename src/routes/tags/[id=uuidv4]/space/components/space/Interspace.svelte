@@ -19,17 +19,49 @@
 
   let { tag }: Props = $props();
 
-  let currentSpace: TagSpace = $state(
-    new TagSpace(
-      tag,
-      new ChunkRepository(),
-      VirtualLocation.of(
-        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2),
-        VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2 + 328 - 208) // 1024 - 184 = 840, 840 - 512 = 328, 328 - (208)微調整分
-      ),
-      new Scale(MAX_SCALE)
-    )
-  );
+  // 遷移時は手動で変えているが、戻る/進むの際に変わらない問題
+  let currentSpace: Option<TagSpace> = $state(undefined);
+
+  let isUserTransferring: boolean = $state(false);
+
+  // currentSpaceの更新と記録した座標の適用
+  afterNavigate(() => {
+    if (!isUserTransferring) {
+      const state = $page.state as LastViewCenterLocation;
+      if (state && typeof state.x === "number" && typeof state.y === "number") {
+        const scale = currentSpace?.scale.reactiveValue() ?? new Scale(MAX_SCALE);
+        currentSpace = new TagSpace(
+          tag,
+          new ChunkRepository(),
+          VirtualLocation.of(
+            VirtualCoordinate.of(state.x),
+            VirtualCoordinate.of(state.y)
+          ),
+          scale
+        );
+      } else {
+        currentSpace = new TagSpace(
+          tag,
+          new ChunkRepository(),
+          VirtualLocation.of(
+            VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2),
+            VirtualCoordinate.of(CHUNK_SIDE_LENGTH / 2 + 328 - 208) // 1024 - 184 = 840, 840 - 512 = 328, 328 - (208)微調整分
+          ),
+          new Scale(MAX_SCALE)
+        );
+      }
+    }
+  });
+
+  $effect(() => {
+    console.log(tag.id.asHexadecimalRepresentation());
+  });
+
+  $effect(() => {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/") console.log(currentSpace!.tag.id.asHexadecimalRepresentation());
+    });
+  });
 
   // 異なるページに移動する際の座標保存処理
   type LastViewCenterLocation = {
@@ -43,32 +75,16 @@
   }
 
   beforeNavigate(() => {
-    saveLastViewCenterLocation(currentSpace.viewCenterLocation.reactiveValue());
+    saveLastViewCenterLocation(currentSpace!.viewCenterLocation.reactiveValue());
   });
 
 
   let nextSpace: Option<TagSpace> = $state(undefined);
   let nextSpaceInitialViewCenterLocation: VirtualLocation;
 
-  let isUserTransferring: boolean = $state(false);
-
-  // 記録した座標の適用
-  afterNavigate(() => {
-    if (!isUserTransferring) {
-      const state = $page.state as LastViewCenterLocation;
-      if (state && typeof state.x === "number" && typeof state.y === "number") {
-        const loc = VirtualLocation.of(
-          VirtualCoordinate.of(state.x),
-          VirtualCoordinate.of(state.y)
-        );
-        currentSpace.viewCenterLocation.update(loc);
-      }
-    }
-  });
-
   // スペースコアによる遷移に関する処理
   function findClickedSpaceCoreChunk(tag: Tag): Option<Chunk> {
-    for (var renderdChunk of currentSpace.renderedChunks.reactiveValue()) {
+    for (var renderdChunk of currentSpace!.renderedChunks.reactiveValue()) {
       if (renderdChunk.content instanceof SpaceCoreData && renderdChunk.content.tag.equals(tag)) {
         return renderdChunk;
       }
@@ -77,7 +93,7 @@
   }
 
   $effect(() => {
-    if (isUserTransferring || currentSpace.tag.equals(tag)) return;
+    if (isUserTransferring || currentSpace === undefined || currentSpace.tag.equals(tag)) return;
 
     let spaceCoreChunk: Option<Chunk> = findClickedSpaceCoreChunk(tag);
     if (spaceCoreChunk === undefined) return;
@@ -126,7 +142,7 @@
         nextSpaceInitialViewCenterLocation.y
       );
 
-      nextSpace?.scale.update(currentSpace.scale.reactiveValue());
+      nextSpace?.scale.update(currentSpace!.scale.reactiveValue());
       currentSpace = nextSpace!;
       currentSpace.viewCenterLocation.update(newViewCenter);
 
@@ -135,7 +151,9 @@
   }
 </script>
 
-<Space space={currentSpace} />
+{#if currentSpace !== undefined}
+  <Space space={currentSpace} />
+{/if}
 {#if isUserTransferring}
-  <TransferAnimation bind:this={transferAnimation} currentSpaceScale={currentSpace.scale.reactiveValue()} nextSpace={nextSpace!} {virtualChunkLocation} />
+  <TransferAnimation bind:this={transferAnimation} currentSpaceScale={currentSpace!.scale.reactiveValue()} nextSpace={nextSpace!} {virtualChunkLocation} />
 {/if}
