@@ -42,6 +42,7 @@ export class TagSpace implements LifeCycle {
       new ChunkRenderer(this.renderedChunks, this.chunkRepository)
     );
 
+    // SSR時にはwindowがないため初期化のタイミングで現在のサイズを設定する
     this.viewportWidth = new ReactiveViewportWidth(new ViewportWidth(0));
     this.viewportHeight = new ReactiveViewportHeight(new ViewportHeight(0));
     this.viewportSizeUpdater = new ViewportSizeUpdater(this.viewportWidth, this.viewportHeight);
