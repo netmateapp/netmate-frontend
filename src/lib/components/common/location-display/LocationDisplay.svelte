@@ -9,8 +9,6 @@
   function buttonLabelTranslationKey(): string {
     return isSpace ? "go-to-database" : "go-to-space";
   }
-
-  
 </script>
 
 <div class="current-location">
@@ -19,9 +17,9 @@
     <span class="location-name">{locationName}</span>
   </div>
   <div class="centered-button">
-    <button class="button">
+    <a href="./{isSpace ? "database" : "space"}" class="button">
       <span class="label">{_(buttonLabelTranslationKey())}</span>
-    </button>
+    </a>
   </div>
 </div>
 
