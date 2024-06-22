@@ -66,7 +66,9 @@
       {#if isTopTag()}
         <div id="on-top" class="on-top">
           <Brand />
-          <SearchBox />
+          <div class="search-box-wrapper">
+            <SearchBox />
+          </div>
         </div>
       {:else}
         <div class="location-name-wrapper">
@@ -96,6 +98,13 @@
     align-items: center;
     gap: 2rem;
     padding-top: 15rem;
+    padding-bottom: 4.4375rem;
+    z-index: 1;
+  }
+
+  .search-box-wrapper {
+    position: absolute;
+    top: 22.375rem;
   }
 
   .top-spacer {
