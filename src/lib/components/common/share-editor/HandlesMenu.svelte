@@ -245,7 +245,7 @@
     padding: 0.5rem 0rem 0.25rem 0rem;
     flex-direction: column;
     align-items: flex-start;
-    z-index: 2;
+    z-index: 102;
   }
 
   .item {
