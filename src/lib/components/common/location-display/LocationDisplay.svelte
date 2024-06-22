@@ -75,7 +75,9 @@
   }
 
   .button:hover {
-    background-color: var(--dominant-color);
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(1px);
+    transition: background-color 0.15s linear, backdrop-filter 0.15s linear;
   }
 
   .label {
