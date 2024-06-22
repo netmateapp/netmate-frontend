@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hideTooltip, tooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
+  import { delayTooltip, hideTooltip } from "$lib/components/common/tooltip/useTooltip.svelte";
   import MainMenu from "./MainMenu.svelte";
   import { interactHandlersEffect } from "$lib/utils.svelte";
   import { _ } from "./nav.svelte";
@@ -29,7 +29,7 @@
   bind:this={seeMoreButtonRef}
   class="see-more-button"
   class:toggled={isToggled}
-  use:tooltip={_("see-more-button-tooltip")}>
+  use:delayTooltip={{ tooltipText: _("see-more-button-tooltip"), delay: 400 }}>
   <svg class="icon">
     <use href="/src/lib/assets/common/more_horiz.svg#more_horiz"></use>
   </svg>
@@ -44,7 +44,6 @@
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background-color: var(--dominant-color);
     fill: var(--secondary-color);
     display: flex;
     justify-content: center;
@@ -52,8 +51,16 @@
     cursor: pointer;
   }
 
-  .see-more-button:hover, .toggled {
+  .see-more-button:not(.toggled):hover {
     background-color: var(--dominant-color-hover);
+    backdrop-filter: blur(1px);
+    transition: background-color 0.25s linear 0.35s, backdrop-filter 0.25s linear 0.35s;
+  }
+
+  .toggled {
+    background-color: var(--dominant-color-hover);
+    backdrop-filter: blur(1px);
+    transition: none;
   }
 
   .icon {
