@@ -18,9 +18,9 @@
   });
 
   setTimeout(() => {
-    // 200ms経過したら強制的に表示
-    if (logoRef && logoRef.style.visibility === "hidden") logoRef.style.visibility = "visible";
-  }, 200);
+    // 50ms経過したら強制的に表示
+    if (logoRef && logoRef.style.visibility !== "visible") logoRef.style.visibility = "visible";
+  }, 50);
 </script>
 
 <a href="https://netmate.app" class="brand">
