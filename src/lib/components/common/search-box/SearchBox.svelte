@@ -47,9 +47,9 @@
 
   function handleInteractEvent(event: InteractEvent) {
     const element = event.target as Element;
-    if (isActive) {
-      if (!isInteractInsideSearchBox(element)) isActive = false;
-    }
+    const isInside: boolean = isInteractInsideSearchBox(element);
+    if (isActive && !isInside) isActive = false;
+    else if (!isActive && isInside) isActive = true;
   }
   interactHandlersEffect(handleInteractEvent)();
 </script>
