@@ -51,7 +51,6 @@
   }
 
   function hasImage(key: Option<MediaKey> = mediaKey): key is ImageUrl {
-    console.log(key instanceof ImageUrl);
     return key instanceof ImageUrl;
   }
 
