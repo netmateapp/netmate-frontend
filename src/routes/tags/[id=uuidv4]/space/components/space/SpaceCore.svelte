@@ -69,7 +69,7 @@
     height: 61rem;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.01);
-    box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.16) inset;
+    box-shadow: 1px 2px 4px 0px rgba(0, 0, 0, 0.14) inset;
     z-index: 1;
     pointer-events: none;
   }
