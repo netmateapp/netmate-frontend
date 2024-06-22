@@ -95,12 +95,12 @@
     flex-direction: column;
     align-items: center;
     gap: 2rem;
-    padding-top: 12rem;
+    padding-top: 15rem;
   }
 
   .top-spacer {
     width: 1px;
-    height: 208px;
+    height: 239px;
   }
 
   .location-name-wrapper {
