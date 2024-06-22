@@ -12,6 +12,7 @@
   import Guidelines from "./Guidelines.svelte";
   import { _ } from "./tag.svelte";
 
+  // タブ関連
   type TagRelation = "super" | "equivalent" | "sub";
 
   const TAG_RELATIONS: TagRelation[] = ["super", "equivalent", "sub"];
@@ -38,6 +39,7 @@
     }
   }
 
+  // タグリスト関連
   class DisplayName {
     private constructor(public readonly value: string) {}
 
@@ -59,6 +61,7 @@
     }
   }
 
+  // 投票関連
   type Progress = "unrelated" | "suggested" | "related";
   type Vote = "agree" | "agree-little" | "disagree";
 
@@ -158,6 +161,23 @@
   function closeConfirmDialog() {
     isConfirmDialogVisible = false;
   }
+
+  // 検索ボックス関連
+  let searchBoxRef: HTMLElement;
+  let isSearchBoxActive: boolean = $state(false);
+
+  function isInteractInsideSearchBox(element: Element): boolean {
+    return searchBoxRef?.contains(element) ?? false;
+  }
+
+  function handleInteractEvent(event: InteractEvent) {
+    const element = event.target as Element;
+    const isInside: boolean = isInteractInsideSearchBox(element);
+    if (isSearchBoxActive && !isInside) isSearchBoxActive = false;
+    else if (!isSearchBoxActive && isInside) isSearchBoxActive = true;
+  }
+  interactHandlersEffect(handleInteractEvent)();
+
 </script>
 
 <div class="menu">
@@ -175,7 +195,7 @@
       {/if}
     {/each}
   </div>
-  <div class="search-box">
+  <div bind:this={searchBoxRef} class="search-box" class:search-box-active={isSearchBoxActive}>
     <svg class="search-icon">
       <use href="/src/lib/assets/tag/search.svg#search"></use>
     </svg>
@@ -302,9 +322,9 @@
     align-items: center;
   }
 
-  .search-box:hover {
-    background-color: var(--dominant-color);
-    transition: background-color 0.25s linear 0.4s;
+  .search-box:hover, .search-box-active {
+    background-color: var(--dominant-color-hover);
+    backdrop-filter: blur(1px);
   }
 
   .search-icon {
