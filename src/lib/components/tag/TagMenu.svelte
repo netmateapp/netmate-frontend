@@ -354,7 +354,7 @@
     gap: 0.5rem;
   }
 
-  ::-webkit-scrollbar {
+  .tags::-webkit-scrollbar {
     display: none;
   }
 
