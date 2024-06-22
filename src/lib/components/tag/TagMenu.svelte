@@ -274,6 +274,7 @@
 
   .tab:hover {
     background-color: var(--dominant-color-hover);
+    backdrop-filter: blur(1px);
   }
 
   .tab-label {
@@ -302,7 +303,8 @@
   }
 
   .search-box:hover {
-    background-color: var(--dominant-color-hover);
+    background-color: var(--dominant-color);
+    transition: background-color 0.25s linear 0.4s;
   }
 
   .search-icon {

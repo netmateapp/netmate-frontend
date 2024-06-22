@@ -7,7 +7,7 @@
   import HandlesButton from "./HandlesButton.svelte";
 
   function isSignedIn() {
-    return false;
+    return true;
   }
 </script>
 
