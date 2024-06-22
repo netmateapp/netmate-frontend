@@ -201,7 +201,7 @@
     </svg>
     <input class="search-input" placeholder={_("search-and-add-tags")} />
   </div>
-  <div class="tags">
+  <div class="tags" onwheel={(event) => event.stopPropagation()}>
     {#each currentItemTagData() as item}
       <div class="tag-item" class:related={item.progress === "related"}>
         <div class="tag">
@@ -271,6 +271,7 @@
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
+    overflow: hidden;
     gap: 0.5rem;
   }
 
@@ -349,12 +350,12 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    overflow-y: auto;
     gap: 0.5rem;
-    max-height: 200px;
   }
 
-  .tags:hover {
-    overflow-y: auto;
+  ::-webkit-scrollbar {
+    display: none;
   }
 
   .tag-item {

@@ -136,6 +136,7 @@
     position: fixed;
     top: 6rem;
     left: 0.75rem;
+    height: calc(100% - 6rem);
     display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
