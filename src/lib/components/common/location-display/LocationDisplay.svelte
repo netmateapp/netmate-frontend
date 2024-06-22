@@ -75,7 +75,7 @@
   }
 
   .button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--dominant-color-hover);
     backdrop-filter: blur(1px);
     transition: background-color 0.15s linear, backdrop-filter 0.15s linear;
   }
