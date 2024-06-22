@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Header from "$lib/components/common/header/Header.svelte";
   import LocationDisplay from "$lib/components/common/location-display/LocationDisplay.svelte";
   import SharesList from "$lib/components/database/shares-list/SharesList.svelte";
