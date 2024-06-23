@@ -1,9 +1,6 @@
 <script lang="ts">
-  import { calculateCharactersCosts } from "$lib/cjk.svelte";
-  import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
-  import { Some, none, some, type Option, type Optional } from "$lib/option";
-  import { Ok, err, ok, type Result } from "$lib/result";
-  import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
+  import { none, some, type Option, type Optional } from "$lib/option";
+  import type { InteractEvent } from "$lib/types";
   import { interactHandlersEffect, makeKeydownHandler } from "$lib/utils.svelte";
   import { Uuid4 } from "$lib/uuid";
   import type { SvelteComponent } from "svelte";
@@ -13,28 +10,21 @@
   import Guidelines from "./Guidelines.svelte";
   import Tabs from "./Tabs.svelte";
   import { TagHierarchy, _, hierarchyAsText } from "./tag.svelte";
+  import { TagName } from "$lib/scripts/domain/tag";
+    import TagSearchBox from "./TagSearchBox.svelte";
 
   let tabs = $state() as SvelteComponent;
 
   // タグリスト関連
-  class DisplayName {
-    private constructor(public readonly value: string) {}
-
-    static from(displayName: string): Result<{}, DisplayName> {
-      const costs = calculateCharactersCosts(displayName);
-      return costs <= TAG_CHARACTERS_COSTS_LIMIT ? ok(new DisplayName(displayName)) : err({});
-    }
-  }
-
   class Tag {
     constructor(
       public readonly id: Uuid4,
-      public readonly displayName: DisplayName,
-      public readonly disambiguation: Optional<DisplayName> = none()
+      public readonly displayName: TagName,
+      public readonly disambiguation: Option<TagName> = undefined,
     ) {}
 
     hasDisambiguation(): boolean {
-      return this.disambiguation.isSome();
+      return this.disambiguation !== undefined;
     }
   }
 
@@ -78,9 +68,7 @@
   function randomlyGenItemTagData4Test(): ItemTagData[] {
     const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "アロナ", "シッテムの箱","夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
     const items = tagsNames
-      .map(name => DisplayName.from(name))
-      .filter(res => res.isOk())
-      .map(res => (res as Ok<{}, DisplayName>).value)
+      .map(name => new TagName(name))
       .map(displayName => new Tag(
         genUuid44Test(),
         displayName
@@ -109,7 +97,7 @@
   function handleInteractToSuggestTagButton(item: ItemTagData) {
     item.progress = "suggested";
     item.isMeProposer = true;
-    toast(_("add-new-relation", { tagName: item.tag.displayName.value, xxxTags: _(`${hierarchyAsText(tabs!.getCurrentlySelectedHierarchy())}-tags`) }));
+    toast(_("add-new-relation", { tagName: item.tag.displayName.name, xxxTags: _(`${hierarchyAsText(tabs!.getCurrentlySelectedHierarchy())}-tags`) }));
   }
 
   const RATING_BUTTONS_DATA: [Vote, string][] = [
@@ -136,32 +124,11 @@
   function closeConfirmDialog() {
     isConfirmDialogVisible = false;
   }
-
-  // 検索ボックス関連
-  let searchBoxRef: HTMLElement;
-  let isSearchBoxActive: boolean = $state(false);
-
-  function isInteractInsideSearchBox(element: Element): boolean {
-    return searchBoxRef?.contains(element) ?? false;
-  }
-
-  function handleInteractEvent(event: InteractEvent) {
-    const element = event.target as Element;
-    const isInside: boolean = isInteractInsideSearchBox(element);
-    if (isSearchBoxActive && !isInside) isSearchBoxActive = false;
-    else if (!isSearchBoxActive && isInside) isSearchBoxActive = true;
-  }
-  interactHandlersEffect(handleInteractEvent)();
 </script>
 
 <div class="menu">
   <Tabs bind:this={tabs} />
-  <div bind:this={searchBoxRef} class="search-box" class:search-box-active={isSearchBoxActive}>
-    <svg class="search-icon">
-      <use href="/src/lib/assets/tag/search.svg#search"></use>
-    </svg>
-    <input class="search-input" placeholder={_("search-and-add-tags")} />
-  </div>
+  <TagSearchBox />
   <div class="tags" onwheel={(event) => event.stopPropagation()}>
     {#each currentItemTagData() as item}
       <div class="tag-item" class:related={item.progress === "related"}>
@@ -171,9 +138,9 @@
             class="tag-name"
             class:unrelated={item.progress === "unrelated"}
             class:suggested={item.progress === "suggested"}
-          >{item.tag.displayName.value}</a>
+          >{item.tag.displayName.name}</a>
           {#if item.tag.hasDisambiguation()}
-            <span class="disambiguation">{(item.tag.disambiguation as Some<DisplayName>).value.value}</span>
+            <span class="disambiguation">{item.tag.disambiguation?.name}</span>
           {/if}
         </div>
         {#if item.progress !== "related"}
@@ -234,37 +201,6 @@
     align-items: flex-start;
     overflow: hidden;
     gap: 0.5rem;
-  }
-
-  .search-box {
-    border-radius: 0.5rem;
-    display: flex;
-    max-width: 11.875rem;
-    padding: 0.25rem;
-    align-items: center;
-  }
-
-  .search-box:hover, .search-box-active {
-    background-color: var(--dominant-color-hover);
-    backdrop-filter: blur(1px);
-  }
-
-  .search-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    fill: var(--light-gray);
-  }
-
-  .search-input {
-    color: var(--secondary-color);
-    font-family: var(--primary-font);
-    font-size: 0.875rem;
-  }
-
-  .search-input::placeholder {
-    color: var(--light-gray);
-    font-family: var(--primary-font);
-    font-size: 0.875rem;
   }
 
   .tags {
