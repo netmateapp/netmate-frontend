@@ -1,6 +1,6 @@
 import { createTranslator } from "$lib/i18n.svelte";
 import type { Option } from "$lib/option";
-import type { Tag } from "$lib/scripts/domain/tag";
+import type { Tag, TagName } from "$lib/scripts/domain/tag";
 import type { Vote } from "$lib/scripts/domain/vote";
 import type { Reactive, Reactivity } from "$lib/scripts/extension/reactivity";
 
@@ -24,10 +24,18 @@ export class OtherSuggestedTag {
   }
 }
 
-export class UserSuggestedTag {
-  public readonly tag: Tag;
+export class NewTag {
+  public readonly name: TagName;
 
-  constructor(tag: Tag) {
+  constructor(name: TagName) {
+    this.name = name;
+  }
+}
+
+export class UserSuggestedTag {
+  public readonly tag: Tag | NewTag;
+
+  constructor(tag: Tag | NewTag) {
     this.tag = tag;
   }
 }
@@ -40,7 +48,7 @@ export class StabilizedTag {
   }
 }
 
-export type ShareTag = CandidateTag | OtherSuggestedTag | UserSuggestedTag | StabilizedTag | string;
+export type ShareTag = CandidateTag | OtherSuggestedTag | UserSuggestedTag | StabilizedTag;
 
 export class ReactiveShareTags implements Reactivity<ShareTag[]> {
   private tags = $state() as ShareTag[];

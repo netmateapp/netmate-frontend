@@ -2,7 +2,7 @@
   import type { ReactiveShareData } from "$lib/scripts/domain/share";
   import { Rating } from "$lib/scripts/domain/vote";
   import { makeKeydownHandler } from "$lib/utils.svelte";
-  import { _ } from "../menu.svelte";
+  import { _ } from "./menu.svelte";
 
   type Props = {
     share: ReactiveShareData;
