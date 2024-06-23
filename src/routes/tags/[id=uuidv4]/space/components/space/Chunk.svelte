@@ -79,7 +79,7 @@
     <div class="share-cards-wrapper">
       <ShareCardsCluster shareCardsCluster={chunk.content as ShareCardsClusterData} applyRandomOffsets={!isCenterChunk()} />
     </div>
-    {#if isTopTag()}
+    {#if isCenterChunk() && isTopTag()}
       <div class="top-spacer"></div>
     {/if}
   {/if}
