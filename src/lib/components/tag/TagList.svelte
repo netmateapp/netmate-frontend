@@ -21,7 +21,7 @@
 
   // 提案関連
   function onSuggest(relationship: CandidateRelationship, index: number) {
-    relationships.relationships[index] = new UserSuggestedRelationship(relationship.tag);
+    relationships.reactiveValue()[index] = new UserSuggestedRelationship(relationship.tag);
 
     const toastProps = {
       tagName: relationship.tag.name.name,
@@ -44,8 +44,9 @@
     isConfirmationDialogVisible = true;
   }
 
-  function onWithdraw(relationship: UserSuggestedRelationship, index: number) {
-    relationships.relationships[index] = new CandidateRelationship(relationship.tag);
+  function onWithdraw(relationship: UserSuggestedRelationship) {
+    const newRelationships = relationships.reactiveValue().filter(r => r !== relationship);
+    relationships.update(newRelationships);
 
     toast(_("withdraw-new-relation"));
   }
@@ -56,7 +57,7 @@
 </script>
 
 <div class="list" onwheel={onWheel}>
-  {#each relationships.relationships as relationship, index}
+  {#each relationships.reactiveValue() as relationship, index}
     <div class="item" class:stabilized={relationship instanceof StabilizedRelationship}>
       <div class="tag">
         <a
@@ -110,7 +111,7 @@
                 title={_("withdraw-dialog-title")}
                 description={_("withdraw-dialog-description")}
                 actionName={_("withdraw-dialog-action-name")}
-                action={() => onWithdraw(relationship, index)}
+                action={() => onWithdraw(relationship)}
                 close={closeConfirmationDialog} />
             {/if}
           {/if}

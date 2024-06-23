@@ -2,6 +2,7 @@ import { createTranslator } from "$lib/i18n.svelte";
 import type { Option } from "$lib/option";
 import type { Vote } from "$lib/scripts/domain/vote";
 import type { FullyQualifiedTag } from "$lib/scripts/domain/tag";
+import type { Reactive, Reactivity } from "$lib/scripts/extension/reactivity";
 
 export const _ = createTranslator("tag", "menu");
 
@@ -47,11 +48,18 @@ export class StabilizedRelationship {
 
 export type Relationship = CandidateRelationship | OtherSuggestedRelationship | UserSuggestedRelationship | StabilizedRelationship;
 
-
-export class ReactiveRelationships {
-  public readonly relationships = $state() as Relationship[];
+export class ReactiveRelationships implements Reactivity<Relationship[]> {
+  private relationships = $state() as Relationship[];
 
   constructor(relationships: Relationship[]) {
     this.relationships = relationships;
+  }
+
+  reactiveValue(): Reactive<Relationship[]> {
+    return this.relationships;
+  }
+
+  update(newRelationships: Relationship[]) {
+    this.relationships = newRelationships;
   }
 }
