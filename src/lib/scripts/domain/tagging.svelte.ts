@@ -37,11 +37,3 @@ export class StabilizedTag {
 }
 
 export type Tag = CandidateTag | OtherSuggestedTag | UserSuggestedTag | StabilizedTag;
-
-export class ReactiveTags {
-  public readonly tags = $state() as Tag[];
-
-  constructor(tags: Tag[]) {
-    this.tags = tags;
-  }
-}

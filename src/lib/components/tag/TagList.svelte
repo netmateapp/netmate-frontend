@@ -4,8 +4,8 @@
   import { toast } from "../common/toast/useToast.svelte";
   import { tooltip } from "../common/tooltip/useTooltip.svelte";
   import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
-  import { ReactiveTags, CandidateTag, UserSuggestedTag, OtherSuggestedTag, StabilizedTag } from "$lib/scripts/domain/tagging.svelte";
-  import { _, type TagHierarchy } from "./tag.svelte";
+  import { CandidateTag, UserSuggestedTag, OtherSuggestedTag, StabilizedTag } from "$lib/scripts/domain/tagging.svelte";
+  import { ReactiveTags, _, type TagHierarchy } from "./tag.svelte";
 
   type Props = {
     isSpace: boolean;

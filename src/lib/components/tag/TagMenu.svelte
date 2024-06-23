@@ -6,8 +6,8 @@
   import TagSearchBox from "./TagSearchBox.svelte";
   import TagList from "./TagList.svelte";
   import { Vote } from "$lib/scripts/domain/vote";
-  import { OtherSuggestedTag, ReactiveTags, StabilizedTag, UserSuggestedTag, type Tag } from "$lib/scripts/domain/tagging.svelte";
-  import { TagHierarchy } from "./tag.svelte";
+  import { OtherSuggestedTag, StabilizedTag, UserSuggestedTag, type Tag } from "$lib/scripts/domain/tagging.svelte";
+  import { ReactiveTags, TagHierarchy } from "./tag.svelte";
 
   type Props = {
     isSpace: boolean;
