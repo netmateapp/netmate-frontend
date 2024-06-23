@@ -1,19 +1,21 @@
 <script lang="ts">
+  import type { ReactiveShareData } from "$lib/scripts/domain/share";
+
   type Props = {
-    share: ShareData;
+    share: ReactiveShareData;
   };
 
   let { share }: Props = $props();
 
   function leadSentence(): string {
-    return share.text !== undefined ? share.text.slice(0, 64) : "";
+    return share.reactiveValue().text !== undefined ? share.reactiveValue().text!.text.slice(0, 64) : "";
   }
 </script>
 
 <div class="information">
   <div class="spacer"></div>
-  {#if share.title !== undefined}
-    <span class="title">{share.title}</span>
+  {#if share.reactiveValue().title !== undefined}
+    <span class="title">{share.reactiveValue().title}</span>
   {:else}
     <span class="lead-sentence">{leadSentence()}</span>
   {/if}
