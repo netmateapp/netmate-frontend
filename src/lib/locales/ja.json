@@ -138,5 +138,12 @@
       "next": "次へ",
       "previous": "前へ"
     }
+  },
+  "session": {
+    "menu": {
+      "rate-highly": "高く評価する",
+      "rate": "評価する",
+      "rate-lowly": "低く評価する"
+    }
   }
 }
