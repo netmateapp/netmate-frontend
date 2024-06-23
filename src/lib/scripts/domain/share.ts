@@ -4,7 +4,6 @@ import type { Uuid7 } from "$lib/uuid";
 import type { Reactive, Reactivity } from "../extension/reactivity";
 import type { UnixTimeMillis } from "../primitive/unixtime";
 import type { HandleId } from "./handle";
-import type { Tag } from "./tagging.svelte";
 import type { Rating } from "./vote";
 
 export type ShareId = Uuid7;
@@ -117,12 +116,11 @@ export class YouTubeVideoId {
 
 export type MediaId = NetmateImageId | SoundCloudTrackId | YouTubeVideoId;
 
-export class ShareData {
+// セッションに表示するための共有データ
+export class SessionShareData {
   public readonly id: ShareId;
   public readonly sharerId: HandleId;
   public readonly timestamp: Timestamp;
-  public readonly conversationsCount: ConversationsCount;
-  public readonly tags: Tag[];
   public readonly rating: Option<Rating>;
   public readonly title: Option<Title>;
   public readonly text: Option<Text>;
@@ -133,21 +131,17 @@ export class ShareData {
     id: ShareId,
     sharerId: HandleId,
     timestamp: Timestamp,
-    conversationsCount: ConversationsCount,
-    tags: Tag[],
     rating: Option<Rating>,
     title?: Option<Title>,
     text?: Option<Text>,
     thumbnailMediaId?: Option<MediaId>,
     shouldProcessThumbnailImage: boolean = false,
   ) {
-    if (!ShareData.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
+    if (!SessionShareData.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
 
     this.id = id;
     this.sharerId = sharerId;
     this.timestamp = timestamp;
-    this.conversationsCount = conversationsCount;
-    this.tags = tags;
     this.rating = rating;
     this.title = title;
     this.text = text;
@@ -181,40 +175,27 @@ type ClassProperties<T> = {
   [K in keyof T]: T[K] extends Function ? never : K
 }[keyof T];
 
-type ShareDataFields = Pick<ShareData, ClassProperties<ShareData>>;
+type ShareDataFields = Pick<SessionShareData, ClassProperties<SessionShareData>>;
 
-export class ReactiveShareData implements Reactivity<ShareData> {
-  private shareData = $state() as ShareData;
+export class ReactiveShareData implements Reactivity<SessionShareData> {
+  private shareData = $state() as SessionShareData;
 
-  constructor(shareData: ShareData) {
+  constructor(shareData: SessionShareData) {
     this.shareData = shareData;
   }
 
-  reactiveValue(): Reactive<ShareData> {
+  reactiveValue(): Reactive<SessionShareData> {
     return this.shareData;
-  }
-
-  updateTags(newTags: Tag[]) {
-    this.update({ tags: newTags });
   }
 
   updateRating(newRating: Option<Rating>) {
     this.update({ rating: newRating });
   }
-
-  incrementConversationsCount() {
-    this.update({ conversationsCount: new ConversationsCount(this.shareData.conversationsCount.count + 1) });
-  }
-
-  decrementConversationsCount() {
-    this.update({ conversationsCount: new ConversationsCount(this.shareData.conversationsCount.count - 1) });
-  }
-
-  private update(updates: Partial<ShareData>) {
+  private update(updates: Partial<SessionShareData>) {
     this.shareData = ReactiveShareData.constructShareData({ ...this.shareData, ...updates });
   }
 
-  private static constructShareData({ id, sharerId, timestamp, conversationsCount, tags, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage }: ShareDataFields): ShareData {
-    return new ShareData(id, sharerId, timestamp, conversationsCount, tags, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage);
+  private static constructShareData({ id, sharerId, timestamp, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage }: ShareDataFields): SessionShareData {
+    return new SessionShareData(id, sharerId, timestamp, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage);
   }
 }
