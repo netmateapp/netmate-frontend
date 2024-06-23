@@ -7,26 +7,12 @@
   import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
   import { toast } from "../common/toast/useToast.svelte";
   import { tooltip } from "../common/tooltip/useTooltip.svelte";
-  import Guidelines from "./Guidelines.svelte";
   import Tabs from "./Tabs.svelte";
-  import { TagHierarchy, _, hierarchyAsText } from "./tag.svelte";
-  import { TagName } from "$lib/scripts/domain/tag";
+  import { TagHierarchy, _ } from "./tag.svelte";
+  import { TagName, UnambiguousTag } from "$lib/scripts/domain/tag";
   import TagSearchBox from "./TagSearchBox.svelte";
 
   let tabs = $state() as SvelteComponent;
-
-  // タグリスト関連
-  class Tag {
-    constructor(
-      public readonly id: Uuid4,
-      public readonly displayName: TagName,
-      public readonly disambiguation: Option<TagName> = undefined,
-    ) {}
-
-    hasDisambiguation(): boolean {
-      return this.disambiguation !== undefined;
-    }
-  }
 
   // 投票関連
   type Progress = "unrelated" | "suggested" | "related";
@@ -37,7 +23,7 @@
     public isMeProposer: boolean = $state(false);
     public vote: Optional<Vote> = $state(none());
     constructor(
-      public readonly tag: Tag,
+      public readonly tag: UnambiguousTag,
       progress: Progress,
       isMeProposer: boolean = false,
       vote: Optional<Vote> = none()
@@ -69,7 +55,7 @@
     const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "アロナ", "シッテムの箱","夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
     const items = tagsNames
       .map(name => new TagName(name))
-      .map(displayName => new Tag(
+      .map(displayName => new UnambiguousTag(
         genUuid44Test(),
         displayName
       )).map(tag => new ItemTagData(
@@ -97,7 +83,7 @@
   function handleInteractToSuggestTagButton(item: ItemTagData) {
     item.progress = "suggested";
     item.isMeProposer = true;
-    toast(_("add-new-relation", { tagName: item.tag.displayName.name, xxxTags: _(`${hierarchyAsText(tabs!.getCurrentlySelectedHierarchy())}-tags`) }));
+    toast(_("add-new-relation", { tagName: item.tag.name.name, xxxTags: _(`${tabs!.getCurrentlySelectedHierarchy()}-tags`) }));
   }
 
   const RATING_BUTTONS_DATA: [Vote, string][] = [
@@ -138,8 +124,8 @@
             class="tag-name"
             class:unrelated={item.progress === "unrelated"}
             class:suggested={item.progress === "suggested"}
-          >{item.tag.displayName.name}</a>
-          {#if item.tag.hasDisambiguation()}
+          >{item.tag.name.name}</a>
+          {#if item.tag.disambiguation !== undefined}
             <span class="disambiguation">{item.tag.disambiguation?.name}</span>
           {/if}
         </div>
@@ -303,9 +289,5 @@
 
   .tag-withdraw-button:hover .tag-button-icon {
     fill: var(--warning-color);
-  }
-
-  .guidelines {
-    display: none;
   }
 </style>

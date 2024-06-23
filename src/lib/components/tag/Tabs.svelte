@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Reactive } from "$lib/scripts/extension/reactivity";
   import { makeKeydownHandler } from "$lib/utils.svelte";
-  import { TagHierarchy, _, hierarchyAsText } from "./tag.svelte";
+  import { TagHierarchy, _ } from "./tag.svelte";
 
   // 状態に関する処理
   let currentlySelectedHierarchy: TagHierarchy = $state(TagHierarchy.Sub);
@@ -23,7 +23,7 @@
 <div class="tabs">
   {#each [TagHierarchy.Super, TagHierarchy.Equivalent, TagHierarchy.Sub] as hierarchy, index}
     <div class="tab" onclick={() => onInteract(hierarchy)} onkeydown={makeKeydownHandler(() => onInteract(hierarchy))}>
-      <span class="label" class:selected={isCurrentlySelected(hierarchy)}>{_(`${hierarchyAsText(hierarchy)}-tags`)}</span>
+      <span class="label" class:selected={isCurrentlySelected(hierarchy)}>{_(`${hierarchy}-tags`)}</span>
     </div>
     {#if index < 2}
       <div class="spacer"></div>
