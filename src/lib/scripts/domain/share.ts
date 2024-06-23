@@ -4,7 +4,7 @@ import type { Uuid7 } from "$lib/uuid";
 import type { Reactive, Reactivity } from "../extension/reactivity";
 import type { UnixTimeMillis } from "../primitive/unixtime";
 import type { HandleId } from "./handle";
-import type { Tag } from "./tag";
+import type { Tag } from "./tagging.svelte";
 import type { Rating } from "./vote";
 
 export type ShareId = Uuid7;
