@@ -177,6 +177,7 @@
     font-family: var(--primary-font);
     font-size: 0.75rem;
     line-height: 1.25rem;
+    cursor: default;
   }
 
   .centered-buttons {
