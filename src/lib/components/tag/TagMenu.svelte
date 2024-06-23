@@ -1,43 +1,20 @@
 <script lang="ts">
   import { calculateCharactersCosts } from "$lib/cjk.svelte";
   import { TAG_CHARACTERS_COSTS_LIMIT } from "$lib/constan";
-  import { Some, none, some, type Optional } from "$lib/option";
+  import { Some, none, some, type Option, type Optional } from "$lib/option";
   import { Ok, err, ok, type Result } from "$lib/result";
   import type { MaybeHTMLElement, InteractEvent } from "$lib/types";
   import { interactHandlersEffect, makeKeydownHandler } from "$lib/utils.svelte";
   import { Uuid4 } from "$lib/uuid";
+  import type { SvelteComponent } from "svelte";
   import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
   import { toast } from "../common/toast/useToast.svelte";
   import { tooltip } from "../common/tooltip/useTooltip.svelte";
   import Guidelines from "./Guidelines.svelte";
-  import { _ } from "./tag.svelte";
+  import Tabs from "./Tabs.svelte";
+  import { TagHierarchy, _, hierarchyAsText } from "./tag.svelte";
 
-  // タブ関連
-  type TagRelation = "super" | "equivalent" | "sub";
-
-  const TAG_RELATIONS: TagRelation[] = ["super", "equivalent", "sub"];
-  let selectedTagRelation: TagRelation = $state("sub");
-  function isSelectedTagRelation(relation: TagRelation) {
-    return selectedTagRelation === relation;
-  }
-
-  function setTagRelation(relation: TagRelation) {
-    selectedTagRelation = relation;
-  }
-
-  let tabsRefs: MaybeHTMLElement[] = [];
-  function handleInteractToTagTab(event: InteractEvent) {
-    const target = event.target as Element;
-    for (var [index, tabRef] of tabsRefs.entries()) {
-      if (tabRef?.contains(target)) {
-        const relation = TAG_RELATIONS[index];
-        if (selectedTagRelation !== relation) {
-          setTagRelation(relation);
-        }
-        break;
-      }
-    }
-  }
+  let tabs = $state() as SvelteComponent;
 
   // タグリスト関連
   class DisplayName {
@@ -116,25 +93,23 @@
     return items;
   }
 
-  const relationsToItemTagData = new Map<TagRelation, ItemTagData[]>([
-    ["super", []],
-    ["equivalent", []],
-    ["sub", randomlyGenItemTagData4Test()]
+  const relationsToItemTagData = new Map<TagHierarchy, ItemTagData[]>([
+    [TagHierarchy.Super, []],
+    [TagHierarchy.Equivalent, []],
+    [TagHierarchy.Sub, randomlyGenItemTagData4Test()]
   ]);
 
   function currentItemTagData(): ItemTagData[] {
-    return isSearchResultVisible ? searchResult : relationsToItemTagData.get(selectedTagRelation)!;
+    return isSearchResultVisible ? searchResult : relationsToItemTagData.get(tabs?.getCurrentlySelectedHierarchy() ?? TagHierarchy.Sub)!;
   }
 
   let isSearchResultVisible = $state(false);
   let searchResult: ItemTagData[] = [];
 
-  interactHandlersEffect(handleInteractToTagTab)();
-
   function handleInteractToSuggestTagButton(item: ItemTagData) {
     item.progress = "suggested";
     item.isMeProposer = true;
-    toast(_("add-new-relation", { tagName: item.tag.displayName.value, xxxTags: _(`${selectedTagRelation}-tags`) }));
+    toast(_("add-new-relation", { tagName: item.tag.displayName.value, xxxTags: _(`${hierarchyAsText(tabs!.getCurrentlySelectedHierarchy())}-tags`) }));
   }
 
   const RATING_BUTTONS_DATA: [Vote, string][] = [
@@ -177,24 +152,10 @@
     else if (!isSearchBoxActive && isInside) isSearchBoxActive = true;
   }
   interactHandlersEffect(handleInteractEvent)();
-
 </script>
 
 <div class="menu">
-  <div class="tabs">
-    {#each TAG_RELATIONS as relation, index}
-      <div bind:this={tabsRefs[index]} class="tab">
-        <span
-          class="tab-label"
-          class:selected-tab={isSelectedTagRelation(relation)}
-          >{_(`${relation}-tags`)}</span
-        >
-      </div>
-      {#if index < 2}
-        <div class="tab-spacer"></div>
-      {/if}
-    {/each}
-  </div>
+  <Tabs bind:this={tabs} />
   <div bind:this={searchBoxRef} class="search-box" class:search-box-active={isSearchBoxActive}>
     <svg class="search-icon">
       <use href="/src/lib/assets/tag/search.svg#search"></use>
@@ -273,46 +234,6 @@
     align-items: flex-start;
     overflow: hidden;
     gap: 0.5rem;
-  }
-
-  .tabs {
-    display: flex;
-    width: 11.875rem;
-    max-width: 11.875rem;
-    align-items: flex-start;
-  }
-
-  .tab {
-    border-radius: 0.5rem;
-    display: flex;
-    height: 2rem;
-    min-width: 3.625rem;
-    padding: 0.25rem 0.125rem 0.125rem 0.125rem;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .tab:hover {
-    background-color: var(--dominant-color-hover);
-    backdrop-filter: blur(1px);
-  }
-
-  .tab-label {
-    color: var(--light-gray);
-    font-family: var(--primary-font);
-    font-size: 0.875rem;
-    line-height: 1.3125rem;
-  }
-
-  .selected-tab {
-    color: var(--secondary-color);
-  }
-
-  .tab-spacer {
-    max-width: 0.5rem;
-    flex: 1 0 0;
-    align-self: stretch;
   }
 
   .search-box {
