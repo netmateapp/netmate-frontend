@@ -1,4 +1,5 @@
 import { calculateCharactersCosts } from "$lib/cjk.svelte";
+import type { Option } from "$lib/option";
 import type { Uuid4 } from "$lib/uuid";
 
 export type TagId = Uuid4;
@@ -29,5 +30,17 @@ export class Tag {
 
   equals(other: Tag): boolean {
     return this.id.asHexadecimalRepresentation() === other.id.asHexadecimalRepresentation();
+  }
+}
+
+export class UnambiguousTag {
+  public readonly id: TagId;
+  public readonly name: TagName;
+  public readonly disambiguation: Option<TagName>;
+
+  constructor(id: TagId, name: TagName, disambiguation: Option<TagName> = undefined) {
+    this.id = id;
+    this.name = name;
+    this.disambiguation = disambiguation;
   }
 }
