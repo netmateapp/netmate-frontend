@@ -3,13 +3,14 @@
   import { Vote } from "$lib/scripts/domain/vote";
   import { toast } from "../common/toast/useToast.svelte";
   import { tooltip } from "../common/tooltip/useTooltip.svelte";
-  import { OtherSuggestedRelationship, ReactiveRelationships, RelationshipCandidate, StabilizedRelationship, TagHierarchy, UserSuggestedRelationship, _, type Relationship } from "./tag.svelte";
   import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
+  import { ReactiveTags, CandidateTag, UserSuggestedTag, OtherSuggestedTag, StabilizedTag } from "$lib/scripts/domain/tagging.svelte";
+  import { _, type TagHierarchy } from "./tag.svelte";
 
   type Props = {
     isSpace: boolean;
     hierarchy: TagHierarchy;
-    relationships: ReactiveRelationships;
+    relationships: ReactiveTags;
   };
 
   let { isSpace, hierarchy, relationships }: Props = $props();
@@ -20,21 +21,21 @@
   }
 
   // 提案関連
-  function onSuggest(relationship: RelationshipCandidate, index: number) {
-    relationships.relationships[index] = new UserSuggestedRelationship(relationship.tag);
+  function onSuggest(tag: CandidateTag, index: number) {
+    relationships.tags[index] = new UserSuggestedTag(tag.tag);
 
     const toastProps = {
-      tagName: relationship.tag.name.name,
-      hierarchicalRelationship: _(`${hierarchy}-tags`)
+      tagName: tag.tag.name.name,
+      hierarchicalTag: _(`${hierarchy}-tags`)
     };
 
     toast(_("add-new-relation", toastProps));
   }
 
   // 投票関連
-  function onVoteButtonClick(relationship: OtherSuggestedRelationship, vote: Vote) {
-    if (relationship.userVote === vote) relationship.userVote = undefined;
-    else relationship.userVote = vote;
+  function onVoteButtonClick(tag: OtherSuggestedTag, vote: Vote) {
+    if (tag.userVote === vote) tag.userVote = undefined;
+    else tag.userVote = vote;
   }
 
   // 撤回関連
@@ -44,8 +45,8 @@
     isConfirmationDialogVisible = true;
   }
 
-  function onWithdraw(relationship: UserSuggestedRelationship, index: number) {
-    relationships.relationships[index] = new RelationshipCandidate(relationship.tag);
+  function onWithdraw(tag: UserSuggestedTag, index: number) {
+    relationships.tags[index] = new CandidateTag(tag.tag);
 
     toast(_("withdraw-new-relation"));
   }
@@ -56,23 +57,23 @@
 </script>
 
 <div class="list" onwheel={onWheel}>
-  {#each relationships.relationships as relationship, index}
-    <div class="item" class:stabilized={relationship instanceof StabilizedRelationship}>
+  {#each relationships.tags as relationship, index}
+    <div class="item" class:stabilized={relationship instanceof StabilizedTag}>
       <div class="tag">
         <a
           href="https://netmate.app/tags/{relationship.tag.id.asHexadecimalRepresentation()}/{isSpace ? "space" : "database"}"
           class="tag-name"
-          class:candidate={relationship instanceof RelationshipCandidate}
-          class:suggested={relationship instanceof OtherSuggestedRelationship || relationship instanceof UserSuggestedRelationship}>
+          class:candidate={relationship instanceof CandidateTag}
+          class:suggested={relationship instanceof OtherSuggestedTag || relationship instanceof UserSuggestedTag}>
           {relationship.tag.name.name}
         </a>
         {#if relationship.tag.disambiguation !== undefined}
           <span class="disambiguation">{relationship.tag.disambiguation!.name}</span>
         {/if}
       </div>
-      {#if !(relationship instanceof StabilizedRelationship)}
+      {#if !(relationship instanceof StabilizedTag)}
         <div class="centered-buttons">
-          {#if relationship instanceof RelationshipCandidate}
+          {#if relationship instanceof CandidateTag}
             <button
               class="tag-button"
               onclick={() => onSuggest(relationship, index)}
@@ -82,8 +83,8 @@
                   <use href="/src/lib/assets/tag/add.svg#add"></use>
                 </svg>
             </button>
-          {:else if relationship instanceof OtherSuggestedRelationship}
-            {#each [[Vote.Agree, "exposure_plus_1"], [Vote.SomewhatAgree, "exposure_zero"], [Vote.Disagree, "exposure_neg_1"]] as data}
+          {:else if relationship instanceof OtherSuggestedTag}
+            {#each ([[Vote.Agree, "exposure_plus_1"], [Vote.SomewhatAgree, "exposure_zero"], [Vote.Disagree, "exposure_neg_1"]] as [Vote, string][]) as data}
               <button
                 class="tag-button"
                 class:toggled={relationship.userVote === data[0]}

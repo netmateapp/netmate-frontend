@@ -120,7 +120,7 @@
       "withdraw-dialog-title": "本当にタグの追加を撤回しますか？",
       "withdraw-dialog-description": "この操作は取り消せません。",
       "withdraw-dialog-action-name": "撤回",
-      "add-new-relation": "「{tagName}」を{hierarchicalRelationship}として追加しました。",
+      "add-new-relation": "「{tagName}」を{hierarchicalTag}として追加しました。",
       "withdraw-new-relation": "タグの追加を撤回しました。",
       "agree": "賛成する",
       "somewhat-agree": "少し賛成する",
