@@ -33,7 +33,7 @@ export class Tag {
   }
 }
 
-export class UnambiguousTag {
+export class FullyQualifiedTag {
   public readonly id: TagId;
   public readonly name: TagName;
   public readonly disambiguation: Option<TagName>;

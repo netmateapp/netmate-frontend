@@ -1,6 +1,6 @@
 export enum Vote {
   Agree = "agree",
-  LittleAgree = "little-agree",
+  SomewhatAgree = "somewhat-agree",
   Disagree = "disagree",
 }
 
@@ -8,9 +8,4 @@ export enum Rating {
   HighRating,
   Rating,
   LowRating,
-}
-
-export enum TallyStatus {
-  Suggested,
-  Stabilized,
 }
