@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { InteractEvent } from "$lib/types";
-  import { interactHandlersEffect, makeKeydownHandler } from "$lib/utils.svelte";
+  import { interactHandlersEffect } from "$lib/utils.svelte";
   import { _ } from "./tag.svelte";
 
   let boxRef: HTMLElement;

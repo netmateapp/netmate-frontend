@@ -1,7 +1,7 @@
 <script lang="ts">
   import { none, some, type Option, type Optional } from "$lib/option";
   import type { InteractEvent } from "$lib/types";
-  import { interactHandlersEffect, makeKeydownHandler } from "$lib/utils.svelte";
+  import { makeKeydownHandler } from "$lib/utils.svelte";
   import { Uuid4 } from "$lib/uuid";
   import type { SvelteComponent } from "svelte";
   import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
@@ -11,7 +11,7 @@
   import Tabs from "./Tabs.svelte";
   import { TagHierarchy, _, hierarchyAsText } from "./tag.svelte";
   import { TagName } from "$lib/scripts/domain/tag";
-    import TagSearchBox from "./TagSearchBox.svelte";
+  import TagSearchBox from "./TagSearchBox.svelte";
 
   let tabs = $state() as SvelteComponent;
 
@@ -160,7 +160,7 @@
                 <button
                   class="tag-button tag-withdraw-button"
                   onclick={handleInteractToWithdrawButton}
-                  onkeydown={makeKeydownHandler(handleInteractToWithdrawButton)}
+                  onkeydown={makeKeydownHandler((e) => handleInteractToWithdrawButton(e))}
                   use:tooltip={_("withdraw")}>
                   <svg class="tag-button-icon">
                     <use href="/src/lib/assets/tag/remove.svg#remove"></use>
@@ -188,9 +188,6 @@
         {/if}
       </div>
     {/each}
-    <div class="guidelines">
-      <Guidelines />
-    </div>
   </div>
 </div>
 
