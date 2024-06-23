@@ -6,8 +6,7 @@
   import TagSearchBox from "./TagSearchBox.svelte";
   import TagList from "./TagList.svelte";
   import { Vote } from "$lib/scripts/domain/vote";
-  import { OtherSuggestedTag, StabilizedTag, UserSuggestedTag, type Tag } from "$lib/scripts/domain/tagging.svelte";
-  import { ReactiveTags, TagHierarchy } from "./tag.svelte";
+  import { OtherSuggestedRelationship, ReactiveRelationships, StabilizedRelationship, TagHierarchy, UserSuggestedRelationship, type Relationship } from "./tag.svelte";
 
   type Props = {
     isSpace: boolean;
@@ -17,10 +16,10 @@
 
   let tabs = $state() as SvelteComponent;
 
-  function generateTestTags(): Tag[] {
+  function generateTestTags(): Relationship[] {
     const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "アロナ", "シッテムの箱","夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
     
-    const relationships: Tag[] = [];
+    const relationships: Relationship[] = [];
     for (var tagName of tagsNames) {
       const tag = new FullyQualifiedTag(
         Uuid4.of("5ca36600-53dc-402b-8bee-0c6f1680b6fd")!,
@@ -30,14 +29,14 @@
 
       const isStabilized = Math.floor(Math.random() * 7) > 0;
       if (isStabilized) {
-        relationships.push(new StabilizedTag(tag));
+        relationships.push(new StabilizedRelationship(tag));
       } else {
         const isUserSuggested = Math.floor(Math.random() * 5) === 0;
         if (isUserSuggested) {
-          relationships.push(new UserSuggestedTag(tag));
+          relationships.push(new UserSuggestedRelationship(tag));
         } else {
           const userVote = [Vote.Agree, Vote.SomewhatAgree, Vote.Disagree, undefined][Math.floor(Math.random() * 4)];
-          relationships.push(new OtherSuggestedTag(tag, userVote));
+          relationships.push(new OtherSuggestedRelationship(tag, userVote));
         }
       }
     }
@@ -59,7 +58,7 @@
 <div class="menu">
   <Tabs bind:this={tabs} />
   <TagSearchBox />
-  <TagList {isSpace} hierarchy={getCurrentHierarchy()} relationships={new ReactiveTags(generateTestTags())} />
+  <TagList {isSpace} hierarchy={getCurrentHierarchy()} relationships={new ReactiveRelationships(generateTestTags())} />
 </div>
 
 <style>

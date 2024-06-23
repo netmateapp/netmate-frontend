@@ -1,5 +1,7 @@
 import { createTranslator } from "$lib/i18n.svelte";
-import type { Tag } from "$lib/scripts/domain/tagging.svelte";
+import type { Option } from "$lib/option";
+import type { Vote } from "$lib/scripts/domain/vote";
+import type { FullyQualifiedTag } from "$lib/scripts/domain/tag";
 
 export const _ = createTranslator("tag", "menu");
 
@@ -9,10 +11,47 @@ export enum TagHierarchy {
   Sub = "sub",
 }
 
-export class ReactiveTags {
-  public readonly tags = $state() as Tag[];
+export class CandidateRelationship {
+  public readonly tag: FullyQualifiedTag;
 
-  constructor(tags: Tag[]) {
-    this.tags = tags;
+  constructor(tag: FullyQualifiedTag) {
+    this.tag = tag;
+  }
+}
+
+export class OtherSuggestedRelationship {
+  public readonly tag: FullyQualifiedTag;
+  public userVote = $state() as Option<Vote>;
+
+  constructor(tag: FullyQualifiedTag, userVote: Option<Vote>) {
+    this.tag = tag;
+    this.userVote = userVote;
+  }
+}
+
+export class UserSuggestedRelationship {
+  public readonly tag: FullyQualifiedTag;
+
+  constructor(tag: FullyQualifiedTag) {
+    this.tag = tag;
+  }
+}
+
+export class StabilizedRelationship {
+  public readonly tag: FullyQualifiedTag;
+
+  constructor(tag: FullyQualifiedTag) {
+    this.tag = tag;
+  }
+}
+
+export type Relationship = CandidateRelationship | OtherSuggestedRelationship | UserSuggestedRelationship | StabilizedRelationship;
+
+
+export class ReactiveRelationships {
+  public readonly relationships = $state() as Relationship[];
+
+  constructor(relationships: Relationship[]) {
+    this.relationships = relationships;
   }
 }

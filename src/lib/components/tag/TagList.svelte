@@ -4,13 +4,12 @@
   import { toast } from "../common/toast/useToast.svelte";
   import { tooltip } from "../common/tooltip/useTooltip.svelte";
   import ConfirmDialog from "../common/confirm-dialog/ConfirmDialog.svelte";
-  import { CandidateTag, UserSuggestedTag, OtherSuggestedTag, StabilizedTag } from "$lib/scripts/domain/tagging.svelte";
-  import { ReactiveTags, _, type TagHierarchy } from "./tag.svelte";
+  import { CandidateRelationship, OtherSuggestedRelationship, ReactiveRelationships, StabilizedRelationship, UserSuggestedRelationship, _, type TagHierarchy } from "./tag.svelte";
 
   type Props = {
     isSpace: boolean;
     hierarchy: TagHierarchy;
-    relationships: ReactiveTags;
+    relationships: ReactiveRelationships;
   };
 
   let { isSpace, hierarchy, relationships }: Props = $props();
@@ -21,21 +20,21 @@
   }
 
   // 提案関連
-  function onSuggest(tag: CandidateTag, index: number) {
-    relationships.tags[index] = new UserSuggestedTag(tag.tag);
+  function onSuggest(relationship: CandidateRelationship, index: number) {
+    relationships.relationships[index] = new UserSuggestedRelationship(relationship.tag);
 
     const toastProps = {
-      tagName: tag.tag.name.name,
-      hierarchicalTag: _(`${hierarchy}-tags`)
+      tagName: relationship.tag.name.name,
+      hierarchicalRelationship: _(`${hierarchy}-tags`)
     };
 
     toast(_("add-new-relation", toastProps));
   }
 
   // 投票関連
-  function onVoteButtonClick(tag: OtherSuggestedTag, vote: Vote) {
-    if (tag.userVote === vote) tag.userVote = undefined;
-    else tag.userVote = vote;
+  function onVoteButtonClick(relationship: OtherSuggestedRelationship, vote: Vote) {
+    if (relationship.userVote === vote) relationship.userVote = undefined;
+    else relationship.userVote = vote;
   }
 
   // 撤回関連
@@ -45,8 +44,8 @@
     isConfirmationDialogVisible = true;
   }
 
-  function onWithdraw(tag: UserSuggestedTag, index: number) {
-    relationships.tags[index] = new CandidateTag(tag.tag);
+  function onWithdraw(relationship: UserSuggestedRelationship, index: number) {
+    relationships.relationships[index] = new CandidateRelationship(relationship.tag);
 
     toast(_("withdraw-new-relation"));
   }
@@ -57,23 +56,23 @@
 </script>
 
 <div class="list" onwheel={onWheel}>
-  {#each relationships.tags as relationship, index}
-    <div class="item" class:stabilized={relationship instanceof StabilizedTag}>
+  {#each relationships.relationships as relationship, index}
+    <div class="item" class:stabilized={relationship instanceof StabilizedRelationship}>
       <div class="tag">
         <a
           href="https://netmate.app/tags/{relationship.tag.id.asHexadecimalRepresentation()}/{isSpace ? "space" : "database"}"
           class="tag-name"
-          class:candidate={relationship instanceof CandidateTag}
-          class:suggested={relationship instanceof OtherSuggestedTag || relationship instanceof UserSuggestedTag}>
+          class:candidate={relationship instanceof CandidateRelationship}
+          class:suggested={relationship instanceof OtherSuggestedRelationship || relationship instanceof UserSuggestedRelationship}>
           {relationship.tag.name.name}
         </a>
         {#if relationship.tag.disambiguation !== undefined}
           <span class="disambiguation">{relationship.tag.disambiguation!.name}</span>
         {/if}
       </div>
-      {#if !(relationship instanceof StabilizedTag)}
+      {#if !(relationship instanceof StabilizedRelationship)}
         <div class="centered-buttons">
-          {#if relationship instanceof CandidateTag}
+          {#if relationship instanceof CandidateRelationship}
             <button
               class="tag-button"
               onclick={() => onSuggest(relationship, index)}
@@ -83,7 +82,7 @@
                   <use href="/src/lib/assets/tag/add.svg#add"></use>
                 </svg>
             </button>
-          {:else if relationship instanceof OtherSuggestedTag}
+          {:else if relationship instanceof OtherSuggestedRelationship}
             {#each ([[Vote.Agree, "exposure_plus_1"], [Vote.SomewhatAgree, "exposure_zero"], [Vote.Disagree, "exposure_neg_1"]] as [Vote, string][]) as data}
               <button
                 class="tag-button"
