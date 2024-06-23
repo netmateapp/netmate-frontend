@@ -2,8 +2,43 @@ import { calculateCharactersCosts } from "$lib/cjk.svelte";
 import type { Option } from "$lib/option";
 import type { Uuid7 } from "$lib/uuid";
 import type { UnixTimeMillis } from "../primitive/unixtime";
+import type { HandleId } from "./handle";
+import type { Tag } from "./tag";
 
 export type ShareId = Uuid7;
+
+export class Timestamp {
+  public readonly unixTimeMillis: UnixTimeMillis;
+
+  constructor(unixTimeMillis: UnixTimeMillis) {
+    this.unixTimeMillis = unixTimeMillis;
+  }
+}
+
+export class ConversationsCount {
+  public readonly count: number;
+
+  constructor(count: number) {
+    if (!ConversationsCount.isValid(count)) throw new Error("A count must be a non-negative integer.");
+    this.count = count;
+  }
+
+  private static isValid(count: number): boolean {
+    return this.isNonNegativeInteger(count);
+  }
+
+  private static isNonNegativeInteger(n: number): boolean {
+    return n >= 0 && Number.isInteger(n);
+  }
+}
+
+export class Tags {
+  public readonly tags: Tag[];
+
+  constructor(tags: Tag[]) {
+    this.tags = tags;
+  }
+}
 
 const MAX_TITLE_CHARACTERS_COST = 48;
 
@@ -88,28 +123,59 @@ export class YouTubeVideoId {
 
 export type MediaId = NetmateImageId | SoundCloudTrackId | YouTubeVideoId;
 
-export class ConversationsCount {
-  public readonly count: number;
+export class ShareData {
+  public readonly id: ShareId;
+  public readonly sharerId: HandleId;
+  public readonly timestamp: Timestamp;
+  public readonly conversationsCount: ConversationsCount;
+  public readonly tags: Tags;
+  public readonly title: Option<Title>;
+  public readonly text: Option<Text>;
+  public readonly thumbnailMediaId: Option<MediaId>;
+  public readonly shouldProcessThumbnailImage: boolean;
 
-  constructor(count: number) {
-    if (!ConversationsCount.isValid(count)) throw new Error("A count must be a non-negative integer.");
-    this.count = count;
+  constructor(
+    id: ShareId,
+    sharerId: HandleId,
+    timestamp: Timestamp,
+    conversationsCount: ConversationsCount,
+    tags: Tags,
+    title?: Option<Title>,
+    text?: Option<Text>,
+    thumbnailMediaId?: Option<MediaId>,
+    shouldProcessThumbnailImage: boolean = false,
+  ) {
+    if (!ShareData.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
+
+    this.id = id;
+    this.sharerId = sharerId;
+    this.timestamp = timestamp;
+    this.conversationsCount = conversationsCount;
+    this.tags = tags;
+    this.title = title;
+    this.text = text;
+    this.thumbnailMediaId = thumbnailMediaId;
+    this.shouldProcessThumbnailImage = shouldProcessThumbnailImage;
   }
 
-  private static isValid(count: number): boolean {
-    return this.isNonNegativeInteger(count);
+  private static isValid(thumbnailMediaId: Option<MediaId>, shouldProcessThumbnailImage: boolean) {
+    const hasImageThumbnail = thumbnailMediaId instanceof NetmateImageId;
+    return hasImageThumbnail ? true : !shouldProcessThumbnailImage;
   }
 
-  private static isNonNegativeInteger(n: number): boolean {
-    return n >= 0 && Number.isInteger(n);
+  isSharer(id: HandleId): boolean {
+    return this.sharerId.asHexadecimalRepresentation() === id.asHexadecimalRepresentation();
+  }
+
+  hasImage(): boolean {
+    return this.thumbnailMediaId instanceof NetmateImageId;
+  }
+
+  hasYouTubeVideo(): boolean {
+    return this.thumbnailMediaId instanceof YouTubeVideoId;
+  }
+
+  hasSoundCloudAudio(): boolean {
+    return this.thumbnailMediaId instanceof SoundCloudTrackId;
   }
 }
-
-export class Timestamp {
-  public readonly unixTimeMillis: UnixTimeMillis;
-
-  constructor(unixTimeMillis: UnixTimeMillis) {
-    this.unixTimeMillis = unixTimeMillis;
-  }
-}
-
