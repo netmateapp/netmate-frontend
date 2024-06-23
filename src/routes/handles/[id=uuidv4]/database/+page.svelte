@@ -2,13 +2,19 @@
   import Header from "$lib/components/common/header/Header.svelte";
   import LocationDisplay from "$lib/components/common/location-display/LocationDisplay.svelte";
   import SharesList from "$lib/components/database/shares-list/SharesList.svelte";
+
+  function handleName(): string {
+    return "はらむらのどか";
+  }
 </script>
+
+<title>{handleName()}</title>
 
 <Header />
 <SharesList />
 
 <div class="side-bar">
-  <LocationDisplay locationName={"はらむらのどか"} isSpace={false} />
+  <LocationDisplay locationName={handleName()} isSpace={false} />
 </div>
 
 <style>

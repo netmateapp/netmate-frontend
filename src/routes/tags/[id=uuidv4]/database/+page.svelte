@@ -5,6 +5,8 @@
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
 </script>
 
+<title>{"ブルーアーカイブ"}</title>
+
 <Header />
 <SharesList />
 
