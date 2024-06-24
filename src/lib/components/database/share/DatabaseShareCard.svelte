@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-  import { elapsedTime } from "$lib/scripts/domain/share";
+  import { ImageProcessor, elapsedTime } from "$lib/scripts/domain/share";
   import type { ShareCard } from "$lib/scripts/domain/shareCard";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
 
@@ -11,41 +11,57 @@
   let { shareCard }: Props = $props();
 
   const _ = createTranslator("common", "share");
+
+  const imageProcessor = new ImageProcessor(false);
+
+  $effect(() => {
+    if (imageProcessor.imageRequireProcessing) {
+      return imageProcessor.initialize();
+    }
+  });
 </script>
 
 <a href="https://netmate.app/shares/{shareCard.id.asHexadecimalRepresentation()}" class="share">
   <div class="content">
     <div class="texts">
       {#if shareCard.title !== undefined}
-        <span class="title">{shareCard.title}</span>
+        <span class="title">{shareCard.title.title}</span>
       {/if}
       {#if shareCard.leadSentences !== undefined}
-        <div class="text">{shareCard.leadSentences}</div>
+        <div class="text">{shareCard.leadSentences.sentences}</div>
       {/if}
     </div>
     {#if shareCard.thumbnailMediaId !== undefined}
-      <div class="media">
-        {#if shareCard.hasImage()}
-          <img src={shareCard.thumbnailMediaId.id} />
-        {:else if shareCard.hasSoundCloudAudio()}
-          <iframe
-            title="SoundCloud audio player"
-            scrolling="no"
-            frameborder="no"
-            allow="autoplay"
-            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{shareCard.thumbnailMediaId.id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true">
-          </iframe>
-        {:else if shareCard.hasYouTubeVideo()}
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/{shareCard.thumbnailMediaId.id}"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen>
-          </iframe>
-        {/if}
-      </div>
+      {#if shareCard.hasImage()}
+        <div class="media">
+          {#if shareCard.shouldProcessThumbnailImage}
+            <img bind:this={imageProcessor.imageRequireProcessing} src={shareCard.thumbnailMediaId.id} class="should-process"/>
+          {:else}
+            <img src={shareCard.thumbnailMediaId.id} />
+          {/if}
+        </div>
+      {:else}
+        <div class="media">
+          {#if shareCard.hasSoundCloudAudio()}
+            <iframe
+              title="SoundCloud audio player"
+              scrolling="no"
+              frameborder="no"
+              allow="autoplay"
+              src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{shareCard.thumbnailMediaId.id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true">
+            </iframe>
+          {:else if shareCard.hasYouTubeVideo()}
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/{shareCard.thumbnailMediaId.id}"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+            </iframe>
+          {/if}
+        </div>
+      {/if}
     {/if}
   </div>
   <div class="footer">

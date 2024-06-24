@@ -45,31 +45,26 @@
           {/if}
         </div>
       {:else}
-      <div class="media">
-        {#if shareCard.hasSoundCloudAudio()}
-          <iframe
-            title="SoundCloud audio player"
-            scrolling="no"
-            frameborder="no"
-            allow="autoplay"
-            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{shareCard
-              .thumbnailMediaId
-              .id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true"
-          >
-          </iframe>
-        {:else if shareCard.hasYouTubeVideo()}
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/{shareCard
-              .thumbnailMediaId.id}"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          >
-          </iframe>
-        {/if}
-      </div>
+        <div class="media">
+          {#if shareCard.hasSoundCloudAudio()}
+            <iframe
+              title="SoundCloud audio player"
+              scrolling="no"
+              frameborder="no"
+              allow="autoplay"
+              src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{shareCard.thumbnailMediaId.id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true">
+            </iframe>
+          {:else if shareCard.hasYouTubeVideo()}
+            <iframe
+              src="https://www.youtube-nocookie.com/embed/{shareCard.thumbnailMediaId.id}"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+            </iframe>
+          {/if}
+        </div>
       {/if}
     {/if}
   </div>
