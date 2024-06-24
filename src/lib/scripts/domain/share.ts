@@ -8,6 +8,37 @@ import type { Rating } from "./vote";
 
 export type ShareId = Uuid7;
 
+type WithinWeek = { unit: string; amount: number; };
+
+type ThisYear = { unit: string; month: number; date: number; hours: string; minutes: string; };
+
+type PreviousYear = ThisYear & { year: number; };
+
+export function elapsedTime(timestamp: number): WithinWeek | ThisYear | PreviousYear {
+  const now: number = Date.now();
+  const elapsedMillis: number = now - timestamp;
+
+  const minutes: number = Math.floor(elapsedMillis / (1000 * 60));
+  const hours: number = Math.floor(elapsedMillis / (1000 * 60 * 60));
+  const days: number = Math.floor(elapsedMillis / (1000 * 60 * 60 * 24));
+  const weeks: number = Math.floor(elapsedMillis / (1000 * 60 * 60 * 24 * 7));
+
+  if (weeks > 0) { // 1週間以上の場合は絶対表記
+    const time = new Date(timestamp);
+
+    const month: number = time.getMonth() + 1; // 月は0始まりなので1を足す
+    const date: number = time.getDate();
+    const hours: string = ("0" + time.getHours()).slice(-2);
+    const minutes: string = ("0" + time.getMinutes()).slice(-2);
+
+    if (new Date(now).getFullYear() === time.getFullYear()) return { unit: "thisYear", month, date, hours, minutes };
+    else return { unit: "previousYear", year: time.getFullYear(), month, date, hours, minutes };
+  }
+  else if (days > 0) return { unit: "days", amount: days };
+  else if (hours > 0) return { unit: "hours", amount: hours };
+  else return { unit: "minutes", amount: minutes };
+}
+
 export class Timestamp {
   public readonly unixTimeMillis: UnixTimeMillis;
 

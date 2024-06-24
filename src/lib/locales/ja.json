@@ -92,7 +92,7 @@
     },
     "share": {
       "conversations-count": "会話件数 {count} 件",
-      "timestamp": "{ unit, select, minutes {{t}分前} hours {{t}時間前} days {{t}日前} thisYear {{month}/{day} {hours}:{minutes}} other {{year}/{month}/{day} {hours}:{minutes}} }",
+      "timestamp": "{ unit, select, minutes {{amount}分前} hours {{amount}時間前} days {{amount}日前} thisYear {{month}/{date} {hours}:{minutes}} other {{year}/{month}/{date} {hours}:{minutes}} }",
       "more-button-tooltip": "もっと見る"
     }
   },
