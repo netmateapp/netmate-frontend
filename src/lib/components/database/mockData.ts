@@ -1,6 +1,6 @@
 import type { Option } from "$lib/option";
 import { genTestUuid4, genTestUuid7, Uuid4, type Uuid7 } from "$lib/uuid";
-import { ImageUrl, type MediaKey } from "./share/Share.svelte";
+import { ImageUrl, type MediaKey } from "./share/DatabaseShareCard.svelte";
 
 export class TestShareData {
   constructor(

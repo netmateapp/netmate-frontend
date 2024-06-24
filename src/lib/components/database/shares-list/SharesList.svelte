@@ -2,7 +2,7 @@
   import Header, { type Sort } from "./Header.svelte";
   import Pager from "./Pager.svelte";
   import { TestShareData, genTestShareData } from "$lib/components/database/mockData";
-  import Share from "../share/Share.svelte";
+  import Share from "../share/DatabaseShareCard.svelte";
   import { onMount } from "svelte";
 
   let resultsCount = 312;
