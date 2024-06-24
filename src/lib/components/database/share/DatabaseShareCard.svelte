@@ -17,6 +17,7 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
   import type { Option } from "$lib/option";
+  import { elapsedTime } from "$lib/scripts/domain/share";
   import { Uuid7 } from "$lib/uuid";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
 
@@ -73,72 +74,6 @@
   function youtubeVideoId(): string {
     return hasYouTubeVideo(mediaKey) ? mediaKey.videoId : "";
   }
-
-  type WithinOneWeek = { unit: string; t: number };
-  type ThisYear = {
-    unit: string;
-    month: number;
-    day: number;
-    hours: string;
-    minutes: string;
-  };
-  type BeforeThisYear = {
-    unit: string;
-    year: number;
-    month: number;
-    day: number;
-    hours: string;
-    minutes: string;
-  };
-
-  export function elapsedTime(
-    timestamp: number,
-  ): WithinOneWeek | ThisYear | BeforeThisYear {
-    const now: number = Date.now();
-    const elapsedMillis: number = now - timestamp;
-
-    const minutes: number = Math.floor(elapsedMillis / (1000 * 60));
-    const hours: number = Math.floor(elapsedMillis / (1000 * 60 * 60));
-    const days: number = Math.floor(elapsedMillis / (1000 * 60 * 60 * 24));
-    const weeks: number = Math.floor(elapsedMillis / (1000 * 60 * 60 * 24 * 7));
-
-    if (weeks > 0) {
-      // 1週間以上の場合は絶対表記
-      const date = new Date(timestamp);
-
-      const month: number = date.getMonth() + 1; // 月は0始まりなので1を足す
-      const day: number = date.getDate();
-      const hours: string = ("0" + date.getHours()).slice(-2);
-      const minutes: string = ("0" + date.getMinutes()).slice(-2);
-
-      const nowDate = new Date(now);
-      if (nowDate.getFullYear() === date.getFullYear()) {
-        return {
-          unit: "thisYear",
-          month: month,
-          day: day,
-          hours: hours,
-          minutes: minutes,
-        };
-      } else {
-        const year: number = date.getFullYear();
-        return {
-          unit: "beforeThisYear",
-          year: year,
-          month: month,
-          day: day,
-          hours: hours,
-          minutes: minutes,
-        };
-      }
-    } else if (days > 0) {
-      return { unit: "days", t: days };
-    } else if (hours > 0) {
-      return { unit: "hours", t: hours };
-    } else {
-      return { unit: "minutes", t: minutes };
-    }
-  }
 </script>
 
 <a href="https://netmate.app/shares/{id.asHexadecimalRepresentation()}" class="share">
@@ -178,12 +113,8 @@
   </div>
   <div class="footer">
     <div class="information">
-      <span class="conversations-count"
-        >{_("conversations-count", { count: conversationsCount })}</span
-      >
-      <span class="timestamp"
-        >{_("timestamp", { ...elapsedTime(timestamp) })}</span
-      >
+      <span class="conversations-count">{_("conversations-count", { count: conversationsCount })}</span>
+      <span class="timestamp">{_("timestamp", { ...elapsedTime(timestamp) })}</span>
     </div>
     <div class="more-button" use:tooltip={_("more-button-tooltip")}>
       <svg class="more-button-icon">
