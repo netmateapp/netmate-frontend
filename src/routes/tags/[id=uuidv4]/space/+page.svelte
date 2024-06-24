@@ -116,7 +116,7 @@
 
 <div class="side-bar">
   <LocationDisplay locationName={tag.name.name} isSpace={true} />
-  <TagMenu />
+  <TagMenu isSpace={true} />
 </div>
 
 <style>
