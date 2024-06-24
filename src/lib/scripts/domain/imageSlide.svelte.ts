@@ -3,7 +3,7 @@ import type { NetmateImageId } from "./share";
 type InteractionEvent = TouchEvent | MouseEvent;
 
 export class ImageSliderController {
-  imagePaths: NetmateImageId[] = [];
+  imagePaths: NetmateImageId[] = $state([]);
   currentIndex: number = $state(0);
   private isDragging: boolean = false;
   private startPos: number = 0;
@@ -67,5 +67,13 @@ export class ImageSliderController {
 
   sliderEditorWidth(): number {
     return this.sliderEditorRef ? this.sliderEditorRef.getBoundingClientRect().width : ImageSliderController.MAX_SLIDER_WIDTH;
+  }
+
+  isCurrentPageNumber(pageNumber: number): boolean {
+    return pageNumber === this.currentIndex;
+  }
+
+  shouldDisplayDotsIndicator(): boolean {
+    return this.imagePaths.length >= 2;
   }
 }

@@ -34,15 +34,6 @@
     imageSliderController.imagePaths = mapToIds(imagesPaths);
   });
 
-  function isCurrentPageNumber(pageNumber: number) {
-    return pageNumber === imageSliderController.currentIndex;
-  }
-
-  // インジケータ関連
-  function shouldDisplayDotsIndicator(): boolean {
-    return imagesPaths.length >= 2;
-  }
-
   //画像追加ボタン関連
   function canAddImage(): boolean {
     return MEDIA_COUNT.reactiveValue < MAX_MEDIA_COUNT;
@@ -145,12 +136,12 @@
       </div>
     {/each}
   </div>
-  {#if shouldDisplayDotsIndicator()}
+  {#if imageSliderController.shouldDisplayDotsIndicator()}
     <div class="dots-indicator">
       {#each imagesPaths as _, pageNumber}
         <div
           class="dot"
-          class:current-page={isCurrentPageNumber(pageNumber)}
+          class:current-page={imageSliderController.isCurrentPageNumber(pageNumber)}
         ></div>
       {/each}
     </div>
