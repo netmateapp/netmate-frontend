@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-    import { elapsedTime } from "$lib/scripts/domain/share";
+  import { elapsedTime } from "$lib/scripts/domain/share";
   import type { ShareCard } from "$lib/scripts/domain/shareCard";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
 

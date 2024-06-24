@@ -1,9 +1,9 @@
 import { Chunk, ChunkCoordinate, ChunkIndex, ChunkLocation, type ChunkRepository } from "./chunk";
 import { ShareCardsClusterData, SpaceCoreData } from "./chunkContent";
-import { generateMockShareCards, generateTestTag } from "../mockShare";
 import type { VirtualLocation } from "../coordinateSystem/virtualCoordinateSystem.svelte";
 import type { Reactive } from "../../../../../../lib/scripts/extension/reactivity";
 import { HashSet } from "$lib/scripts/extension/hashSet/hashSet";
+import { generateMockShareCards, generateTestTag } from "$lib/scripts/domain/mockShare";
 
 export abstract class ChunkFetcher {
   abstract fetchChunksBy(indexes: HashSet<ChunkIndex>): HashSet<Chunk>;

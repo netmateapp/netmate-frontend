@@ -1,106 +1,43 @@
-<script lang="ts" context="module">
-  export class ImageUrl {
-    constructor(public readonly url: string) {}
-  }
-
-  export class YouTubeId {
-    constructor(public readonly videoId: string) {}
-  }
-
-  export class SoundCloudId {
-    constructor(public readonly trackId: string) {}
-  }
-
-  export type MediaKey = ImageUrl | YouTubeId | SoundCloudId;
-</script>
-
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-  import type { Option } from "$lib/option";
   import { elapsedTime } from "$lib/scripts/domain/share";
-  import { Uuid7 } from "$lib/uuid";
+  import type { ShareCard } from "$lib/scripts/domain/shareCard";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
 
-  let {
-    id,
-    title,
-    text,
-    mediaKey,
-    conversationsCount,
-    timestamp,
-  }: {
-    id: Uuid7
-    title: Option<string>;
-    text: Option<string>;
-    mediaKey: Option<MediaKey>;
-    conversationsCount: number;
-    timestamp: number;
-  } = $props();
+  type Props = {
+    shareCard: ShareCard;
+  };
+
+  let { shareCard }: Props = $props();
 
   const _ = createTranslator("common", "share");
-
-  function hasTitle(): boolean {
-    return title !== undefined;
-  }
-
-  function hasText(): boolean {
-    return text !== undefined;
-  }
-
-  function hasMedia(): boolean {
-    return mediaKey !== undefined;
-  }
-
-  function hasImage(key: Option<MediaKey> = mediaKey): key is ImageUrl {
-    return key instanceof ImageUrl;
-  }
-
-  function imageUrl(): string {
-    return hasImage(mediaKey) ? mediaKey.url : "";
-  }
-
-  function hasSoundCloudAudio(key: Option<MediaKey> = mediaKey): key is SoundCloudId {
-    return key instanceof SoundCloudId;
-  }
-
-  function soundCloudId(): string {
-    return hasSoundCloudAudio(mediaKey) ? mediaKey.trackId : "";
-  }
-
-  function hasYouTubeVideo(key: Option<MediaKey> = mediaKey): key is YouTubeId {
-    return key instanceof YouTubeId;
-  }
-
-  function youtubeVideoId(): string {
-    return hasYouTubeVideo(mediaKey) ? mediaKey.videoId : "";
-  }
 </script>
 
-<a href="https://netmate.app/shares/{id.asHexadecimalRepresentation()}" class="share">
+<a href="https://netmate.app/shares/{shareCard.id.asHexadecimalRepresentation()}" class="share">
   <div class="content">
     <div class="texts">
-      {#if hasTitle()}
-        <span class="title">{title}</span>
+      {#if shareCard.title !== undefined}
+        <span class="title">{shareCard.title}</span>
       {/if}
-      {#if hasText()}
-        <div class="text">{text}</div>
+      {#if shareCard.leadSentences !== undefined}
+        <div class="text">{shareCard.leadSentences}</div>
       {/if}
     </div>
-    {#if hasMedia()}
+    {#if shareCard.thumbnailMediaId !== undefined}
       <div class="media">
-        {#if hasImage()}
-          <img src={imageUrl()} />
-        {:else if hasSoundCloudAudio()}
+        {#if shareCard.hasImage()}
+          <img src={shareCard.thumbnailMediaId.id} />
+        {:else if shareCard.hasSoundCloudAudio()}
           <iframe
             title="SoundCloud audio player"
             scrolling="no"
             frameborder="no"
             allow="autoplay"
-            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{soundCloudId()}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true">
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/{shareCard.thumbnailMediaId.id}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true">
           </iframe>
-        {:else if hasYouTubeVideo()}
+        {:else if shareCard.hasYouTubeVideo()}
           <iframe
-            src="https://www.youtube-nocookie.com/embed/{youtubeVideoId()}"
+            src="https://www.youtube-nocookie.com/embed/{shareCard.thumbnailMediaId.id}"
             title="YouTube video player"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -113,8 +50,8 @@
   </div>
   <div class="footer">
     <div class="information">
-      <span class="conversations-count">{_("conversations-count", { count: conversationsCount })}</span>
-      <span class="timestamp">{_("timestamp", { ...elapsedTime(timestamp) })}</span>
+      <span class="conversations-count">{_("conversations-count", { count: shareCard.conversationsCount.count })}</span>
+      <span class="timestamp">{_("timestamp", { ...elapsedTime(shareCard.timestamp.unixTimeMillis.time) })}</span>
     </div>
     <div class="more-button" use:tooltip={_("more-button-tooltip")}>
       <svg class="more-button-icon">

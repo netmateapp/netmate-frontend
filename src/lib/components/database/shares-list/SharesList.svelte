@@ -1,30 +1,31 @@
 <script lang="ts">
   import Header, { type Sort } from "./Header.svelte";
   import Pager from "./Pager.svelte";
-  import { TestShareData, genTestShareData } from "$lib/components/database/mockData";
   import Share from "../share/DatabaseShareCard.svelte";
   import { onMount } from "svelte";
+  import type { ShareCard } from "$lib/scripts/domain/shareCard";
+  import { generateMockShareCards } from "$lib/scripts/domain/mockShare";
 
   let resultsCount = 312;
   let initialSort: Sort = "newest";
 
-  let viewSharesData: TestShareData[] = $state([]);
-  function leftRowSharesData(): TestShareData[] {
-    const sharesData: TestShareData[] = [];
+  let viewSharesData: ShareCard[] = $state([]);
+  function leftRowSharesData(): ShareCard[] {
+    const sharesData: ShareCard[] = [];
     for (var i = 0; i < viewSharesData.length; i += 2) sharesData.push(viewSharesData[i]);
     return sharesData;
   }
 
-  function rightRowSharesData(): TestShareData[] {
-    const sharesData: TestShareData[] = [];
+  function rightRowSharesData(): ShareCard[] {
+    const sharesData: ShareCard[] = [];
     for (var i = 1; i < viewSharesData.length; i += 2) sharesData.push(viewSharesData[i]);
     return sharesData;
   }
 
-  function generateTestSharesData(): TestShareData[] {
-    const data: TestShareData[] = [];
+  function generateTestSharesData(): ShareCard[] {
+    const data: ShareCard[] = [];
     for (var i = 0; i < 50; i++) {
-      data.push(genTestShareData());
+      data.push(generateMockShareCards());
     }
     return data;
   }
@@ -40,24 +41,12 @@
   <div class="shares">
     <div class="left-row">
       {#each leftRowSharesData() as share (share.id)}
-        <Share
-          id={share.id}
-          title={share.title}
-          text={share.text}
-          mediaKey={share.mediaKey}
-          conversationsCount={share.conversationsCount}
-          timestamp={share.timestamp} />
+        <Share shareCard={share} />
       {/each}
     </div>
     <div class="right-row">
       {#each rightRowSharesData() as share}
-        <Share
-          id={share.id}
-          title={share.title}
-          text={share.text}
-          mediaKey={share.mediaKey}
-          conversationsCount={share.conversationsCount}
-          timestamp={share.timestamp} />
+        <Share shareCard={share} />
       {/each}
     </div>
   </div>
