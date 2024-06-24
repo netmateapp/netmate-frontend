@@ -10,90 +10,22 @@
 />
 
 <script lang="ts">
-    import { toast } from "../toast/useToast.svelte";
-    import { MEDIA_COUNT, MAX_MEDIA_COUNT } from "./ShareEditor.svelte";
-    import { _ } from "./editor.svelte";
-    import { dispatchDeleteSlideCommand } from "./lexical-editor";
-    import { IDENTITY_ATTRIBUTE, IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA } from "./image-slide-plugin.svelte";
-    import { tooltip } from "../tooltip/useTooltip.svelte";
-    import type { MaybeHTMLElement, MaybeHTMLInputElement, InteractEvent } from "$lib/types";
+  import { toast } from "../toast/useToast.svelte";
+  import { MEDIA_COUNT, MAX_MEDIA_COUNT } from "./ShareEditor.svelte";
+  import { _ } from "./editor.svelte";
+  import { dispatchDeleteSlideCommand } from "./lexical-editor";
+  import { IDENTITY_ATTRIBUTE, IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA } from "./image-slide-plugin.svelte";
+  import { tooltip } from "../tooltip/useTooltip.svelte";
+  import type { MaybeHTMLInputElement, InteractEvent } from "$lib/types";
+  import { ImageSliderController } from "$lib/scripts/domain/imageSlide.svelte";
 
-    let { imagesPaths, nodeKey }: { imagesPaths: string[], nodeKey: string } = $props();
-
-    let currentIndex = $state(0);
-
-    function isCurrentPageNumber(pageNumber: number) {
-      return pageNumber === currentIndex;
-    }
+  let { imagesPaths, nodeKey }: { imagesPaths: string[], nodeKey: string } = $props();
 
   // スライド関連
-  let slidesRefs: HTMLElement[] = [];
-  let isDragging = false;
-  let startPos = 0;
-  let currentTranslate = 0;
-  let prevTranslate = 0;
-  let animationID: number;
+  const imageSliderController = new ImageSliderController(imagesPaths);
 
-  function touchStart(event: TouchEvent | MouseEvent, index: number) {
-    currentIndex = index;
-      startPos = getPositionX(event);
-      isDragging = true;
-
-      animationID = requestAnimationFrame(animation);
-  }
-
-  function touchEnd() {
-    isDragging = false;
-    cancelAnimationFrame(animationID);
-
-    const movedBy = currentTranslate - prevTranslate;
-
-    if (movedBy < -100 && currentIndex < imagesPaths.length - 1) {
-      currentIndex += 1;
-    }
-
-    if (movedBy > 100 && currentIndex > 0) {
-      currentIndex -= 1;
-    }
-
-    setPositionByIndex();
-  }
-
-  function touchMove(event: TouchEvent | MouseEvent) {
-    if (isDragging) {
-      const currentPosition = getPositionX(event);
-      currentTranslate = prevTranslate + currentPosition - startPos;
-    }
-  }
-
-  function getPositionX(event: TouchEvent | MouseEvent): number {
-    return event.type.includes("mouse")
-      ? (event as MouseEvent).pageX
-      : (event as TouchEvent).touches[0].clientX;
-  }
-
-  function animation() {
-    setSliderPosition();
-    if (isDragging) requestAnimationFrame(animation);
-  }
-
-  let sliderRef: MaybeHTMLElement = $state(null);
-  function setSliderPosition() {
-    if (sliderRef) sliderRef.style.transform = `translateX(${currentTranslate}px)`;
-  }
-
-  function setPositionByIndex() {
-    currentTranslate = currentIndex * -sliderEditorWidth();
-    prevTranslate = currentTranslate;
-    setSliderPosition();
-  }
-
-  const MAX_SLIDER_WIDTH = 986;
-  let sliderEditorRef: MaybeHTMLElement = $state(null);
-  function sliderEditorWidth(): number {
-    return sliderEditorRef
-      ? sliderEditorRef.getBoundingClientRect().width
-      : MAX_SLIDER_WIDTH;
+  function isCurrentPageNumber(pageNumber: number) {
+    return pageNumber === imageSliderController.currentIndex;
   }
 
   // インジケータ関連
@@ -138,16 +70,16 @@
   function onClickRemoveImageButton(event: InteractEvent) {
     const imagesCount = imagesPaths.length;
     if (imagesCount == 1) {
-      const key = sliderEditorRef?.parentElement?.getAttribute(IDENTITY_ATTRIBUTE);
+      const key = imageSliderController.sliderEditorRef?.parentElement?.getAttribute(IDENTITY_ATTRIBUTE);
       if (key) dispatchDeleteSlideCommand(key);
       event.stopPropagation();
     } else {
-      if (currentIndex == (imagesCount - 1)) {
-        currentIndex--;
-        imagesPaths = imagesPaths.filter((v, index, a) => index != (currentIndex + 1));
-        setPositionByIndex();
+      if (imageSliderController.currentIndex == (imagesCount - 1)) {
+        imageSliderController.currentIndex--;
+        imagesPaths = imagesPaths.filter((v, index, a) => index != (imageSliderController.currentIndex + 1));
+        imageSliderController.setPositionByIndex();
       } else {
-        imagesPaths = imagesPaths.filter((v, index, a) => index != currentIndex);
+        imagesPaths = imagesPaths.filter((v, index, a) => index != imageSliderController.currentIndex);
       }
       MEDIA_COUNT.reactiveValue--;
       const sliderData = IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.get(nodeKey);
@@ -156,7 +88,7 @@
   }
 </script>
 
-<div bind:this={sliderEditorRef} class="slider-editor">
+<div bind:this={imageSliderController.sliderEditorRef} class="slider-editor">
   <div class="edit-slider-buttons">
     <button
       class="edit-slider-button"
@@ -183,20 +115,19 @@
       </svg>
     </button>
   </div>
-  <div bind:this={sliderRef} class="slider">
+  <div bind:this={imageSliderController.sliderRef} class="slider">
     {#each imagesPaths as imagePath, index}
       <div class="slide">
         <img
-          bind:this={slidesRefs[index]}
           src={imagePath}
           ondragstart={(e) => e.preventDefault()}
-          ontouchstart={(event) => touchStart(event, index)}
-          ontouchend={touchEnd}
-          ontouchmove={touchMove}
-          onmousedown={(event) => touchStart(event, index)}
-          onmouseup={touchEnd}
-          onmouseleave={touchEnd}
-          onmousemove={touchMove}
+          ontouchstart={(event) => imageSliderController.touchStart(event, index)}
+          ontouchend={() => imageSliderController.touchEnd()}
+          ontouchmove={(event) => imageSliderController.touchMove(event)}
+          onmousedown={(event) => imageSliderController.touchStart(event, index)}
+          onmouseup={() => imageSliderController.touchEnd()}
+          onmouseleave={() => imageSliderController.touchEnd()}
+          onmousemove={(event) => imageSliderController.touchMove(event)}
         />
       </div>
     {/each}
