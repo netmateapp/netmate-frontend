@@ -12,7 +12,7 @@
 
 <div class="side-bar">
   <LocationDisplay locationName={"ブルーアーカイブ"} isSpace={false} />
-  <TagMenu />
+  <TagMenu isSpace={false} />
 </div>
 
 <style>
