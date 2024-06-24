@@ -148,6 +148,8 @@ export class YouTubeVideoId {
 
 export type MediaId = NetmateImageId | SoundCloudTrackId | YouTubeVideoId;
 
+export type SessionMediaId = NetmateImageId[] | SoundCloudTrackId | YouTubeVideoId;
+
 // セッションに表示するための共有データ
 export class SessionShareData {
   public readonly id: ShareId;
@@ -156,7 +158,7 @@ export class SessionShareData {
   public readonly rating: Option<Rating>;
   public readonly title: Option<Title>;
   public readonly text: Option<Text>;
-  public readonly thumbnailMediaId: Option<MediaId>;
+  public readonly thumbnailMediaId: Option<SessionMediaId>;
   public readonly shouldProcessThumbnailImage: boolean;
 
   constructor(
@@ -166,7 +168,7 @@ export class SessionShareData {
     rating: Option<Rating>,
     title?: Option<Title>,
     text?: Option<Text>,
-    thumbnailMediaId?: Option<MediaId>,
+    thumbnailMediaId?: Option<SessionMediaId>,
     shouldProcessThumbnailImage: boolean = false,
   ) {
     if (!SessionShareData.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
@@ -181,8 +183,8 @@ export class SessionShareData {
     this.shouldProcessThumbnailImage = shouldProcessThumbnailImage;
   }
 
-  private static isValid(thumbnailMediaId: Option<MediaId>, shouldProcessThumbnailImage: boolean) {
-    const hasImageThumbnail = thumbnailMediaId instanceof NetmateImageId;
+  private static isValid(thumbnailMediaId: Option<SessionMediaId>, shouldProcessThumbnailImage: boolean) {
+    const hasImageThumbnail = thumbnailMediaId !== undefined && !(thumbnailMediaId instanceof SoundCloudTrackId) && !(thumbnailMediaId instanceof YouTubeVideoId);
     return hasImageThumbnail ? true : !shouldProcessThumbnailImage;
   }
 
