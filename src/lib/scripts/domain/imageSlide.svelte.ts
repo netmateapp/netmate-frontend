@@ -1,7 +1,9 @@
+import type { NetmateImageId } from "./share";
+
 type InteractionEvent = TouchEvent | MouseEvent;
 
 export class ImageSliderController {
-  private imagePaths: string[];
+  imagePaths: NetmateImageId[] = [];
   currentIndex: number = $state(0);
   private isDragging: boolean = false;
   private startPos: number = 0;
@@ -12,10 +14,6 @@ export class ImageSliderController {
 
   sliderRef: HTMLElement | null = null;
   sliderEditorRef: HTMLElement | null = null;
-
-  constructor(imagePaths: string[]) {
-    this.imagePaths = imagePaths;
-  }
 
   touchStart(event: InteractionEvent, index: number) {
     this.currentIndex = index;

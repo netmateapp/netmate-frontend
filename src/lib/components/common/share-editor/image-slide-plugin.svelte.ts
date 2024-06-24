@@ -32,9 +32,10 @@ import ImageSlide from "./ImageSlider.svelte";
 import { MAX_MEDIA_COUNT, MEDIA_COUNT } from "./ShareEditor.svelte";
 import { toast } from "../toast/useToast.svelte";
 import { _ } from "./editor.svelte";
+import { NetmateImageId } from "$lib/scripts/domain/share";
 
 export interface ImagePayload {
-  imagesPaths: string[];
+  imagesPaths: NetmateImageId[];
 }
 
 export type InsertImagePayload = Readonly<ImagePayload>;
@@ -71,18 +72,19 @@ function convertImageSlideElement(
 export const IDENTITY_ATTRIBUTE = "data-lexical-image-slider-key";
 
 export class ImageSliderData {
-  imagesPaths: string[] = [];
+  imagesPaths: NetmateImageId[];
 
-  constructor(imagePaths: string[]) {
+  constructor(imagePaths: NetmateImageId[]) {
     this.imagesPaths = imagePaths;
   }
 
   toString(): string {
-    return this.imagesPaths.toString();
+    return this.imagesPaths.map(id => id.id).toString();
   }
 
   static fromString(imagesPathsStr: string): ImageSliderData {
-    const imagePaths: string[] = imagesPathsStr.split(",");
+    const imagePaths: NetmateImageId[] = imagesPathsStr.split(",")
+      .map(source => new NetmateImageId(source));
     return new ImageSliderData(imagePaths);
   }
 }
@@ -118,7 +120,7 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
 
   createElement(): HTMLElement {
     const imageSlide = document.createElement("image-slider");
-    imageSlide.setAttribute(NODE_ATTRIBUTE, JSON.stringify(this.__data.imagesPaths));
+    imageSlide.setAttribute(NODE_ATTRIBUTE, JSON.stringify(this.__data.imagesPaths.map(id => id.id)));
     imageSlide.setAttribute("node-key", this.__key);
     imageSlide.setAttribute(IDENTITY_ATTRIBUTE, this.__key);
     return imageSlide;
@@ -239,7 +241,8 @@ export class ImageSliderNode extends DecoratorNode<DecoratorImageSliderType> {
     return {
       componentClass: ImageSlide,
       props: {
-        imagesPaths: this.__data.imagesPaths,
+        // HTMLを経由するのでここはstringで受け渡し
+        imagesPaths: this.__data.imagesPaths.map(id => id.id),
         nodeKey: this.__key,
       }
     }

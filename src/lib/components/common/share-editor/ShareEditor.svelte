@@ -35,6 +35,7 @@
   import Overlay from "../confirm-dialog/Overlay.svelte";
   import ConfirmDialog from "../confirm-dialog/ConfirmDialog.svelte";
   import type { MaybeHTMLElement, InteractEvent, MaybeComponent } from "$lib/types";
+    import { NetmateImageId } from "$lib/scripts/domain/share";
 
   $effect(() => {
     init();
@@ -139,10 +140,10 @@
     if (count == 0) return;
 
     if (count <= MAX_MEDIA_COUNT - MEDIA_COUNT.reactiveValue) {
-      const imagesPaths: string[] = [];
+      const imagesPaths: NetmateImageId[] = [];
       for (var file of files) {
         const filePath = URL.createObjectURL(file);
-        imagesPaths.push(filePath);
+        imagesPaths.push(new NetmateImageId(filePath));
       }
       //MEDIA_COUNT.reactiveValue += count;
       dispatchInsertSlideCommand(imagesPaths);

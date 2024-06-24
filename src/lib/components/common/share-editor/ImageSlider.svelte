@@ -18,11 +18,21 @@
   import { tooltip } from "../tooltip/useTooltip.svelte";
   import type { MaybeHTMLInputElement, InteractEvent } from "$lib/types";
   import { ImageSliderController } from "$lib/scripts/domain/imageSlide.svelte";
+  import { NetmateImageId } from "$lib/scripts/domain/share";
 
+  // ※ `imagesPaths` のリアクティブ性は深くない
   let { imagesPaths, nodeKey }: { imagesPaths: string[], nodeKey: string } = $props();
 
+  function mapToIds(paths: string[]): NetmateImageId[] {
+    return paths.map(source => new NetmateImageId(source));
+  }
+
   // スライド関連
-  const imageSliderController = new ImageSliderController(imagesPaths);
+  const imageSliderController = new ImageSliderController();
+
+  $effect(() => {
+    imageSliderController.imagePaths = mapToIds(imagesPaths);
+  });
 
   function isCurrentPageNumber(pageNumber: number) {
     return pageNumber === imageSliderController.currentIndex;
@@ -57,10 +67,13 @@
       for (var file of files) {
         const filePath = URL.createObjectURL(file);
         imagesPaths.push(filePath);
+
+        // この配列のリアクティブは深くないので、代入で反応させる
+        imagesPaths = imagesPaths.slice();
       }
       MEDIA_COUNT.reactiveValue += count;
       const sliderData = IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.get(nodeKey);
-      if (sliderData) sliderData.imagesPaths = imagesPaths.slice();
+      if (sliderData) sliderData.imagesPaths = imagesPaths.slice().map(source => new NetmateImageId(source));
     } else {
       toast(_("failed-to-add-media", { limit: MAX_MEDIA_COUNT }));
     }
@@ -83,7 +96,7 @@
       }
       MEDIA_COUNT.reactiveValue--;
       const sliderData = IMAGE_SLIDERS_KEYS_TO_IMAGE_SLIDER_DATA.get(nodeKey);
-      if (sliderData) sliderData.imagesPaths = imagesPaths.slice();
+      if (sliderData) sliderData.imagesPaths = imagesPaths.slice().map(source => new NetmateImageId(source));
     }
   }
 </script>

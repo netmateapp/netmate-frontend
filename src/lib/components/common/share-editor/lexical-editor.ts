@@ -10,6 +10,7 @@ import { registerCharactersCounterPlugin } from './characters-conter-plugin.svel
 import { INSERT_IMAGE_SLIDER_COMMAND, registerSlidePlugin, ImageSliderNode, DELETE_IMAGE_SLIDER_COMMAND } from './image-slide-plugin.svelte';
 import { CursorPositionObserver, registerTitlePlugin } from './title-plugin.svelte';
 import { INSERT_SOUNDCLOUD_COMMAND, registerSoundCloudPlugin, SoundCloudNode } from './soundcloud-plugin.svelte';
+import type { NetmateImageId } from '$lib/scripts/domain/share';
 
 export type InitialEditorStateType = null | string | EditorState | (() => void);
 
@@ -51,7 +52,7 @@ export function dispatchInsertSoundCloudCommand(trackId: string) {
   editor.dispatchCommand(INSERT_SOUNDCLOUD_COMMAND, trackId);
 }
 
-export function dispatchInsertSlideCommand(imagesPaths: string[]) {
+export function dispatchInsertSlideCommand(imagesPaths: NetmateImageId[]) {
   editor.dispatchCommand(INSERT_IMAGE_SLIDER_COMMAND, { imagesPaths });
 }
 
