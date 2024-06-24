@@ -310,7 +310,6 @@ export class ImageProcessor implements LifeCycle {
   }
 
   initialize(): Finalizer {
-    console.log("initialized");
     if (this.imageRequireProcessing === null) throw new Error(`imageRequireProcessing must be non-null.`);
 
     const mouseDown = () => this.onMouseDown();

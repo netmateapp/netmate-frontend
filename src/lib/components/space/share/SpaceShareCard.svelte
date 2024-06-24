@@ -37,16 +37,11 @@
     </div>
     {#if shareCard.thumbnailMediaId !== undefined}
       {#if shareCard.hasImage()}
-        <div
-          class="media">
+        <div class="media">
           {#if shareCard.shouldProcessThumbnailImage}
-            <div class="media">
-              <img bind:this={imageProcessor.imageRequireProcessing} src={shareCard.thumbnailMediaId.id} class="should-process"/>
-            </div>
+            <img bind:this={imageProcessor.imageRequireProcessing} src={shareCard.thumbnailMediaId.id} class="should-process"/>
           {:else}
-            <div class="media">
-              <img src={shareCard.thumbnailMediaId.id} />
-            </div>
+            <img src={shareCard.thumbnailMediaId.id} />
           {/if}
         </div>
       {:else}
