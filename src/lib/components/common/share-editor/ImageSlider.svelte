@@ -34,14 +34,12 @@
   let prevTranslate = 0;
   let animationID: number;
 
-  function touchStart(index: number) {
-    return function (event: TouchEvent | MouseEvent) {
-      currentIndex = index;
+  function touchStart(event: TouchEvent | MouseEvent, index: number) {
+    currentIndex = index;
       startPos = getPositionX(event);
       isDragging = true;
 
       animationID = requestAnimationFrame(animation);
-    };
   }
 
   function touchEnd() {
@@ -192,10 +190,10 @@
           bind:this={slidesRefs[index]}
           src={imagePath}
           ondragstart={(e) => e.preventDefault()}
-          ontouchstart={touchStart(index)}
+          ontouchstart={(event) => touchStart(event, index)}
           ontouchend={touchEnd}
           ontouchmove={touchMove}
-          onmousedown={touchStart(index)}
+          onmousedown={(event) => touchStart(event, index)}
           onmouseup={touchEnd}
           onmouseleave={touchEnd}
           onmousemove={touchMove}
