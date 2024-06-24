@@ -1,6 +1,7 @@
 import { calculateCharactersCosts } from "$lib/cjk.svelte";
 import type { Option } from "$lib/option";
 import type { Uuid7 } from "$lib/uuid";
+import type { Finalizer, LifeCycle } from "../extension/lifeCycle";
 import type { Reactive, Reactivity } from "../extension/reactivity";
 import type { UnixTimeMillis } from "../primitive/unixtime";
 import type { HandleId } from "./handle";
@@ -228,5 +229,115 @@ export class ReactiveShareData implements Reactivity<SessionShareData> {
 
   private static constructShareData({ id, sharerId, timestamp, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage }: ShareDataFields): SessionShareData {
     return new SessionShareData(id, sharerId, timestamp, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage);
+  }
+}
+
+export class ImageProcessor implements LifeCycle {
+  private static readonly MAX_BLUR: number = 14; // ぼかしの最大値
+  private static readonly MAX_GRAYSCALE: number = 0.3; // グレースケールの最大値
+  private static readonly DURATION: number = 500;
+  private static readonly INTERVAL: number = 100; // 100msごとのインターバル
+  private static readonly STEPS: number = ImageProcessor.DURATION / ImageProcessor.INTERVAL;
+  private static readonly BLUR_STEP: number = ImageProcessor.MAX_BLUR / ImageProcessor.STEPS;
+  private static readonly GRAYSCALE_STEP: number = ImageProcessor.MAX_GRAYSCALE / ImageProcessor.STEPS;
+  private intervalId: any;
+  private blurValue: number = ImageProcessor.MAX_BLUR;
+  private grayscaleValue: number = ImageProcessor.MAX_GRAYSCALE;
+  private isMouseDown: boolean = false;
+  private step: number = 0;
+
+  private readonly isInSpaceCore: boolean;
+  imageRequireProcessing: HTMLImageElement | null = null;
+
+  constructor(isInSpaceCore: boolean) {
+    this.isInSpaceCore = isInSpaceCore;
+  }
+
+  resetFilter() {
+    if (!this.isMouseDown) return;
+    this.isMouseDown = false;
+    clearInterval(this.intervalId); // 既存のインターバルをクリア
+    this.intervalId = setInterval(() => {
+      this.blurValue = Math.min(ImageProcessor.MAX_BLUR, this.blurValue + ImageProcessor.BLUR_STEP * 5); // 回復速度はぼかしを取る速度の5倍
+      this.grayscaleValue = Math.min(
+        ImageProcessor.MAX_GRAYSCALE,
+        this.grayscaleValue + ImageProcessor.GRAYSCALE_STEP * 5,
+      ); // 回復速度はぼかしを取る速度の5倍
+
+      // 移動で消失した場合
+      if (this.imageRequireProcessing === null) {
+        clearInterval(this.intervalId);
+        this.step = 0;
+        return;
+      }
+
+      this.imageRequireProcessing!.style.filter = `blur(${this.blurValue}px) grayscale(${this.grayscaleValue})`;
+      if (this.blurValue === ImageProcessor.MAX_BLUR && this.grayscaleValue === ImageProcessor.MAX_GRAYSCALE) {
+        clearInterval(this.intervalId);
+        this.step = 0;
+      }
+    }, ImageProcessor.INTERVAL); // INTERVALごとにぼかしとグレースケールを増やす
+  }
+
+  onMouseDown() {
+    if (this.isInSpaceCore) return;
+
+    this.isMouseDown = true;
+    clearInterval(this.intervalId); // 既存のインターバルをクリア
+    this.intervalId = setInterval(() => {
+      this.step++;
+      this.blurValue = Math.max(0, this.blurValue - ImageProcessor.BLUR_STEP);
+      this.grayscaleValue = Math.max(0, this.grayscaleValue - ImageProcessor.GRAYSCALE_STEP);
+
+      if (this.imageRequireProcessing === null) {
+        clearInterval(this.intervalId);
+        this.step = 0;
+        return;
+      }
+
+      this.imageRequireProcessing!.style.filter = `blur(${this.blurValue}px) grayscale(${this.grayscaleValue})`;
+      if (this.blurValue === 0 && this.grayscaleValue === 0) {
+        clearInterval(this.intervalId);
+      }
+    }, ImageProcessor.INTERVAL); // INTERVALごとにぼかしとグレースケールを減らす
+  }
+
+  onImageClick(event: MouseEvent) {
+    if (this.step > 1 && !this.isInSpaceCore) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  initialize(): Finalizer {
+    console.log("initialized");
+    if (this.imageRequireProcessing === null) throw new Error(`imageRequireProcessing must be non-null.`);
+
+    const mouseDown = () => this.onMouseDown();
+    const reset = () => this.resetFilter();
+    const mouseMove = (event: MouseEvent) => {
+      if (event.buttons === 0) this.resetFilter();
+    };
+    const drag = (event: DragEvent) => event.preventDefault();
+    const click = (event: MouseEvent) => this.onImageClick(event);
+
+
+    this.imageRequireProcessing.addEventListener("mousedown", mouseDown);
+    this.imageRequireProcessing.addEventListener("mouseup", reset);
+    this.imageRequireProcessing.addEventListener("mouseleave", reset);
+    this.imageRequireProcessing.addEventListener("mousemove", mouseMove);
+    this.imageRequireProcessing.addEventListener("dragstart", drag);
+    this.imageRequireProcessing.addEventListener("click", click);
+
+    return () => {
+      if (this.imageRequireProcessing !== null) {
+        this.imageRequireProcessing.removeEventListener("mousedown", mouseDown);
+        this.imageRequireProcessing.removeEventListener("mouseup", reset);
+        this.imageRequireProcessing.removeEventListener("mouseleave", reset);
+        this.imageRequireProcessing.removeEventListener("mousemove", mouseMove);
+        this.imageRequireProcessing.removeEventListener("dragstart", drag);
+        this.imageRequireProcessing.removeEventListener("click", click);
+      }
+    };
   }
 }

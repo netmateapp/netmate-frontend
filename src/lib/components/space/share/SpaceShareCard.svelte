@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createTranslator } from "$lib/i18n.svelte";
-  import { elapsedTime } from "$lib/scripts/domain/share";
+  import { ImageProcessor, elapsedTime } from "$lib/scripts/domain/share";
   import type { ShareCard } from "$lib/scripts/domain/shareCard";
   import { tooltip } from "../../common/tooltip/useTooltip.svelte";
 
@@ -13,77 +13,13 @@
 
   let { shareCard, isInSpaceCore = false }: Props = $props();
 
-  const MAX_BLUR = 14; // ぼかしの最大値
-  const MAX_GRAYSCALE = 0.3; // グレースケールの最大値
-  const DURATION = 500;
-  const INTERVAL = 100; // 100msごとのインターバル
-  const STEPS = DURATION / INTERVAL;
-  const BLUR_STEP = MAX_BLUR / STEPS;
-  const GRAYSCALE_STEP = MAX_GRAYSCALE / STEPS;
+  const imageProcessor = new ImageProcessor(isInSpaceCore);
 
-  let intervalId: any;
-  let blurValue = MAX_BLUR;
-  let grayscaleValue = MAX_GRAYSCALE;
-  let isMouseDown = false;
-  let step = 0;
-
-  let imageRequireProcessing: HTMLImageElement;
-
-  function resetFilter() {
-    if (!isMouseDown) return;
-    isMouseDown = false;
-    clearInterval(intervalId); // 既存のインターバルをクリア
-    intervalId = setInterval(() => {
-      blurValue = Math.min(MAX_BLUR, blurValue + BLUR_STEP * 5); // 回復速度はぼかしを取る速度の5倍
-      grayscaleValue = Math.min(
-        MAX_GRAYSCALE,
-        grayscaleValue + GRAYSCALE_STEP * 5,
-      ); // 回復速度はぼかしを取る速度の5倍
-
-      // 移動で消失した場合
-      if (imageRequireProcessing === null) {
-        clearInterval(intervalId);
-        step = 0;
-        return;
-      }
-
-      imageRequireProcessing!.style.filter = `blur(${blurValue}px) grayscale(${grayscaleValue})`;
-      if (blurValue === MAX_BLUR && grayscaleValue === MAX_GRAYSCALE) {
-        clearInterval(intervalId);
-        step = 0;
-      }
-    }, INTERVAL); // INTERVALごとにぼかしとグレースケールを増やす
-  }
-
-  function onMouseDown() {
-    if (isInSpaceCore) return;
-
-    isMouseDown = true;
-    clearInterval(intervalId); // 既存のインターバルをクリア
-    intervalId = setInterval(() => {
-      step++;
-      blurValue = Math.max(0, blurValue - BLUR_STEP);
-      grayscaleValue = Math.max(0, grayscaleValue - GRAYSCALE_STEP);
-
-      if (imageRequireProcessing === null) {
-        clearInterval(intervalId);
-        step = 0;
-        return;
-      }
-
-      imageRequireProcessing!.style.filter = `blur(${blurValue}px) grayscale(${grayscaleValue})`;
-      if (blurValue === 0 && grayscaleValue === 0) {
-        clearInterval(intervalId);
-      }
-    }, INTERVAL); // INTERVALごとにぼかしとグレースケールを減らす
-  }
-
-  function onImageClick(event: MouseEvent) {
-    if (step > 1 && !isInSpaceCore) {
-      event.preventDefault();
-      event.stopPropagation();
+  $effect(() => {
+    if (imageProcessor.imageRequireProcessing) {
+      return imageProcessor.initialize();
     }
-  }
+  });
 </script>
 
 <a
@@ -104,20 +40,8 @@
         <div
           class="media">
           {#if shareCard.shouldProcessThumbnailImage}
-            <div
-              class="media"
-              onmousedown={() => onMouseDown()}
-              onmouseup={() => resetFilter()}
-              onmouseleave={() => resetFilter()}
-              onmousemove={(event) => {
-                if (event.buttons === 0) resetFilter();
-              }}
-              ondragstart={(event) => event.preventDefault()}
-              onclick={(event) => onImageClick(event)}>
-                <img
-                bind:this={imageRequireProcessing}
-                src={shareCard.thumbnailMediaId.id}
-                class="should-process"/>
+            <div class="media">
+              <img bind:this={imageProcessor.imageRequireProcessing} src={shareCard.thumbnailMediaId.id} class="should-process"/>
             </div>
           {:else}
             <div class="media">
