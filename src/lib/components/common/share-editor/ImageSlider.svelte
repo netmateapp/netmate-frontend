@@ -27,7 +27,6 @@
     }
 
   // スライド関連
-  let slideCount = $derived(imagesPaths.length);
   let slidesRefs: HTMLElement[] = [];
   let isDragging = false;
   let startPos = 0;
@@ -51,7 +50,7 @@
 
     const movedBy = currentTranslate - prevTranslate;
 
-    if (movedBy < -100 && currentIndex < slideCount - 1) {
+    if (movedBy < -100 && currentIndex < imagesPaths.length - 1) {
       currentIndex += 1;
     }
 
