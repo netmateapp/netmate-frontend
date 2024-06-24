@@ -4,7 +4,7 @@ import type { Uuid7 } from "$lib/uuid";
 import type { Finalizer, LifeCycle } from "../extension/lifeCycle";
 import type { Reactive, Reactivity } from "../extension/reactivity";
 import type { UnixTimeMillis } from "../primitive/unixtime";
-import type { HandleId } from "./handle";
+import type { Handle, HandleId } from "./handle";
 import type { Rating } from "./vote";
 
 export type ShareId = Uuid7;
@@ -153,7 +153,7 @@ export type SessionMediaId = NetmateImageId[] | SoundCloudTrackId | YouTubeVideo
 // セッションに表示するための共有データ
 export class SessionShareData {
   public readonly id: ShareId;
-  public readonly sharerId: HandleId;
+  public readonly sharer: Handle;
   public readonly timestamp: Timestamp;
   public readonly rating: Option<Rating>;
   public readonly title: Option<Title>;
@@ -163,7 +163,7 @@ export class SessionShareData {
 
   constructor(
     id: ShareId,
-    sharerId: HandleId,
+    sharer: Handle,
     timestamp: Timestamp,
     rating: Option<Rating>,
     title?: Option<Title>,
@@ -174,7 +174,7 @@ export class SessionShareData {
     if (!SessionShareData.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
 
     this.id = id;
-    this.sharerId = sharerId;
+    this.sharer = sharer;
     this.timestamp = timestamp;
     this.rating = rating;
     this.title = title;
@@ -189,7 +189,7 @@ export class SessionShareData {
   }
 
   isSharer(id: HandleId): boolean {
-    return this.sharerId.asHexadecimalRepresentation() === id.asHexadecimalRepresentation();
+    return this.sharer.id.asHexadecimalRepresentation() === id.asHexadecimalRepresentation();
   }
 
   hasImage(): boolean {
@@ -229,7 +229,7 @@ export class ReactiveShareData implements Reactivity<SessionShareData> {
     this.shareData = ReactiveShareData.constructShareData({ ...this.shareData, ...updates });
   }
 
-  private static constructShareData({ id, sharerId, timestamp, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage }: ShareDataFields): SessionShareData {
+  private static constructShareData({ id, sharer: sharerId, timestamp, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage }: ShareDataFields): SessionShareData {
     return new SessionShareData(id, sharerId, timestamp, rating, title, text, thumbnailMediaId, shouldProcessThumbnailImage);
   }
 }
