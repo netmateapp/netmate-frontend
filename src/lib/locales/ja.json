@@ -144,6 +144,9 @@
       "rate-highly": "高く評価する",
       "rate": "評価する",
       "rate-lowly": "低く評価する"
+    },
+    "session": {
+      "show-hidden-shares": "{ unit, select, one {――共有を表示する} other {――{startNumber}-{endNumber}の共有を表示する} }"
     }
   }
 }
