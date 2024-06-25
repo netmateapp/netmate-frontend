@@ -1,9 +1,71 @@
 import { map, type Option } from "$lib/option";
-import { ConversationsCount, NetmateImageId, Timestamp, Title, type MediaId } from "$lib/scripts/domain/share";
+import { ConversationsCount, NetmateImageId, SessionShareData, SoundCloudTrackId, Text, Timestamp, Title, YouTubeVideoId, type MediaId, type SessionMediaId } from "$lib/scripts/domain/share";
 import { LeadSenetences, ShareCard } from "$lib/scripts/domain/shareCard";
 import { Tag, TagName } from "$lib/scripts/domain/tag";
 import { UnixTimeMillis } from "$lib/scripts/primitive/unixtime";
 import { genTestUuid4, genTestUuid7 } from "$lib/uuid";
+import { HandleName, Handle } from "./handle";
+import { Rating } from "./vote";
+
+export function generateMockSessionShareData(): SessionShareData {
+  const title = generateTestTitle();
+  let text = generateTestText();
+  const mediaId = generateTestSessionMediaId();
+  if (title === undefined && text === undefined && mediaId === undefined) {
+    text = new Text(TEST_TEXTS[getRandomInt(TEST_TEXTS.length)]);
+  }
+
+  return new SessionShareData(
+    genTestUuid7(),
+    generateTestHandle(),
+    generateTestTimestamp(),
+    generateTestRating(),
+    title,
+    text,
+    mediaId,
+    mediaId !== undefined && !(mediaId instanceof SoundCloudTrackId) && !(mediaId instanceof YouTubeVideoId) ? getRandomInt(5) === 0 : false,
+    getRandomInt(5) === 0
+  )
+}
+
+const HANDLE_NAMES: string[] = [
+  "のどっち",
+  "はらむらのどか",
+  "ハルヒ",
+  "A-chan",
+  "涼宮"
+];
+
+function generateTestHandle(): Handle {
+  return new Handle(genTestUuid4(), new HandleName(HANDLE_NAMES[getRandomInt(HANDLE_NAMES.length)]));
+}
+
+const RATINGS = [
+  Rating.HighRating,
+  Rating.Rating,
+  Rating.LowRating,
+  undefined
+];
+
+function generateTestRating(): Option<Rating> {
+  return RATINGS[getRandomInt(RATINGS.length)];
+}
+
+function generateTestText(): Option<Text> {
+  const text: Option<string> = pickUpValueOrUndefinedAtRandom(5, TEST_TEXTS);
+  return map(text, t => new Text(t));
+}
+
+function generateTestSessionMediaId(): Option<SessionMediaId> {
+  const has = getRandomInt(5) < 2;
+  if (!has) return undefined;
+
+  const count = getRandomInt(4) + 1;
+  const array: NetmateImageId[] = [];
+  for (let i = 0; i < count; i++) array.push(NETMATE_IMAGE_IDS[getRandomInt(NETMATE_IMAGE_IDS.length)]);
+
+  return array;
+}
 
 export function generateMockShareCards(): ShareCard {
   const title = generateTestTitle();

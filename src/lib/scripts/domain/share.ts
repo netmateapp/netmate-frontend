@@ -160,6 +160,7 @@ export class SessionShareData {
   public readonly text: Option<Text>;
   public readonly thumbnailMediaId: Option<SessionMediaId>;
   public readonly shouldProcessThumbnailImage: boolean;
+  public readonly shouldHide: boolean;
 
   constructor(
     id: ShareId,
@@ -170,6 +171,7 @@ export class SessionShareData {
     text?: Option<Text>,
     thumbnailMediaId?: Option<SessionMediaId>,
     shouldProcessThumbnailImage: boolean = false,
+    shouldHide: boolean = false
   ) {
     if (!SessionShareData.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
 
@@ -181,6 +183,7 @@ export class SessionShareData {
     this.text = text;
     this.thumbnailMediaId = thumbnailMediaId;
     this.shouldProcessThumbnailImage = shouldProcessThumbnailImage;
+    this.shouldHide = shouldHide;
   }
 
   private static isValid(thumbnailMediaId: Option<SessionMediaId>, shouldProcessThumbnailImage: boolean) {
