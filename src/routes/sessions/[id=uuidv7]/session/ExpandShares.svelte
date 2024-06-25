@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { SessionShareData } from "$lib/scripts/domain/session";
   import { makeKeydownHandler } from "$lib/utils.svelte";
   import { _, HiddenShares } from "./session.svelte";
   import SessionShare from "./SessionShare.svelte";
@@ -18,12 +17,12 @@
 </script>
 
 {#if isExpanded}
-  {#each shares.shares as share (share.id.asHexadecimalRepresentation())}
+  {#each shares.shares as share}
     <SessionShare {share} />
   {/each}
 {:else}
   <div class="button" onclick={() => onClick()} onkeydown={makeKeydownHandler(() => onClick())}>
-    <span class="label">{_(`show-hidden-shares`, { sharesCount: shares.length })}</span>
+    <span class="label">{_(`show-hidden-shares`, { sharesCount: shares.shares.length })}</span>
   </div>
 {/if}
 
