@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ReactiveShareData } from "$lib/scripts/domain/share";
-
+  import type { ReactiveShareData } from "$lib/scripts/domain/session";
+  
   type Props = {
     share: ReactiveShareData;
   };

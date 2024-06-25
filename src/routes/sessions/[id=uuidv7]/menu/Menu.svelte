@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { ReactiveShareData } from "$lib/scripts/domain/share";
+  import type { ReactiveShareData } from "$lib/scripts/domain/session";
   import RatingButtons from "./RatingButtons.svelte";
   import ShareInformation from "./ShareInformation.svelte";
-    import TagList from "./TagList.svelte";
-    import { ReactiveShareTags } from "./menu.svelte";
+  import TagList from "./TagList.svelte";
+  import { ReactiveShareTags } from "./menu.svelte";
 
   type Props = {
     share: ReactiveShareData;

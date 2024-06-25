@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ReactiveShareData } from "$lib/scripts/domain/share";
+  import type { ReactiveShareData } from "$lib/scripts/domain/session";
   import { Rating } from "$lib/scripts/domain/vote";
   import { makeKeydownHandler } from "$lib/utils.svelte";
   import { _ } from "./menu.svelte";
