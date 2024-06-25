@@ -146,7 +146,8 @@
       "rate-lowly": "低く評価する"
     },
     "session": {
-      "show-hidden-shares": "{ unit, select, one {――共有を表示する} other {――{startNumber}-{endNumber}の共有を表示する} }"
+      "show-hidden-shares": "――{sharesCount}件の共有を表示する",
+      "deleted-shares-log": "――{sharesCount}件の共有が削除されました"
     }
   }
 }
