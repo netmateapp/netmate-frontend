@@ -1,5 +1,6 @@
 import { map, type Option } from "$lib/option";
-import { ConversationsCount, NetmateImageId, SessionShareData, SoundCloudTrackId, Text, Timestamp, Title, YouTubeVideoId, type MediaId, type SessionMediaId } from "$lib/scripts/domain/share";
+import { ConversationsCount, NetmateImageId, SoundCloudTrackId, Text, Timestamp, Title, YouTubeVideoId, type MediaId } from "$lib/scripts/domain/share";
+import { SessionShareData, type SessionMediaId } from "./session";
 import { LeadSenetences, ShareCard } from "$lib/scripts/domain/shareCard";
 import { Tag, TagName } from "$lib/scripts/domain/tag";
 import { UnixTimeMillis } from "$lib/scripts/primitive/unixtime";
