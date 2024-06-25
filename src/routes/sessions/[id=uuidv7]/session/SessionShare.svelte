@@ -1,13 +1,13 @@
 <script lang="ts">
   import { ImageSliderController } from "$lib/scripts/domain/imageSlide.svelte";
-  import { ImageProcessor, NetmateImageId, SoundCloudTrackId, YouTubeVideoId, elapsedTime, type SessionShareData } from "$lib/scripts/domain/share";
+  import { type SessionShareData } from "$lib/scripts/domain/session";
+  import { elapsedTime, ImageProcessor, NetmateImageId, SoundCloudTrackId, YouTubeVideoId } from "$lib/scripts/domain/share";
 
   type Props = {
-    number: number,
     share: SessionShareData;
   };
 
-  let { number, share }: Props = $props();
+  let { share }: Props = $props();
 
   // 画像を持つ場合の関連処理
   const imageProcessor = new ImageProcessor(false);
@@ -86,7 +86,6 @@
       {/if}
     {/if}
     <div class="footer">
-      <span class="number">{number}</span>
       <div class="footer-right">
         <span class="handle">{share.sharer.name.name}</span>
         <span class="dot-separator">·</span>
@@ -189,16 +188,9 @@
 
   .footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     align-self: stretch;
-  }
-
-  .number {
-    color: var(--dark-gray);
-    font-family: Roboto;
-    font-size: 0.9375rem;
-    line-height: 1.375rem;
   }
 
   .footer-right {
