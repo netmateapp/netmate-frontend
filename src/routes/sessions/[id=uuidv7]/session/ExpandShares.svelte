@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { SessionShareData } from "$lib/scripts/domain/session";
   import { makeKeydownHandler } from "$lib/utils.svelte";
-  import { _ } from "./session.svelte";
+  import { _, HiddenShares } from "./session.svelte";
   import SessionShare from "./SessionShare.svelte";
 
   type Props = {
-    shares: SessionShareData[];
+    shares: HiddenShares;
   };
 
   let { shares }: Props = $props();
@@ -18,7 +18,7 @@
 </script>
 
 {#if isExpanded}
-  {#each shares as share (share.id.asHexadecimalRepresentation())}
+  {#each shares.shares as share (share.id.asHexadecimalRepresentation())}
     <SessionShare {share} />
   {/each}
 {:else}
