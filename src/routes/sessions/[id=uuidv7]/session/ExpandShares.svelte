@@ -1,35 +1,29 @@
 <script lang="ts">
-  import type { SessionShareData } from "$lib/scripts/domain/share";
+  import type { SessionShareData } from "$lib/scripts/domain/session";
   import { makeKeydownHandler } from "$lib/utils.svelte";
   import { _ } from "./session.svelte";
   import SessionShare from "./SessionShare.svelte";
 
   type Props = {
-    indexStart: number;
     shares: SessionShareData[];
   };
 
-  let { indexStart, shares }: Props = $props();
+  let { shares }: Props = $props();
 
   let isExpanded: boolean = $state(false);
 
   function onClick() {
     isExpanded = true;
   }
-
-  function translationKey(): { unit: string } | { unit: string, startNumber: number, endNumber: number } {
-    if (shares.length === 1) return { unit: "one" };
-    else return { unit: "more", startNumber: indexStart, endNumber: indexStart + shares.length - 1 };
-  }
 </script>
 
 {#if isExpanded}
-  {#each shares as share, index (share.id.asHexadecimalRepresentation())}
-    <SessionShare number={indexStart + index} {share} />
+  {#each shares as share (share.id.asHexadecimalRepresentation())}
+    <SessionShare {share} />
   {/each}
 {:else}
   <div class="button" onclick={() => onClick()} onkeydown={makeKeydownHandler(() => onClick())}>
-    <span class="label">{_(`show-hidden-shares`, translationKey())}</span>
+    <span class="label">{_(`show-hidden-shares`, { sharesCount: shares.length })}</span>
   </div>
 {/if}
 
