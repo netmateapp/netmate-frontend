@@ -55,10 +55,6 @@ export class ShareCard {
     return hasImageThumbnail ? true : !shouldProcessThumbnailImage;
   }
 
-  isSharer(id: HandleId): boolean {
-    return this.sharerId.asHexadecimalRepresentation() === id.asHexadecimalRepresentation();
-  }
-
   hasImage(): boolean {
     return this.thumbnailMediaId instanceof NetmateImageId;
   }
