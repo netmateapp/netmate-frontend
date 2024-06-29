@@ -20,7 +20,6 @@ export class LeadSenetences {
 
 export class ShareCard {
   public readonly id: ShareId;
-  public readonly sharerId: HandleId;
   public readonly timestamp: Timestamp;
   public readonly conversationsCount: ConversationsCount;
   public readonly title: Option<Title>;
@@ -30,7 +29,6 @@ export class ShareCard {
 
   constructor(
     id: ShareId,
-    sharerId: HandleId,
     timestamp: Timestamp,
     conversationsCount: ConversationsCount,
     title?: Option<Title>,
@@ -41,7 +39,6 @@ export class ShareCard {
     if (!ShareCard.isValid(thumbnailMediaId, shouldProcessThumbnailImage)) throw new Error(`A shouldProcessThumbnailImage cannot be set to true unless a thumbnail media is an image.`);
 
     this.id = id;
-    this.sharerId = sharerId;
     this.timestamp = timestamp;
     this.conversationsCount = conversationsCount;
     this.title = title;

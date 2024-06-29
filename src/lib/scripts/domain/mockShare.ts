@@ -78,7 +78,6 @@ export function generateMockShareCards(): ShareCard {
 
   return new ShareCard(
     genTestUuid7(),
-    genTestUuid4(),
     generateTestTimestamp(),
     generateTestConversationsCount(),
     title,
