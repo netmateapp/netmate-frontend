@@ -23,7 +23,7 @@
 </script>
 
 <a
-  href="https://netmate.app/shares/{shareCard.sharerId.asHexadecimalRepresentation()}"
+  href="https://netmate.app/shares/{shareCard.id.asHexadecimalRepresentation()}"
   class="share"
 >
   <div class="content">
