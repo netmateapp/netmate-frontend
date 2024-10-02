@@ -93,11 +93,49 @@ export function register(
   return removeListener;
 }
 
+// デバッグ用だが、本番で使える
+function flattenLexicalJson(node: any): string {
+  let result = '';
+
+  if (node.root) {
+    result += flattenLexicalJson(node.root);
+  }
+
+  if (node.type === 'text') {
+    result += node.text;
+  }
+
+  if (node.type === 'linebreak') {
+    result += '\n';
+  }
+
+  if (node.type === "image-slider") {
+    result += node.slide.imagesPaths.map((imagePath: any) => imagePath.id).join('\n') + '\n';
+  }
+
+  console.log(node.children);
+  console.log(Array.isArray(node.children));
+
+  if (node.children && Array.isArray(node.children)) {
+    for (const child of node.children) {
+      result += flattenLexicalJson(child);
+    }
+  }
+
+  return result;
+}
+
 // 改行と改段落の統一
 function registerEnterListener(editor: LexicalEditor) {
   return editor.registerCommand<KeyboardEvent | null>(
     KEY_ENTER_COMMAND,
     (event) => {
+      // デバッグ用
+      editor.getEditorState().read(() => {
+        console.log(flattenLexicalJson(editor.getEditorState().toJSON()));  
+      });
+      // デバッグ用ここまで
+
       const selection = getSelection();
       if (!isRangeSelection(selection)) {
         return false;

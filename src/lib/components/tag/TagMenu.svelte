@@ -17,14 +17,25 @@
   let tabs = $state() as SvelteComponent;
 
   function generateTestTags(): Relationship[] {
-    const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "アロナ", "シッテムの箱","夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
-    
+    //const tagsNames = ["早瀬ユウカ", "早瀬ユウカイラスト", "陸八魔アル", "一之瀬アスナ", "天雨アコ", "アロナ", "シッテムの箱","夏の特殊作戦！RABBIT小隊と消えたエビの謎", "古関ウイ", "羽川ハスミ", "空崎ヒナ"];
+    const tagsNames = [
+      "タグサンプル",
+      "イラスト",
+      "写真",
+      "プログラミング",
+      "秋",
+      "量子コンピューター",
+      "アニメ",
+      "長い文字列サンプル長い文字列サンプル長い文字列サンプル",
+      "雑談"
+    ];
+
     const relationships: Relationship[] = [];
     for (var tagName of tagsNames) {
       const tag = new FullyQualifiedTag(
         Uuid4.of("5ca36600-53dc-402b-8bee-0c6f1680b6fd")!,
         new TagName(tagName),
-        Math.floor(Math.random() * 10) > 0 ? undefined : new TagName("ブルーアーカイブ")
+        Math.floor(Math.random() * 10) > 0 ? undefined : new TagName("曖昧さ回避")
       );
 
       const isStabilized = Math.floor(Math.random() * 7) > 0;

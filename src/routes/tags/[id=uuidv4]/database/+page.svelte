@@ -5,13 +5,13 @@
   import TagMenu from "$lib/components/tag/TagMenu.svelte";
 </script>
 
-<title>{"ブルーアーカイブ"}</title>
+<title>{"ネットメイト"}</title>
 
 <Header />
 <SharesList />
 
 <div class="side-bar">
-  <LocationDisplay locationName={"ブルーアーカイブ"} isSpace={false} />
+  <LocationDisplay locationName={"ネットメイト"} isSpace={false} />
   <TagMenu isSpace={false} />
 </div>
 

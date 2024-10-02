@@ -24,8 +24,8 @@
   function handles(): Handle[] {
     return [
       new Handle(14324, "--temp-anonymous", 341),
-      new Handle(12434, "はらむらのどか", 543),
-      new Handle(7373748, "のどっち", 2849),
+      new Handle(12434, "ななし", 543),
+      new Handle(7373748, "江戸川乱歩", 2849),
     ];
   }
 

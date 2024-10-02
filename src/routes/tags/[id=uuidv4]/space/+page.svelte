@@ -40,7 +40,17 @@
   // スペース関連
   let { data }: { data: PageServerData } = $props();
 
-  let mockTagNames = ["早瀬ユウカ", "陸八魔アル", "空崎ヒナ"];
+  let mockTagNames = [
+    "タグサンプル",
+    "イラスト",
+    "写真",
+    "プログラミング",
+    "秋",
+    "量子コンピューター",
+    "アニメ",
+    "長い文字列サンプル長い文字列サンプル長い文字列サンプル",
+    "雑談"
+  ];
   let mockTagNamesPointer = 0;
 
   let tag = $derived(
