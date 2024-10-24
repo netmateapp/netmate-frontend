@@ -30,11 +30,11 @@ export function generateMockSessionShareData(): SessionShareData {
 }
 
 const HANDLE_NAMES: string[] = [
-  "ななし",
-  "サンプルテキスト",
-  "江戸川乱歩",
-  "二十面相",
-  "長い文字列サンプル長い文字列サンプル"
+  "名義A",
+  "名義B",
+  "名義C",
+  "名義D",
+  "名義E",
 ];
 
 function generateTestHandle(): Handle {
@@ -97,9 +97,7 @@ function pickUpValueOrUndefinedAtRandom<T>(undefinedCount: number, values: T[]):
 }
 
 const TEST_TITLES: string[] = [
-  "タイトルサンプル",
-  "秋の空はなぜ高いのか",
-  "イラスト描いたよ"
+  "タイトル",
 ];
 
 function generateTestTitle(): Option<Title> {
@@ -108,15 +106,10 @@ function generateTestTitle(): Option<Title> {
 }
 
 const TEST_TEXTS: string[] = [
-  "秋らしい空になってきた",
-  "2段テキストサンプル\n2行目",
-  "描いてみた\nどうかな？",
-  "気温は夏なのに外は秋の匂いがする",
-  "絵文字テキストサンプル🐉",
-  "これらを仮定すれば、applyComposition は\n\n(fbc ＊ (fab ＊ fa)).map { (bc, (ab, a)) => bc(ab(a)) }\n = ((fbc ＊ fab) ＊ fa).map { ((bc, ab), a) => bc(ab(a)) }\n\nと等価",
-  "これに対するアプローチはいくつか存在しますが、その中でもある程度根本的に問題に対処するために必要なのが「量子誤り訂正」です。量子誤り訂正の基本的なアプローチは、複数の量子ビットが分散して一つの量子ビットの情報を持つことで、ノイズで少し情報が破損しても残りから情報を復元できるようにする、というものです。",
-  "長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル長文テキストサンプル",
-  "すべてが一気に実現するわけではありませんが、近い将来、AI なしではできなかったことをはるかに多く達成するのに役立つ AI を活用できるようになります。最終的には、私たち一人ひとりが、さまざまな分野の仮想専門家で構成されたパーソナル AI チームを持ち、協力して想像できるほぼすべてのものを作成できるようになります。子どもたちには、あらゆる科目、あらゆる言語、必要なペースで個別の指導を提供できる仮想家庭教師が付きます。同様のアイデアにより、より優れた医療、想像できるあらゆる種類のソフトウェアを作成できる能力などが実現するでしょう。",
+  "第一毛をもって装飾されべきはずの顔がつるつるしてまるで薬缶だ。その後猫にもだいぶ逢ったがこんな片輪には一度も出会わした事がない。のみならず顔の真中があまりに突起している。そうしてその穴の中から時々ぷうぷうと煙を吹く。どうも咽せぽくて実に弱った。これが人間の飲む煙草というものである事はようやくこの頃知った。",
+  "ふと気が付いて見ると書生はいない。たくさんおった兄弟が一疋も見えぬ。肝心の母親さえ姿を隠してしまった。その上今までの所とは違って無暗に明るい。眼を明いていられぬくらいだ。はてな何でも容子がおかしいと、のそのそ這い出して見ると非常に痛い。吾輩は藁の上から急に笹原の中へ棄てられたのである。",
+  "この書生の掌の裏でしばらくはよい心持に坐っておったが、しばらくすると非常な速力で運転し始めた。書生が動くのか自分だけが動くのか分らないが無暗に眼が廻る。胸が悪くなる。到底助からないと思っていると、どさりと音がして眼から火が出た。それまでは記憶しているがあとは何の事やらいくら考え出そうとしても分らない。",
+  "吾輩は猫である。名前はまだ無い。\nどこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。しかもあとで聞くとそれは書生という人間中で一番獰悪な種族であったそうだ。この書生というのは時々我々を捕て煮て食うという話である。しかしその当時は何という考もなかったから別段恐しいとも思わなかった。ただ彼の掌に載せられてスーと持ち上げられた時何だかフワフワした感じがあったばかりである。掌の上で少し落ちついて書生の顔を見たのがいわゆる人間というものの見始であろう。この時妙なものだと思った感じが今でも残っている。",
 ];
 
 function generateTestLeadSentences(): Option<LeadSenetences> {
@@ -125,17 +118,11 @@ function generateTestLeadSentences(): Option<LeadSenetences> {
 }
 
 const NETMATE_IMAGE_IDS = [
-  new NetmateImageId("/src/lib/assets/test/sampleimage1.jpg"),
-  new NetmateImageId("/src/lib/assets/test/sampleimage2.jpg"),
-  new NetmateImageId("/src/lib/assets/test/sampleimage3.jpg"),
-  new NetmateImageId("/src/lib/assets/test/sampleimage4.jpg"),
-  new NetmateImageId("/src/lib/assets/test/sampleimage5.jpg"),
-  new NetmateImageId("/src/lib/assets/test/sampleimage6.jpg"),
-  new NetmateImageId("/src/lib/assets/test/sampleimage7.jpg")
+  new NetmateImageId("/src/lib/assets/test/sample.png"),
 ];
 
 function generateTestMediaId(): Option<MediaId> {
-  return pickUpValueOrUndefinedAtRandom(15, NETMATE_IMAGE_IDS);
+  return pickUpValueOrUndefinedAtRandom(3, NETMATE_IMAGE_IDS);
 }
 
 function generateTestConversationsCount(): ConversationsCount {
@@ -152,15 +139,14 @@ export function generateTestTag(): Tag {
 }
 
 const TAG_NAMES: string[] = [
-  "タグサンプル",
-  "イラスト",
-  "写真",
-  "プログラミング",
-  "秋",
-  "量子コンピューター",
-  "アニメ",
-  "長い文字列サンプル長い文字列サンプル長い文字列サンプル",
-  "雑談"
+  "子タグA",
+  "子タグB",
+  "子タグC",
+  "子タグD",
+  "子タグE",
+  "子タグF",
+  "子タグG",
+  "子タグH",
 ];
 
 function generateTestTagName(): TagName {

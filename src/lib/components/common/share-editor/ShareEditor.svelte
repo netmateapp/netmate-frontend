@@ -222,7 +222,7 @@
   }
 
   function lastUsedHandle(): string {
-    return "はらむらのどか";
+    return "名義A";
   }
 
   function onSelectHandle(handleId: string) {
